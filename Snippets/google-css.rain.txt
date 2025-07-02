@@ -1,0 +1,388 @@
+{% set google_font = 'fonts/' ~ google_font_family | lower |
+replace(' ', '-') %}
+{% if google_font_family in ['Alegreya','Alegreya SC','Alegreya Sans','Alegreya Sans SC','Alice','Andika','Arimo','Bitter','Black Ops One','Comfortaa','Cousine','Cuprum','Didact Gothic','EB Garamond','Exo 2','Forum','Fruktur','Gabriela','Istok Web','Jura','Lobster','Lora','Merriweather','Merriweather Sans','Montserrat','Montserrat Alternates','Noto Sans','Noto Serif','Nunito','Old Standard TT','Open Sans','Oranienbaum','Oswald','PT Mono','PT Sans','PT Sans Caption','PT Sans Narrow','PT Serif','PT Serif Caption','Pacifico','Philosopher','Play','Podkova','Prata','Press Start 2P','Raleway','Roboto','Roboto Condensed','Roboto Slab','Scada','Source Code Pro','Source Sans Pro','Tinos','Ubuntu','Ubuntu Condensed','Ubuntu Mono','Vollkorn','Yeseva One'] %}
+/* cyrillic-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-cyrillic-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-cyrillic-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-cyrillic-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF,
+U+A640-A69F, U+FE2E-FE2F;
+}
+{% endif %}
+{% if google_font_family in ['Alegreya','Alegreya SC','Alegreya Sans','Alegreya Sans SC','Alice','Amatic SC','Andika','Anonymous Pro','Arimo','Bad Script','Bitter','Comfortaa','Cousine','Cuprum','Didact Gothic','EB Garamond','Exo 2','Forum','Gabriela','Istok Web','Jura','Kelly Slab','Ledger','Lobster','Lora','Marck Script','Marmelad','Merriweather','Montserrat','Montserrat Alternates','Neucha','Noto Sans','Noto Serif','Nunito','Old Standard TT','Open Sans','Oranienbaum','Oswald','PT Mono','PT Sans','PT Sans Caption','PT Sans Narrow','PT Serif','PT Serif Caption','Pacifico','Philosopher','Play','Playfair Display','Playfair Display SC','Podkova','Poiret One','Prata','Press Start 2P','Prosto One','Raleway','Roboto','Roboto Condensed','Roboto Slab','Ruda','Ruslan Display','Scada','Seymour One','Source Code Pro','Source Sans Pro','Stalinist One','Tenor Sans','Tinos','Ubuntu','Ubuntu Condensed','Ubuntu Mono','Underdog','Vollkorn','Yanone Kaffeesatz','Yeseva One'] %}
+/* cyrillic */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-cyrillic.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1,
+U+2116;
+}
+/* cyrillic */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-cyrillic.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1,
+U+2116;
+}
+/* cyrillic */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-cyrillic.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1,
+U+2116;
+}
+{% endif %}
+{% if google_font_family in ['Alegreya','Alegreya SC','Alegreya Sans','Alegreya Sans SC','Arimo','Cardo','Caudex','Cousine','Didact Gothic','EB Garamond','Jura','Noto Sans','Noto Serif','Open Sans','Roboto','Roboto Condensed','Roboto Slab','Source Code Pro','Source Sans Pro','Tinos','Ubuntu','Ubuntu Condensed','Ubuntu Mono'] %}
+/* greek-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-greek-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+1F00-1FFF;
+}
+/* greek-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-greek-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+1F00-1FFF;
+}
+/* greek-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-greek-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+1F00-1FFF;
+}
+{% endif %}
+{% if google_font_family in ['Alegreya','Alegreya SC','Alegreya Sans','Alegreya Sans SC','Anonymous Pro','Arimo','Cardo','Caudex','Comfortaa','Cousine','Didact Gothic','EB Garamond','GFS Didot','GFS Neohellenic','Jura','Noto Sans','Noto Serif','Nova Mono','Open Sans','Play','Press Start 2P','Roboto','Roboto Condensed','Roboto Slab','Source Code Pro','Source Sans Pro','Tinos','Ubuntu','Ubuntu Condensed','Ubuntu Mono','Vollkorn'] %}
+/* greek */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-greek.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0370-03FF;
+}
+/* greek */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-greek.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0370-03FF;
+}
+/* greek */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-greek.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0370-03FF;
+}
+{% endif %}
+{% if google_font_family in ['Alef','Amatic SC','Arimo','Cousine','Open Sans','Tinos','Varela Round'] %}
+/* hebrew */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-hebrew.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC,
+U+FB1D-FB4F;
+}
+/* hebrew */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-hebrew.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC,
+U+FB1D-FB4F;
+}
+/* hebrew */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-hebrew.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0590-05FF, U+200C-2010, U+20AA, U+25CC,
+U+FB1D-FB4F;
+}
+{% endif %}
+{% if google_font_family in ['Alegreya','Alegreya SC','Alegreya Sans','Alegreya Sans SC','Alex Brush','Alfa Slab One','Allura','Amatic SC','Andika','Anton','Archivo Narrow','Arimo','Arizonia','Asap','Bangers','Bevan','Bilbo','Bitter', 'Black Ops One','Cabin','Cabin Condensed','Comfortaa','Cousine','Crimson Text','Cuprum','Dancing Script','Dosis','EB Garamond','Exo','Exo 2','Francois One','Fruktur','Great Vibes','Inconsolata','Italianno','Josefin Sans','Judson','Jura','Lobster','Lora','Lovers Quarrel','Maven Pro','Merriweather','Merriweather Sans','Metrophobic','Monda','Montserrat','Montserrat Alternates','Muli','Noticia Text','Noto Sans','Noto Serif','Nunito','Old Standard TT','Open Sans','Oswald','Pacifico','Patrick Hand','Patrick Hand SC','Paytone One','Petrona','Philosopher','Pinyon Script','Play','Playball','Playfair Display','Playfair Display SC','Podkova','Prata','Questrial','Quicksand','Qwigley','Raleway','Ro boto','Roboto Condensed','Roboto Slab','Rokkitt','Rosario','Ruda','Ruge Boogie','Ruthie','Sigmar One','Signika','Signika Negative','Source Code Pro','Source Sans Pro','Tinos','VT323','Varela Round','Vollkorn','Yanone Kaffeesatz','Yeseva One'] %}
+/* vietnamese */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-vietnamese.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* vietnamese */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-vietnamese.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+/* vietnamese */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-vietnamese.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169,
+U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+}
+{% endif %}
+{% if google_font_family not in ['Abel','Aclonica','Acme','Actor','Adamina','Aldrich','Alef','Alike', 'Alike Angular','Allerta','Allerta Stencil','Almendra SC','Amaranth','Amethysta','Angkor','Annie Use Your Telescope','Antic','Antic Didone','Antic Slab','Arapey','Architects Daughter','Artifika','Arvo','Asset','Astloch','Asul','Atomic Age','Aubrey','Averia Libre','Averia Sans Libre','Averia Serif Libre','Bad Script','Balthazar','Battambang','Baumans','Bayon','Belgrano','Bentha m','Bigshot One','Bokor','Bonbon','Boogaloo','Bowlby One','Brawler','Buda','Cabin Sketch','Cagliostro','Calligraffitti','Cambo','Candal','Cantarell','C arme','Carrois Gothic','Carrois Gothic SC','Carter One','Cedarville Cursive','Changa One','Chenla Cherry Cream Soda','Chewy','Cinzel Decorative','Coda Caption','Coming Soon','Content','Contrail One','Cookie','Copse','Coustard','Covered By Your Grace','Crafty Girls','Creepster','Crushed','Damion','Dangrek','Dawning of a New Day','Days One','Delius','Delius Swash Caps','Delius Unicase','Della Respira','Dorsa','Droid Sans','Droid Sans Mono','Droid Serif','Electrolize','Engagement','Fanwood Text','Fascinate','Fascinate Inline','Faster One','Fasthand','Federant','Federo','Finger Paint','Fjord One','Flamenco','Fontdiner Swanky','Fredoka One','Freehand','Frijole','Fugaz One','GFS Didot','GFS Neohellenic','Gabriela','Galdeano','Geo','Geostar','Geostar Fill','Germania One','Give You Glory','Gloria Hallelujah','Goblin One','Gochi Hand','Gorditas','Goudy Bookletter 1911','Graduate','Gravitas One','Handlee','Hanuman','One Henny Penny','Holtwood One SC','Homemade Apple','Homenaje','IM Fell DW Pica','IM Fell DW Pica SC','IM Fell Double Pica','IM Fell Double Pica SC','IM Fell English','IM Fell English SC','IM Fell French Canon','IM Fell French Canon SC','IM Fell Great Primer','IM Fell Great Primer SC','Iceberg','Iceland','Indie Flower','Irish Grover','Italiana','Jacques Francois','Jacques Francois Shadow','Josefin Slab','Julee','Junge','Just Another Hand','Kameron','Kantumruy','Kdam Thmor','Kenia','Khmer','Kite One','Koulen','Kranky','Kristi','La Belle Aurore','League Script','Leckerli One','Lemon','Linden Hill','Lobster Two','Londrina Outline','Londrina Shadow','Londrina Sketch','Londrina Solid','Love Ya Like A Sister','Loved by the King','Luckiest Guy','Lusitana','Lustria','Macondo','Macondo Swash Caps','Maiden Orange','Mako','Marko One','Marvel','Mate','Mate SC','Meddon','Medula One','Megrim','Merienda One','Metal','Michroma','Miltonian','Miltonian Tattoo','Miniver','Molle','Monofett','Monoton','Montaga','Montez','Mo ntserrat Subrayada','Moul','Moulpali','Mountains of Christmas','Neucha','Nixie One','Nokora','Nothing You Could Do','Nova Cut','Nova Flat','Nova Mono','Nova Oval','Nova Round','Nova Script','Nova Slim','Nova Square','Numans','Odor Mean Chey','Offside','Open Sans Condensed','Orbitron','Original Surfer','Over the Rainbow','Ovo','Patua One','Permanent Marker','Philosopher','Poller One','Poly','Pompiere','Port Lligat Sans','Port Lligat Slab','Prata','Preahvihear','Sofia Prociono','Puritan','Quantico','Rancho','Rationale','Redressed','Reen ie Beanie','Rochester','Rock Salt','Rouge Script','Salsa','Sansita One','Satisfy','Schoolbell','Shadows Into Light','Shanti','Share Tech','Share Tech Mono','Short Stack','Siemreap','Sirin Stencil','Six Caps','Slackey','Smokum','Smythe','Snippet','Sofadi One','Sofia','Special Elite','Spicy Rice','Spirax','Squada One','Stardos Stencil','Strait','Sue Ellen Francisco','Sunshiney','Supermercado One','Suwannaphum','Swanky and Moo Moo','Syncopate','Tangerine','Taprom','The Girl Next Door','Tienne','Trade Winds','Trochut','Tulpen One','Ultra','Uncial Antiqua','UnifrakturCook','UnifrakturMaguntia','Unkempt','Unlock','Va st Shadow','Vibur','Vidaloka','Volkhov','Voltaire','Waiting for the Sunrise','Wallpoet','Walter Turncoat','Wire One','Yellowtail','Yesteryear','Zeyada'] %}
+/* latin-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-latin-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020,
+U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-latin-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020,
+U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin-ext */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-latin-ext.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020,
+U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+{% endif %}
+{% if google_font_family not in ['Buda','Chenla Cherry Cream Soda','Coda Caption','Content','GFS Didot','GFS Neohellenic','One Henny Penny','Kantumruy','Kdam Thmor','Khmer','Molle','Open Sans Condensed','Sofia Prociono','Siemreap','UnifrakturCook'] %}
+/* latin */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-latin.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC,
+U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-latin.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC,
+U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* latin */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-latin.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC,
+U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
+U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+{% endif %}
+{% if google_font_family in ['Angkor','Battambang','Bayon','Bokor','Content','Dangrek','Fasthand' ,'Freehand','Hanuman','Kantumruy','Kdam Thmor','Khmer','Koulen','Metal','Moul','Moulpali','Nokora','Odor Mean Chey','Preahvihear','Siemreap','Suwannaphum','Taprom'] %}
+/* khmer */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-khmer.woff2') | url_core }})
+format('woff2');
+unicode-range: unicode-range: U+1780-17FF, U+200C, U+25CC;
+}
+/* khmer */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-khmer.woff2') | url_core }})
+format('woff2');
+unicode-range: U+1780-17FF, U+200C, U+25CC;
+}
+{% endif %}
+{% if google_font_family in ['Glegoo','Noto Sans'] %}
+/* devanagari */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-devanagari.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D,
+U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+/* devanagari */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-devanagari.woff2') | url_core }})
+format('woff2');
+unicode-range: U+0900-097F, U+1CD0-1CF6, U+1CF8-1CF9, U+200C-200D,
+U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FB;
+}
+{% endif %}
+{% if google_font_family in ['Jura'] %}
+/* kayah-li */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 300;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-kayah-li.woff2') | url_core }})
+format('woff2');
+unicode-range: U+200C-200D, U+2010, U+25CC, U+A900-A92F;
+}
+/* kayah-li */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 400;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-kayah-li.woff2') | url_core }})
+format('woff2');
+unicode-range: U+200C-200D, U+2010, U+25CC, U+A900-A92F;
+}
+/* kayah-li */
+@font-face {
+font-family: '{{ google_font_family }}';
+font-style: normal;
+font-weight: 600;
+font-stretch: 100%;
+font-display: swap;
+src: url({{ (google_font ~ '-kayah-li.woff2') | url_core }})
+format('woff2');
+unicode-range: U+200C-200D, U+2010, U+25CC, U+A900-A92F;
+}
+{% endif %}

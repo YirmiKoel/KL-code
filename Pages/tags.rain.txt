@@ -1,0 +1,22 @@
+<div class="container tags">
+  
+  <div class="row rowmargin">
+    <div class="col-md-12">
+      <h1 class="category-title">{{ 'Tags' | t }}</h1>
+    </div>
+  </div>
+  
+  <div class="row">
+    
+    <div class="col-md-12">
+      <div class="tagcloud">
+        {% for tag in shop.tags %}
+        <a href="{{ tag.url | url }}" title="{{ tag.title }}" class="tagcloud-tag">
+          {{ tag.title }} <span>({{ tag.count }})</span></a>
+        {% endfor %}
+      </div>
+    </div>
+    
+  </div>
+  
+</div>

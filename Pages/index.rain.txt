@@ -1,0 +1,109 @@
+{% set home_modules = {
+	1: (theme.home_module_1 == 'disabled' ? false : theme.home_module_1 ),
+	2: (theme.home_module_2 == 'disabled' ? false : theme.home_module_2 ),
+	3: (theme.home_module_3 == 'disabled' ? false : theme.home_module_3 ),
+	4: (theme.home_module_4 == 'disabled' ? false : theme.home_module_4 ),
+	5: (theme.home_module_5 == 'disabled' ? false : theme.home_module_5 ),
+	6: (theme.home_module_6 == 'disabled' ? false : theme.home_module_6 ),
+	7: (theme.home_module_7 == 'disabled' ? false : theme.home_module_7 ),
+	8: (theme.home_module_8 == 'disabled' ? false : theme.home_module_8 ),
+	9: (theme.home_module_9 == 'disabled' ? false : theme.home_module_9 ),
+	10: (theme.home_module_10 == 'disabled' ? false : theme.home_module_10 ),
+	11: (theme.home_module_11 == 'disabled' ? false : theme.home_module_11 ),
+	12: (theme.home_module_12 == 'disabled' ? false : theme.home_module_12 ),
+	13: (theme.home_module_13 == 'disabled' ? false : theme.home_module_13 ),
+	14: (theme.home_module_14 == 'disabled' ? false : theme.home_module_14 )
+} %}
+
+{% set active_modules = {} %}
+
+{% set modsWithSpacing = ['promo-a', 'promo-b'] %}
+
+{% set featuredOffset = 0 %}
+{% set featuredLimit = 8 %}
+
+{% if 'promo-a' in home_modules %}
+  {% set featuredOffset = featuredOffset + 1 %}
+  {% set featuredLimit = featuredLimit + 1 %}
+{% endif %}
+
+{% if 'promo-b' in home_modules %}
+  {% set featuredOffset = featuredOffset + 1 %}
+  {% set featuredLimit = featuredLimit + 1 %}
+{% endif %}
+
+{% set lastModuleGrayBg = false %}
+{% set lastModuleFullWidth = false %}
+{% set firstActiveModule = false %}
+
+{# keep track of true module/loop index #}
+{% set moduleIndex = 1 %}
+
+{% for home_module in home_modules %}
+  {% if home_module != false and home_module not in active_modules %}
+
+		{% set active_modules = active_modules | merge([home_module]) %}
+
+		{% if not firstActiveModule %}
+			{% set firstActiveModule = home_module %}
+		{% endif %}
+
+		{% set moduleClasses = '' %}
+		{% set moduleMarginTopClass = '' %}
+		{% set moduleGrayBg = theme['module_'~loop.index~'_gray'] %}
+		{% set nextModuleGrayBg = theme['module_'~(loop.index+1)~'_gray'] %}
+		{% set moduleFullWidth = (theme[home_module~'_fullwidth'] or theme['home_mod_'~home_module~'_fullwidth'] or theme['home'~home_module~'_full_width']) %}
+
+		{# if moduleGrayBg %}
+			{% set moduleMarginTopClass = (not lastModuleGrayBg) ? 'margin-top-double zzx' : '' %}
+		{% elseif nextModuleGrayBg and firstActiveModule != home_module%}
+			{% if lastModuleGrayBg %}
+				{% set moduleMarginTopClass = 'mt-5' %}
+      {% else %}
+				{% set moduleMarginTopClass = 'mt-4' %}
+      {% endif %}
+			{% set zz_moduleMarginTopClass = (not lastModuleGrayBg) ? 'margin-top-double zzy' : '' %}
+		{% else %}
+			{% set moduleMarginTopClass = 'margin-top' %}
+		{% endif #}
+
+		{% if (moduleFullWidth and lastModuleFullWidth) or (moduleGrayBg and lastModuleFullWidth) %}
+			{% set moduleMarginTopClass = 'mt-0' %}
+		{% elseif moduleGrayBg %}
+			{% set moduleMarginTopClass = 'mt-6 mb-6' %}
+		{% elseif home_module in modsWithSpacing or (home_module == 'banner' and moduleFullWidth)  %}
+			{% set moduleMarginTopClass = 'mt-6 mb-6' %}
+		{% elseif moduleIndex == 1 %}
+			{% set moduleMarginTopClass = 'mt-4' %}
+    {% else %}
+			{% set moduleMarginTopClass = 'mt-5' %}
+    {% endif %}
+
+		{# dont want margin on the first active module if it's full width #}
+		{# if firstActiveModule and moduleFullWidth %#}
+		{% if moduleIndex == 1 and moduleFullWidth %}
+			{% set moduleMarginTopClass = '' %}
+		{% endif %}
+
+		{% set moduleClasses = moduleClasses ~ ' home-module mod-' ~ home_module ~ ' ' ~ moduleMarginTopClass %}
+
+		{% if lastModuleGrayBg %}
+			{% set moduleClasses = moduleClasses ~ ' prev-gray-bg' %}
+		{% endif %}
+		{% if moduleGrayBg %}
+			{% set moduleClasses = moduleClasses ~ ' gray-bg container-bar' %}
+		{% endif %}
+		{% if moduleFullWidth %}
+			{% set moduleClasses = moduleClasses ~ ' full-width' %}
+		{% endif %}
+
+
+    <div class="{{ moduleClasses }}" data-mod-id="{{ loop.index }}">
+      {% include 'snippets/home-mod-' ~ home_module ~ '.rain' with {'gray_bg': moduleGrayBg, 'prev_module_gray_bg': lastModuleGrayBg, 'prev_module_fullwidth': lastModuleFullWidth, 'index': moduleIndex} %}
+    </div>
+
+		{% set moduleIndex = moduleIndex + 1 %}
+		{% set lastModuleGrayBg = moduleGrayBg %}
+		{% set lastModuleFullWidth = moduleFullWidth %}
+  {% endif %}
+{% endfor %}

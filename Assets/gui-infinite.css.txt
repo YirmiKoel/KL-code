@@ -1,0 +1,99 @@
+gui-progressbar.gui-fixed, .gui-checkout .gui-progressbar.gui-fixed{ z-index:1 !important; }
+.checkout .gui-margin-fix{display:none;}
+
+.gui-progressbar{background: #fff !important;}
+
+.gui-progressbar ul li.gui-active a,
+.gui-checkout .gui-progressbar ul li.gui-done a
+{
+  font-weight:400;
+}
+
+
+.gui-checkout .gui-progressbar ul li:first-child
+{
+  /*background-image:none !important;*/
+}
+
+.gui-checkout .gui-progressbar ul li.gui-done a span
+{
+  background-position: 1px -7px !important;
+}
+
+.gui-page-title, .gui-blog-article h1
+{
+  font-weight:400;
+  font-weight:300;
+  font-size:30px;
+}
+
+.gui a.gui-button-large, .gui a.gui-button-small, .gui-block, .gui-block.gui-closed .gui-block-title, .gui-block-option, .gui-block-option img.gui-border, .gui-block-option-block, .gui-block-title span, .gui-image, .gui-input, .gui-text, .gui-messages ul, .messages ul, .gui-number, .gui-popover, .gui-popover-bg, .gui-popover-content, .gui-popover-title a, .gui-select, .gui-table
+{
+  border-radius:0;
+}
+
+.gui.gui-blog p
+{
+  margin: 0 0 10px;
+  text-align:justify;
+}
+
+.gui-blog-article h1, .gui-blog-article h2, .gui-blog-article h3, .gui-blog-article h4, .gui-blog-article h5, .gui-blog-article h6
+{
+  margin-top:0;
+  margin-bottom:10px;
+}
+
+
+.gui-div-faq-questions .gui-content-title
+{
+  font-size: 1.3em;
+  margin-bottom: 15px;
+}
+
+.gui-div-faq-questions .gui-content-subtitle
+{
+  padding-bottom:10px;
+  margin-top:15px;
+  cursor:pointer;
+  font-size:0.9em;
+}
+
+.gui-div-faq-questions .gui-content-subtitle:after
+{
+  font-family: "FontAwesome";
+  content: "\f078";
+  float: right;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.gui-div-faq-questions .gui-content-subtitle.active:after {
+    content: "\f077";
+}
+
+.gui-div-faq-questions .gui-content-wysiwyg {
+    display: none;
+}
+
+
+.gui-block-title {
+    color: #444 !important;
+    background: #fafafa !important;
+    border: 0;
+    /*font-size: 0.9em;*/
+    padding: 14px;
+}
+
+.gui-block-title strong {
+    font-weight: normal;
+}
+
+.gui-block{ /*border:1px solid #eee !important;*/ border-color:#eee !important; }
+
+.gui-popover { position: fixed; left: 50%; top: 50%; width: 80%; max-width: 800px; }
+.gui-popover { -moz-transform: translate(-50%,-50%); -webkit-transform: translate(-50%,-50%); -o-transform: translate(-50%,-50%); -ms-transform: translate(-50%,-50%); transform: translate(-50%,-50%); }
+
+.gui-thankyou .gui-spacer {
+    display: block !important;
+}

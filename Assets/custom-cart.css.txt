@@ -1,0 +1,128 @@
+.gui-cart { max-width: 991px; margin-left: auto; margin-right: auto; }
+.gui-cart .gui-page-title{ margin:20px 0 30px 0; text-align:center; display:none; }
+.gui-cart .cart-free-shipping{ margin-bottom:30px; }
+.gui-cart .gui-progressbar{ display:none; }
+
+.gui-cart>.gui-col3-equal{ padding:30px; background:#fafafa; margin-top:15px;}
+
+.gui-cart .gui-table tbody tr td:first-child{padding-left:0;}
+
+.gui-cart thead{ display:none; }
+#gui-form-cart table tr:last-child{ display:none; }
+#gui-form-cart table tr td:last-child{ font-weight:bold; }
+
+#gui-form-cart .gui-table, #gui-form-cart .gui-image{ border:0; }
+
+#gui-form-cart .gui-image img
+{
+  border:0;
+  height:80px;
+  width:80px;
+}
+
+#gui-form-cart .gui-bundle img{ width:40px; height:40px; }
+
+.gui-cart-sum{ }
+.gui-cart-sum .gui-item.gui-big{ font-size: 16px; letter-spacing:1px; }
+
+.gui-cart .gui-div-cart-related,
+.gui-div-cart-shipping{display:none;}
+
+.gui-col3-equal-col2.gui-div-cart-coupons{ width:45%; }
+.gui-div-cart-coupons .gui-block
+{
+  border:0;
+  padding:0;
+}
+
+.gui-div-cart-coupons .gui-block-title
+{
+  padding:0px;
+  border:0;
+  background:none;
+  margin-bottom:10px;
+}
+
+.gui-div-cart-coupons .gui-block-title strong{ color:#666; }
+
+.gui-div-cart-coupons .gui-block-content
+{
+  padding:0;
+  border:0;
+}
+
+.cart-extra-holder
+{
+  max-width:991px;
+  margin:0 auto;
+  padding:0 15px;
+  /*margin-top:20px;*/
+  padding:30px;
+  /*background:#fafafa;*/
+  border:1px solid #ddd;
+}
+
+#gui-wrapper>.gui-spacer
+{
+  display:none;
+}
+
+/*.gui-cart { max-width: 991px; margin-left: auto; margin-right: auto; }
+.gui-cart table { table-layout: auto; }
+.gui-cart .gui-table a { font-size: 90%; font-weight: 400; }
+.gui-input { border-color: #e5e5e5; }
+.gui-cart .gui-table { border-color: #fff; overflow: hidden!important; }
+.gui-cart .gui-table thead tr th { background-color: #ffffff; }
+.gui-cart .gui-table thead { display: none; }
+.gui-cart .gui-table tbody tr td { border-top: 1px solid #e5e5e5; }
+.gui-cart .gui-table tbody tr td:nth-child(n+4) { font-size: 0.8125em; }
+.gui-cart .gui-table tbody tr td:last-child { color: #000000; }
+.gui-cart .gui-table tbody tr:nth-last-child(2) { border-bottom: 1px solid #e5e5e5; }
+.gui-cart .gui-table tbody tr:last-child { display: none; }
+.gui-cart .gui-cart-sum, .gui-cart .gui-cart-sum strong { font-size: 0.8125em; font-weight: 400; }
+.gui-cart-sum .gui-item .gui-desc { text-align: left; }
+.gui-cart .gui-col3-equal .gui-col3-equal-col3 { width: 100%; float: none; }
+.gui-cart .gui-page-title { text-align: center; }
+.gui-cart .gui-button-action, .gui-confirm-buttons a { font-size: .85em; display: block; padding: 1em; width: 100% !important; max-width: 20em; margin: auto; font-weight: bold; text-transform: uppercase; background-color: #000; text-align: center;}
+.gui-cart .gui-button-action { margin-left: auto !important; margin-right: auto!important; }
+.gui-cart .gui-button-action:hover, .gui-confirm-buttons a:hover { background-color: #ddad28!important; color #ffffff!important; }
+.gui-cart .gui-align-right { float: none; text-align: center; }
+.gui-cart .gui-table tbody tr:last-child > td:first-child a { display: none; }
+.gui-cart .gui-table tbody tr td { vertical-align: middle; }
+.gui-cart .gui-table tbody tr td:first-child, .gui-cart .gui-table tbody tr {/* display: block; display:table-cell; }
+.gui-cart .gui-table tbody tr:first-child td:first-child { width: 100%; }
+.gui-cart .gui-number { border: 1px solid #e5e5e5; }
+.gui-cart .gui-table a.gui-button-small { visibility: hidden!important; }
+.gui-cart .gui-image a img { width: 80px; height: 80px; display: block; max-width: none; }
+.gui-cart .gui-image { border-color: #fff; }
+.gui-cart .gui-table thead tr th { border-color: #fff; }
+.gui-cart .gui-success { display: none; }
+.gui-cart .gui-page-title { text-align: center; }
+.gui-form.gui-confirm { max-width: 28em; }
+#gui-block-review .gui-block-content { border-bottom: 1px solid #e5e5e5; margin-bottom: 2em; }
+.gui-step .gui-table tr td:first-child a img, .gui-div-cart-coupons, .gui-div-cart-related, .gui-cart .gui-progressbar { display: none; }
+
+@media screen and (min-height: 700px) {
+  
+}
+@media screen and (min-width: 480px) {
+  .gui-cart .gui-table tbody tr:first-child td:first-child { width: auto; }
+  .gui-cart .gui-table tbody tr td:first-child { display: table-cell; }
+  .gui-cart .gui-table tbody tr { display: table-row; }
+  .gui-checkout input[type='submit'].gui-hide { max-width: 13em; }
+}
+@media screen and (min-width: 540px) {
+  .gui-step .gui-table tr td:first-child a img { display: block; }
+}
+@media screen and (min-width: 768px) {
+  .gui-cart .gui-align-right { text-align: left; }
+  .gui-checkout input[type='submit'].gui-hide { float: right; }
+}
+@media screen and (min-width: 53em) {
+   .gui-cart .gui-table tbody tr td { padding: 1.5em 1em; }
+}
+@media screen and (min-width: 60em) {
+  .gui-cart .gui-table tbody tr:first-child td:first-child, .gui-cart .gui-table tbody tr:nth-child(2) td:first-child { padding-left: 6em; }
+  .gui-cart .gui-table tbody tr:first-child td:last-child, .gui-cart .gui-table tbody tr:nth-child(2) td:last-child { padding-right: 6em; }
+  .gui-cart .gui-cart-sum { padding-left: 6.5em; padding-right: 6.5em; }
+}*/

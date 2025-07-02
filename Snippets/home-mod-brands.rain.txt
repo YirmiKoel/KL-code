@@ -1,0 +1,26 @@
+{% if shop.brands %}
+<div class="container homepage-brands">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="headline">{{ 'Our brands' | t }}</h3>
+  
+      <div id="home-brands" class="swiper-container swiper-home-brands mt-3">
+        <div class="swiper-wrapper">
+          {% for brand in shop.brands %}
+          <div class="swiper-slide home-brands-slide">
+              <a href="{{ brand.url | url }}">
+              {% if brand.image %}
+              <img src="{{ brand.image | url_image('280x180x'~(theme.brand_image_fit ? '2' : '1')) }}" class="img-responsive br-2" alt="{{ brand.title }}" width="280" height="180" loading="lazy">
+              {% else %}
+              <img src="{{ 'placeholder-brand.svg' | url_asset }}" class="img-responsive br-2" alt="{{ brand.title }}" width="280" height="180" loading="lazy">
+              {% endif %}
+              </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+	</div>
+</div>  
+{% endif %}

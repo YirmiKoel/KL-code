@@ -1,0 +1,86 @@
+{% set productsBType = theme.home_products_b_type %}
+{% if (theme.home_products_b_type == 'featured' and featured) or (theme.home_products_b_type == 'newest' and newest) or (theme.home_products_b_type == 'popular' and popular) %}
+{# had margin-top-double, but parent also has margin-top #}
+<div class="home-main-products container">
+    {% if theme.home_products_b_carousel %}
+    <div class="pos-relative">
+        <h3 class="headline  mb-n2">{{ theme.home_products_b_title | t }}</h3>
+             <div class="title-swiper-arrows">
+              <i class="swiper-home-main-prev title-swiper-arrow icon-angle-left"></i>
+              <i class="swiper-home-main-next title-swiper-arrow icon-angle-right"></i>
+            </div>
+      </div>
+          <div class="swiper-container homepage-product-slider margin-top home-slide-a">
+            <div class="swiper-wrapper static-products-holder">
+              {% if productsBType == 'featured' %}
+                    {% include 'snippets/products.rain' with {'mode': 'grid', 'in_slider': true, 'lazyOffset' : 0, 'products': featured, 'offset': featuredOffset, 'limit': featuredLimit } %}
+              {% else %}
+                    {% include 'snippets/products.rain' with {'mode': 'grid', 'in_slider': true, 'lazyOffset' : 0, 'products': _context[productsBType], 'offset': featuredOffset, 'limit': 8 } %}
+              {% endif %}
+            </div>
+          </div>
+  <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}?sort={{ productsBType }}" class="button buttolarge with-icon lined">{{ theme.home_products_b_button | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+    {% else %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h3 class="headline mb-n2 with-link" data-text="{{ theme.main_grid_title | t }}">{{ theme.main_grid_title | t }}</h3>
+        
+        <div class="row">
+          <div class="col-md-12">
+            <div class="row productsrow product-grid static-products-holder">
+              
+              
+              {% if productsBType == 'featured' %}
+                    {% include 'snippets/products.rain' with {'mode': 'grid', 'lazyOffset' : 0, 'col_width':3, 'products': featured, 'offset': featuredOffset, 'limit': featuredLimit } %}
+              {% else %}
+                    {% include 'snippets/products.rain' with {'mode': 'grid', 'lazyOffset' : 0, 'col_width':3, 'products': _context[productsBType], 'offset': featuredOffset, 'limit': 8 } %}
+              {% endif %}
+              
+            </div>
+          </div> 
+        </div>
+          
+      </div>
+    </div>
+    </div>
+    <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}?sort={{ productsBType }}" class="button buttolarge with-icon lined">{{ theme.home_products_b_button | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+    {% endif %}
+    
+</div>
+{% endif %}
+
+{# if newest %}
+<div class="gray-bg container-bar margin-top-double home-main-products">    
+    <div class="container pos-relative">
+        <h3 class="headline" data-text="{{ theme.bottom_grid_title | t }}">{{ theme.bottom_grid_title | t }}</h3>
+      
+            <div class="title-swiper-arrows">
+              <div class="swiper-home-main-prev">
+                <i class="fas fa-chevron-left"></i>
+              </div>
+              <div class="swiper-home-main-next">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+      </div>
+          <div class="container swiper-container homepage-product-slider margin-top home-slider-b">
+            <div class="swiper-wrapper">
+              {% for product in newest | limit(8) %} 
+                {% include 'snippets/products.rain' with {'mode': 'grid', 'in_slider': true } %}
+              {% endfor %}
+            </div>
+            <div class="dy-swiper-preload">
+              <div class="lds-dual-ring"></div>
+            </div>
+          </div>
+  <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}" class="button with-icon">{{ 'View collection' | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+</div>
+{% endif #}

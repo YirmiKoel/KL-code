@@ -1,0 +1,195 @@
+{% if type == 'blog' %}
+<div class="blog-sidebar">
+<div class="latest-articles">
+  
+          <h4>{{ 'Recent articles' | t }}</h4>
+          
+          {% for article in blog.recent | limit(5) %}
+          <div class="block">
+            <img src="{{ article.image | url_image('50x50x1') }}" alt="" class="rounded">
+            <div class="details">
+              <div class="date">{{ article.date | date('d-m-Y') }}</div>
+              <a href="{{ article.url | url }}">{{ article.title }}</a>
+              <div class="count">
+                {% if article.comments_count == 1 %}
+                  1 {{ 'Comment' | t }}
+                {% elseif article.comments_count > 1  %}
+                  {{ article.comments_count }} {{ 'Comments' | t }}
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        
+  {% if theme.blog_twitter and not request.get.twitter == 'false' %}
+		<a class="twitter-timeline" data-width="220" data-height="400" href="https://twitter.com/{{ theme.blog_twitter | replace({'@':''}) }}">Twitter Feed</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  {% endif %}
+
+        <div class="tags mt-4">
+          <h4>{{ 'Tags' | t }}</h4>
+          
+          <div class="tagcloud mt-1 text-left">
+            {% for tag in blog.tags %}
+            <a href="{{ tag.url | url }}" class="tagcloud-tag">{{ tag.title }}</a>
+            {% endfor %}
+          </div>
+        </div>
+
+				<div class="p-3 mt-4 gray-bg">
+          <h4>{{ 'Newsletter' | t }}</h4>
+          
+          <div class="mt-3">{{ theme.newsletter_sub_text | t }}</div>
+          
+          <form action="{{ 'account/newsletter' | url }}" method="post" class="mt-3">
+            <input type="hidden" name="key" value="{{ page.key }}" />
+              <input type="email" name="email" id="emailaddress" value="" placeholder="{{ 'Email address' | t }}" class="theme-input body-bg" />
+            <button type="submit" class="button button-small w-100 mt-2" name="submit" value="1">{{ 'Subscribe' | t }}</button>
+        	</form>
+        </div>
+</div>
+
+{% elseif type == 'service-links' %}
+
+  <ul id="service-sidelinks" class="custom-scrollbar d-flex d-md-block">
+    {% for link in shop.links.service if link.url != 'sitemap' and link.url not in excludeLinks %}
+    <li class="service-sidelink-item">
+      <a href="{{ link.url | url }}" class="service-sidelink{% if link.url is active %} service-sidelink-active bold{% endif %}"{% if link.new_window %} target="_blank"{% endif %}>{{ link.title }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+
+{% else %}
+
+		{% if type != 'textpage' %}
+    {#<div class="filters">
+      <form action="{{ collection.internal.url | url }}" method="get" id="filter_form">       
+        
+        {% if collection.filters.custom and theme.filters_in_sidebar %}
+        <div class="sidebar-filters hidden-sm hidden-xs hidden-xxs"{% if not theme.filters_in_sidebar %} style="display:none !important;"{% endif %}>
+          {% for filter in collection.filters.custom %}
+            <div class="sidebar-filter-block">
+            <h4>{{ filter.title }}</h4>
+            {% for value in filter.values %}
+            <div class="sidebar-filter-item">
+              <input id="filter_{{ value.id }}" type="checkbox" name="filter[]" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+              <label for="filter_{{ value.id }}">{{ value.title }}{% if not value.active and value.has_count %} <span>({{ value.count }})</span>{% endif %}</label>
+            </div>
+            {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+      </form>
+    </div>#}
+		{% endif %}
+
+		{% if theme.filters_position == 'sidebar' %}
+		<div class="filters-sidebar hidden-xxs hidden-xs hidden-sm">
+      {% include 'snippets/product-filters.rain' with {'type': 'sidebar'} %}
+		</div>
+		{% endif %}
+
+    <div class="sidebar-cats{% if type != 'textpage' %} rowmargin{% endif %} hidden-sm hidden-xs hidden-xxs ">
+      <h4 class="gray-bg d-inline-block padding-10">{{ 'Categories' | t }}</h4>
+      
+      <ul class="sub0">
+      {% for category in shop.categories %}
+      <li{% if category.url is active %} class="active"{% endif %}>
+        <div class="main-cat">
+          <a href="{{ category.url | url }}">{{ category.title }}</a>{% if category.subs %}<span class="open-sub"></span>{% endif %}
+        </div>
+        
+        {% if category.subs %}
+        
+        {#<span class="expand-cat"><i class="fa fa-caret-down"></i></span>#}
+        
+        <ul class="sub1">
+          {% for category in category.subs %}
+          <li class="{% if category.url is active %}active{% endif %}{% if not category.subs %} nosubs{% endif %}">
+            
+            <div class="main-cat">
+              <a href="{{ category.url | url }}">{{ category.title }}{% if theme.settingshow_amount_of_product_in_category %} <span class="count">({{ category.count }})</span>{% endif %}</a>{% if category.subs %}<span class="open-sub"></span>{% endif %}
+            </div>
+            
+            {% if category.subs %}
+            <ul class="sub2">
+              {% for category in category.subs %}
+              <li{% if category.url is active %} class="active"{% endif %}>
+                
+                <div class="main-cat">
+                  <a href="{{ category.url | url }}">{{ category.title }}</a>{% if category.subs %}<span class="open-sub"></span>{% endif %}
+                </div>
+                
+                  {% if category.subs %}
+                  <ul class="sub3">
+                    {% for category in category.subs %}
+                    <li{% if category.url is active %} class="active"{% endif %}>
+                      <div class="main-cat"><a href="{{ category.url | url }}">{{ category.title }}</a></div>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        
+      </li>
+      {% endfor %}
+      </ul>
+      
+    </div>
+    
+{# include 'snippets/usps.rain' with {'type': 'sidebar' } #}
+
+	{#{% if theme.kiyoh %}
+	<div class="row rowmargin hidden-sm hidden-xs hidden-xxs">
+    <div class="col-md-12">
+      <div class="sidebar-widget kiyoh widget">
+      {{ theme.kiyoh | raw }}
+      </div>
+    </div>
+	</div>
+	{% endif %}#}
+    
+    
+{#<script type="text/javascript">
+  $(function(){
+    $('#filter_form input, #filter_form select').change(function(){
+      //$(this).closest('form').submit();
+      $('#filter_form').submit();
+    });
+    
+    $("#collection-filter-price").slider(
+    {
+      range: true,
+      min: {{ collection.price_min }},
+      max: {{ collection.price_max }},
+      values: [{{ collection.filters.min }}, {{ collection.filters.max }}],
+      step: 1,
+      slide: function( event, ui)
+      {
+        $('.sidebar-filter-range .min span').html(ui.values[0]);
+        $('.sidebar-filter-range .max span').html(ui.values[1]);
+        
+        $('#filter_form_min').val(ui.values[0]);
+        $('#filter_form_max').val(ui.values[1]);
+      },
+      stop: function(event, ui)
+      {
+        $('#filter_form').submit();
+      }
+    });
+    
+  });
+</script>#}
+
+{% endif %}

@@ -1,0 +1,39 @@
+<div class="container catalog mt-3">  
+  
+  <h1>{{ catalog.title }}</h1>
+  
+  {% if catalog.description and theme.enable_catalog_top_description %}
+  <p>{{ catalog.description }}</p>
+  {% endif %}
+  
+  {% if catalog.content and theme.catalog_text_position == 'top'  %}
+  <div class="content my-3">
+    {{ catalog.content | raw }}
+  </div>
+  {% endif %}
+  
+  <div class="row">
+         
+    	{% for category in catalog.categories %}
+    <div class="col-6 col-md-4 col-lg-3 mt-3">
+<a href="{{ category.url | url }}" class="home-highlight">
+  <picture class="overflow-hidden">
+    <img src="{{ category.image | url_image('350x350x'~(theme.category_image_fit ? '2' : '1')) }}" class="home-highlight-img banner-img{% if theme.category_img_hover_effect %} image-hover-scale{% endif %}" alt="{{ category.title }}" width="350" height="350">
+  </picture>
+<div class="banner-footer-textblock">
+  <span>{{ category.title }}</span>
+  <i class="button button-icon-circle ml-1 icon-arrow-right"></i>
+</div>
+</a>
+    </div>
+  			{# include 'snippets/categories.rain' with {'lazyOffset':0} #}
+    	{% endfor %}
+    
+  </div>
+  
+  {% if catalog.content and theme.catalog_text_position == 'bottom'  %}
+  <div class="content mt-5">
+    {{ catalog.content | raw }}
+  </div>
+  {% endif %}
+</div>

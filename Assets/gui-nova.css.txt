@@ -1,0 +1,147 @@
+.gui-form .gui-checkbox label, .gui-form .gui-radio label
+{
+  
+}
+
+.gui-radio .fancy-radio+label,
+.gui-checkbox .fancy-checkbox+label
+{
+    line-height: 1.1;
+    padding-bottom: 5px;
+    padding-top: 5px;
+  width: auto;
+}
+
+.gui-input, .gui-text, .gui-select, .gui-number {
+    background-color: var(--body-bg-color) !important;
+    border-color: var(--body-text-color-020) !important;
+}
+
+.gui-block, .gui-block-title, .gui-buttons.gui-border, .gui-block-inner, .gui-image
+{
+  border-color: var(--body-text-color-030) !important;
+}
+
+
+/* .gui-select select.fancy-select
+{
+  height:unset;
+  padding: 0 20px 0 15px;
+} */
+
+/* .gui-input input
+{
+	line-height: 40px;
+	height: 40px;
+} */
+
+.gui-input-phone-number .gui-input-phone-number-code-wrapper
+{
+	margin-top: 8px !important;
+}
+
+.gui-checkout .gui-progressbar
+{
+  background:none;
+  border:0;
+ overflow:hidden;
+}
+.gui-checkout .gui-progressbar.gui-fixed{ position:relative !important; width:100% !important; }
+
+.gui-form > .gui-margin-fix,
+.gui-checkout .gui-margin-fix {
+    display: none !important;
+}
+
+.gui-progressbar>ul>li
+{
+  background:none !important;
+  position:relative;
+}
+
+.gui-progressbar>ul>li:after {
+    content: "";
+    display: block;
+    position: absolute;
+    /*width: calc(100% - 30px);*/
+  width:100%;
+    height: 2px;
+    background: rgba(155,155,155,0.17);
+    top: 19px;
+    z-index: -1;
+    /*left: 15px;*/
+}
+
+.gui-progressbar>ul>li>a
+{
+  font-weight:normal;
+  background: none !important;
+  display: inline-block;
+  background: #fff !important;
+}
+
+.gui-progressbar>ul>li.gui-done>a
+{
+  color: initial !important;
+}
+
+.gui-progressbar>ul>li>a>span
+{
+  content: "x" !important;
+  height:40px !important;
+  width:40px !important;
+  line-height:40px !important;
+  text-align:center !important;
+  border-radius:100% !important;
+  border:1px solid #eee !important;
+  background:none !important;
+  color:#444;
+  text-indent:0 !important;
+  font-weight:bold;
+  position:relative;
+}
+
+.gui-progressbar>ul>li>a>span:after
+{
+  display:none !important;
+}
+
+/* .gui-progressbar>ul>li.gui-done>a>span:after
+{
+  font-family: 'proximav2';
+  font-weight:bold;
+  content: "\e928" !important;
+  display:block !important;
+  position:absolute;
+  left:0;
+  top:0;
+  width:40px;
+  height:40px;
+  line-height:40px;
+  text-align:center;
+  text-indent:0 !important;
+}
+
+.gui-progressbar>ul>li.gui-done>a>span
+{
+  text-indent:-99999px !important;
+} */
+
+.gui-checkout .gui-confirm-buttons>a
+{
+  display:block;
+  font-size:1.1em;
+  padding:10px 20px;
+  border-radius:0;
+}
+
+.gui-block-content, .gui-block
+{
+  border-radius:0;
+}
+
+/*.gui-input, .gui-text, .gui-select, .gui-number,
+.gui-select select.fancy-select
+{
+  border-color: rgba(155,155,155,0.25) !important;
+}*/

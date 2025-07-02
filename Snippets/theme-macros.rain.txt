@@ -1,0 +1,6 @@
+{% set testVar = 'abc' %}
+{% global test = 'bb' %}
+
+{% macro test() %}
+<h1>{{ testVar }}</h1>
+{% endmacro %}

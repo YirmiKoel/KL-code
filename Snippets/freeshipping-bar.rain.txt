@@ -1,0 +1,75 @@
+{% set minimum = theme.amount_to_free_shipping %}
+{% if shop.b2b %}
+	{% set total = page.cart.total.price %}
+{% else %}
+	{% set total = page.cart.total.price_incl %}
+{% endif %}
+
+{% set remaining = minimum - total %}
+{% set contentbedrag = '<strong>' ~ remaining | money_without_currency ~ '</strong>' %}
+
+{% if type == 'fancy' %}
+
+  <div class="freeshipping d-flex align-items-center{% if total >= minimum %} justify-content-end{% endif %}">
+    {% if total >= minimum %}
+      <i class="icon-check free-shipping-success-icon mr-1"></i>
+      <div class="text c-success">
+        {{ 'Free shipping' | t }}
+      </div>
+    {% else %}
+      <div class="text fz-090 gray-border-top mt-2 pt-2">
+        {{ 'Order for another $1 and receive free shipping' | t(contentbedrag) | raw }}
+      </div>
+    {% endif %}
+  </div>
+
+{% elseif type == 'cart' %}
+
+<div class="cart-free-shipping box-shadow d-flex w-100 align-items-center">
+    {% if total >= minimum or (cart.shipment and cart.shipment.price.price_incl == 0) %}
+      <i class="icon-check free-shipping-success-icon mr-1"></i>
+      <div class="text c-success">
+        {{ 'Free shipping' | t }}
+      </div>
+    {% else %}
+      <div class="text fz-090">
+        {{ 'Order for another $1 and receive free shipping' | t(contentbedrag) | raw }}
+      </div>
+    {% endif %}
+</div>
+
+	{# if total >= minimum or (cart.shipment and cart.shipment.price.price_incl == 0) %}
+		<div class="cart-free-shipping box-shadow c-success {{ classList }}">
+			<i class="icon-check"></i> {{ 'Free shipping' | t }}
+		</div>
+  {% else %}
+		<div class="cart-free-shipping box-shadow {{ classList }}">
+			<i class="icon-truck fz-130"></i> {{ 'Order for another $1 and receive free shipping' | t(contentbedrag) | raw }}
+		</div>
+  {% endif #}
+{% elseif type == 'text' %}
+	{% if total >= minimum or (cart.shipment and cart.shipment.price.price_incl == 0) %}
+		<div class="c-success {{ classList }}">
+			<i class="icon-check"></i> {{ 'Free shipping' | t }}
+		</div>
+  {% else %}
+		<div class="{{ classList }}">
+			<i class="icon-truck fz-130"></i> {{ 'Order for another $1 and receive free shipping' | t(contentbedrag) | raw }}
+		</div>
+  {% endif %}
+{% else %}
+              
+                <div class="freeshipping-bar{% if total >= minimum %} complete{% endif %}">
+                  {% if total >= minimum %}
+                  	<div class="icon"><i class="fas fa-check"></i></div>
+                  	{{ 'Free shipping' | t }}
+                  {% else %}
+                    
+                    {% set remaining = minimum - total %}
+                    {% set contentbedrag = '<span>' ~ remaining | money_without_currency ~ '</span>' %}
+                    
+                    <div class="icon"><i class="fas fa-truck"></i></div>
+                  	{{ 'Order for another $1 and receive free shipping' | t(contentbedrag) | raw }}
+                  {% endif %}
+                </div>
+{% endif %}

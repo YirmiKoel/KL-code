@@ -1,0 +1,25 @@
+{% if not theme.enable_custom_cart and theme.enable_free_shipping_notice %}
+
+	{% set minimum = theme.amount_to_free_shipping %}
+  {% set total = page.cart.total.price_incl %}
+  {% set remaining = minimum - total %}
+  {% set contentbedrag = '<span>' ~ remaining | money ~ '</span>' %}
+
+<script>
+  $(function()
+  {
+    	//$('#gui-form-cart').after('<div class="cart-free-shipping"></div>');
+    	$('.gui-progressbar').after('<div class="cart-free-shipping"></div>');
+     
+      {% if total == minimum or total > minimum %}
+        $('.cart-free-shipping').append('<i class="fa fa-check"></i> {{ 'Free shipping' | t }}');
+      {% else %}
+      
+      	{% set remaining = minimum - total %}
+        {% set contentbedrag = '<span>' ~ remaining | money ~ '</span>' %}
+      	$('.cart-free-shipping').append('{{ 'Order for another $1 and receive free shipping' | t(contentbedrag) | raw }}');
+         
+      {% endif %}
+  });
+</script>
+{% endif %}

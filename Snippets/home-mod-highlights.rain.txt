@@ -1,0 +1,119 @@
+{% set amountHighlights = 0 %}
+
+{% if theme.highlight_1_enabled %}
+  {% set amountHighlights = amountHighlights+1 %}
+{% endif %}
+{% if theme.highlight_2_enabled %}
+  {% set amountHighlights = amountHighlights+1 %}
+{% endif %}
+{% if theme.highlight_3_enabled %}
+  {% set amountHighlights = amountHighlights+1 %}
+{% endif %}
+
+{% set borderRadius = theme.rounded_highlights ? 'br-5' : 'br' %}
+
+{% set bannerHolderClasses = 'banner-holder' ~ (' amount-'~amountHighlights) ~ (' highlight-' ~ theme.highlight_size) %}
+
+<div id="home-highlights" class="container{% if theme.home_mod_highlights_fullwidth %}-fluid full-width{% endif %}{% if not theme.highlights_overlay %} no-overlay{% endif %}">
+  <div class="row{% if theme.highlights_mobile_slider_enabled %} highlight-row-mobile-scrollable custom-scrollbar{% endif %}">
+    
+        {% for i in range (1,3) %}
+          {% if theme['highlight_'~i~'_enabled'] %}
+          <div id="home-highlight-{{ i }}" class="col home-highlight-col">
+            <a href="{{ theme['highlight_'~i~'_button_url'] | t }}" class="home-highlight {{ (theme.home_mod_highlights_fullwidth ? '' : borderRadius) }}">
+              <div class="{{ bannerHolderClasses }}">
+                <picture class="">
+									{% if theme['highlight_'~i~'_mobile_image_enabled'] %}
+                  <source id="home-highlight-source-{{ i }}" srcset="{{ ('highlight-'~i~'-mobile.jpg') | url_asset }}" media="(max-width: 576px)" />
+                  {% endif %}
+                  <img src="{{ ('highlight-'~i~'-image.jpg') | url_asset }}" class="home-highlight-img banner-img">
+                </picture>
+                <div class="banner-content-holder banner-overlay">
+                <div class="banner-content justify-content-{{  theme['highlight_'~i~'_text_position'] }} align-items-{{  theme['highlight_'~i~'_text_align_items'] }}{% if theme['highlight_'~i~'_text_position'] == 'end' %} text-right{% endif %}">
+                  <div class="banner-text">
+                    <h3 class="c-inherit banner-footer-title title-size-{{ theme.highlights_title_size }}">{{  theme['highlight_'~i~'_title'] | t }}</h3>
+                    <div class="banner-subtitle">{{  theme['highlight_'~i~'_sub_title'] | t }}</div>
+                  </div>
+                </div>
+                </div>
+              </div>
+              <div class="banner-footer-textblock">
+                <span>{{  theme['highlight_'~i~'_button_text'] | t }}</span>
+                <i class="button button-icon-circle ml-1 icon-arrow-right"></i>
+              </div>
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+    
+    
+    {# if theme.highlight_1_enabled %}
+      <div id="home-highlight-1" class="col home-highlight-col">
+        
+        <a href="{{ theme.highlight_1_button_url | t }}" class="home-highlight">
+          <div class="{{ bannerHolderClasses }}">
+            <picture class="">
+              <img src="{{ 'highlight-1-image.jpg' | url_asset }}" class="home-highlight-img banner-img">
+            </picture>
+            <div class="banner-content-holder banner-overlay">
+              <div class="banner-content justify-content-{{ theme.highlight_1_text_position }} align-items-{{ theme.highlight_1_text_align_items }}">
+              <div class="banner-text">
+                <h3 class="c-inherit banner-footer-title title-size-{{ theme.highlight_1_title_size }}">{{ theme.highlight_1_title | t }}</h3>
+              	<div class="banner-subtitle">{{ theme.highlight_1_sub_title | t }}</div>
+              </div>
+              </div>
+            </div>
+          </div>
+          <div class="banner-footer-textblock">
+            <span>{{ theme.highlight_1_button_text | t }}</span>
+            <i class="button button-icon-circle ml-1 icon-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+    {% endif #}
+
+    {# if theme.highlight_2_enabled %}
+      <div id="home-highlight-2" class="col home-highlight-col">
+        <a href="{{ theme.highlight_2_button_url | t }}" class="home-highlight">
+          <div class="{{ bannerHolderClasses }}">
+            <picture class="">
+              <img src="{{ 'highlight-2-image.jpg' | url_asset }}" class="home-highlight-img banner-img">
+            </picture>
+            <div class="banner-content banner-overlay justify-content-{{ theme.highlight_2_text_position }} align-items-{{ theme.highlight_2_text_align_items }}">
+              <div class="banner-text">
+                <h3 class="c-inherit banner-footer-title title-size-{{ theme.highlight_2_title_size }}">{{ theme.highlight_2_title | t }}</h3>
+              	<div class="banner-subtitle">{{ theme.highlight_2_sub_title | t }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="banner-footer-textblock">
+            <span>{{ theme.highlight_2_button_text | t }}</span>
+            <i class="button button-icon-circle ml-1 icon-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+    {% endif #}
+
+    {# if theme.highlight_3_enabled %}
+      <div id="home-highlight-3" class="col home-highlight-col">
+        <a href="{{ theme.highlight_3_button_url | t }}" class="home-highlight">
+          <div class="{{ bannerHolderClasses }}">
+            <picture class="">
+              <img src="{{ 'highlight-3-image.jpg' | url_asset }}" class="home-highlight-img banner-img">
+            </picture>
+            <div class="banner-content banner-overlay justify-content-{{ theme.highlight_3_text_position }} align-items-{{ theme.highlight_3_text_align_items }}">
+              <div class="banner-text">
+                <h3 class="c-inherit banner-footer-title title-size-{{ theme.highlight_3_title_size }}">{{ theme.highlight_3_title | t }}</h3>
+              	<div class="banner-subtitle">{{ theme.highlight_3_sub_title | t }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="banner-footer-textblock">
+            <span>{{ theme.highlight_3_button_text | t }}</span>
+            <i class="button button-icon-circle ml-1 icon-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+    {% endif #}
+  </div>
+</div>

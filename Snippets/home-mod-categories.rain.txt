@@ -1,0 +1,77 @@
+{% if theme.home_categories_type == 'catalog' %}
+
+<div class="container">
+      {% if theme.title_categories %}
+      	{% if theme.categories_pre_title %}<h5 class="headline">{{ theme.categories_pre_title | t }}</h5>{% endif %}
+      	<h3 class="headline headline-side">{{ theme.title_categories | t }}</h3>
+      {% endif %}
+  <div class="horizontal-scroller-container pos-relative">
+  <div id="home-category-scroller-catalog" class="d-flex flex-nowrap horizontal-scroller py-4 custom-scrollbar mx-1 mx-sm-0">
+	{% include 'snippets/categories.rain' with {'lazyOffset': 0, 'type': theme.home_categories_type} %}
+  </div>
+		<i id="catalog-scroll-icon-left" class="icon-angle-left horizontal-scroll-icon horizontal-scroll-icon-left"></i>
+		<i id="catalog-scroll-icon-right" class="icon-angle-right horizontal-scroll-icon horizontal-scroll-icon-right"></i>
+  </div>
+</div>
+
+{% elseif categories and (categories | length) >= 3 %}
+
+  {% if theme.home_categories_type == 'circles' %}
+    {% set classesText = 'col-lg-3 col-md-4 col-sm-4 col-xs-6' %}
+    {% set classesCats = 'col-lg-9 col-md-8 col-sm-8 col-xs-6' %}
+
+		{% set maxWidth = (200 * (categories | length)) | round %}
+		{% set maxWidthStyle = (categories | length) > 5 ? '' : 'max-width:'~maxWidth~'px' %}
+
+    <div class="container max-wifdth-1200">
+      <div class="row">
+        <div class="col-md-12">
+        {% if theme.title_categories %}
+          {% if theme.categories_pre_title %}<h5 class="headline text-center">{{ theme.categories_pre_title | t }}</h5>{% endif %}
+          <h3 class="headline text-center">
+            {{ theme.title_categories | t }}
+          </h3>
+        {% endif %}
+          
+        {% include 'snippets/categories.rain' with {'lazyOffset': 0, 'type': theme.home_categories_type} %}
+        </div>
+      </div>
+    </div>
+
+	{% elseif theme.home_categories_type == 'grid' %}
+
+    <div class="container">
+      
+      {% if theme.title_categories %}
+      	{% if theme.categories_pre_title %}<h5 class="headline">{{ theme.categories_pre_title | t }}</h5>{% endif %}
+      	<h3 class="headline headline-side">{{ theme.title_categories | t }}</h3>
+      {% endif %}
+			<div id="homepage-categories-grid" class="row flex-nowrap flex-md-wrap mx-0 mx-md-n3">
+      {% include 'snippets/categories.rain' with {'lazyOffset':0, 'type': theme.home_categories_type} %}
+    	</div>
+		</div>
+
+  {% else %}
+
+    {% set classesText = 'col-lg-3 col-md-5 col-12' %}
+    {% set classesCats = 'col-lg-9 col-md-7 col-12' %}
+
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="{{ classesText }}">
+          <div class="bg-none gray-bg-md p-0 p-md-5">
+            
+          {% if theme.title_categories %}
+            {% if theme.categories_pre_title %}<h5 class="headline">{{ theme.categories_pre_title | t }}</h5>{% endif %}
+            <h3 class="headline headline-side">{{ theme.title_categories | t }}</h3>
+          {% endif %}
+
+          </div>
+        </div>
+        <div class="{{ classesCats }}">
+      {% include 'snippets/categories.rain' with {'lazyOffset':0, 'type': theme.home_categories_type} %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}

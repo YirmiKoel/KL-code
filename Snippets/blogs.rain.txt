@@ -1,0 +1,63 @@
+{% if type == 'home' %}
+
+  {% for article in blog.articles | limit (3) %}
+		<div class="col-md-4{% if loop.index > 1 %} col-sm-6{% endif %} margin-top">
+          <div class="blog-block full-width">
+            <div class="img-holder">
+              <div class="date">
+                <span class="day">{{ article.date | date('d') }}</span>
+                <span class="month">{{ article.date | date('M') | t }}</span>
+              </div>
+              {% if article.image %}
+                <a href="{{ article.url | url }}"><img data-src="{{ article.image | url_image('300x150x1') }}" alt="{{ article.title }}" class="img-responsive lazy"></a>
+              {% else %}
+              	<div class="article-dummy-header small gray-bg"></div>
+              {% endif %}
+            </div>
+            <div class="summary p-compact">
+              <h3 class="title">{{ article.title }}</h3>
+              
+              <p>
+                {{ article.summary | striptags | limit(150) }}...
+              </p>
+              
+              <a href="{{ article.url | url }}" class="button-txt">{{ 'Read more' | t }} <i class="fas fa-angle-right"></i></a>
+            </div>
+          </div>
+        </div>
+  {% endfor %}
+
+{% else %}
+
+{% for blog in shop.blogs | limit(1) %}
+    
+      {% for article in blog.articles | limit (4) %}
+      <div class="swiper-slide blog-block-slide">
+            <div class="blog-block">
+            <div class="img-holder">
+              <div class="date">
+                <span class="day">{{ article.date | date('d') }}</span>
+                <span class="month">{{ article.date | date('M') | t}}</span>
+              </div>
+              {% if article.image %}
+                <a href="{{ article.url | url }}"><img src="{{ article.image | url_image('300x150x1') }}" alt="{{ article.title }}" class="img-responsive"></a>
+              {% else %}
+              <div class="article-dummy-header small gray-bg"></div>
+              {% endif %}
+            </div>
+            <div class="summary-holder">
+            <h3 class="title">{{ article.title }}</h3>
+            <div class="content-holder">
+              <p>
+                {{ article.summary | striptags | limit(150) }}...
+              </p>
+              <a href="{{ article.url | url }}" class="button-txt">{{ 'Read more' | t }} <i class="fas fa-angle-right"></i></a>
+            </div>
+            </div>
+          </div>
+          </div>
+
+      {% endfor %}
+    
+{% endfor %}
+{% endif %}

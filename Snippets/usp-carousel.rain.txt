@@ -1,0 +1,183 @@
+{% macro uspCarousel(theme, classes, desktopAmount) %}
+  <div class="usp-carousel swiper-container {{ classes }} usp-def-amount-{{ theme.subheader_usp_default_amount }}">
+    <div class="swiper-wrapper" data-slidesperview-desktop="{{ desktopAmount }}">
+        {% if theme.product_usp_1 %}
+        <div class="swiper-slide usp-carousel-item">
+          <a data-trigger-fancy="fancy-modal-usp-1" data-fancy-id="fancy-modal-usp-1"><i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_1 | t | raw }}</span>
+          </a>
+        </div>
+        {% endif %}
+        {% if theme.product_usp_2 %}
+        <div class="swiper-slide usp-carousel-item">
+          <a data-trigger-fancy="fancy-modal-usp-2" data-fancy-id="fancy-modal-usp-2"><i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_2 | t | raw }}</span></a>
+        </div>
+        {% endif %}
+        {% if theme.product_usp_3 %}
+        <div class="swiper-slide usp-carousel-item">
+          <a data-trigger-fancy="fancy-modal-usp-3" data-fancy-id="fancy-modal-usp-3"><i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_3 | t | raw }}</span></a>
+        </div>
+        {% endif %}
+        {% if theme.product_usp_4 %}
+        <div class="swiper-slide usp-carousel-item">
+          <a data-trigger-fancy="fancy-modal-usp-4" data-fancy-id="fancy-modal-usp-4"><i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_4 | t | raw }}</span></a>
+        </div>
+        {% endif %}
+    </div>
+  </div>
+
+  {#<div class="usp-carousel swiper-container {{ classes }} usp-def-amount-{{ theme.subheader_usp_default_amount }}">
+    <div class="swiper-wrapper" data-slidesperview-desktop="{{ desktopAmount }}">
+        {% if theme.product_usp_1 %}
+        <div class="swiper-slide usp-carousel-item">
+          <i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_1 | t | raw }}</span>
+        </div>
+        {% endif %}
+        {% if theme.product_usp_2 %}
+        <div class="swiper-slide usp-carousel-item">
+          <i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_2 | t | raw }}</span>
+        </div>
+        {% endif %}
+        {% if theme.product_usp_3 %}
+        <div class="swiper-slide usp-carousel-item">
+          <i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_3 | t | raw }}</span>
+        </div>
+        {% endif %}
+        {% if theme.product_usp_4 %}
+        <div class="swiper-slide usp-carousel-item">
+          <i class="icon-check-b usp-carousel-icon"></i> <span class="usp-item-text">{{ theme.product_usp_4 | t | raw }}</span>
+        </div>
+        {% endif %}
+    </div>
+  </div>#}
+{% endmacro %} 
+
+
+{% macro customLinks(links, showStores, showService) %}
+    	{% for link in links | limit(4) %}
+      	<a href="{{ link.url | t | url }}"{% if 'service/presets' in link.url %} id="demo-preset-link"{% endif %} target="{% if link.new_window %}_blank{% endif %}" class="topbar-custom-link d-none d-lg-inline-block" title="{{ link.title | t }}">{{ link.title | t }}</a>
+    	{% endfor %}
+      {% if showStores %}
+        <a href="{{ 'service/stores' | url }}" class="topbar-custom-link d-none d-lg-inline-block">{{ 'Stores' | t }}</a>
+      {% endif %}
+      {% if showService %}
+        <a href="{{ 'service' | url }}" class="topbar-custom-link d-none d-lg-inline-block">{{ 'Customer service' | t }}</a>
+      {% endif %}
+{% endmacro %}
+
+{% set hallmarkClasses = subheaderEnabled ? 'd-block d-md-none' : '' %}
+{% set reviewsClasses = subheaderEnabled ? 'd-block d-md-none' : '' %}
+
+{% if position == 'checkout' %}
+  <div class="usp-bar usp-bar-top{% if theme.usp_carousel_shadow %} header-has-shadow{% endif %}">
+    <div class="container d-flex align-items-center">
+    {{ _self.uspCarousel(theme, 'usp-carousel-top') }}
+    </div>
+  </div>
+{% elseif position == 'top' %}
+  <div class="usp-bar usp-bar-top{% if theme.usp_carousel_shadow %} header-has-shadow{% endif %}">
+    <div class="container d-flex align-items-center">
+    {{ _self.uspCarousel(theme, 'usp-carousel-top') }}
+
+    {% if ((shop.links.main and theme.navigation_show_custom_links) or theme.show_navbar_stores_page or theme.show_navbar_service_page) and theme.navigation_custom_links_position == 'topbar' %}
+      {{ _self.customLinks(shop.links.main, theme.show_navbar_stores_page, theme.show_navbar_service_page) }}
+    {% endif %}
+      
+    {% if theme.shopreviews_in_header %}
+			{% include 'snippets/header-rating.rain' with {position: 'carousel'} %}
+    {% endif %}
+
+    {% if theme.hallmark != 'disabled' and not subheaderEnabled %}
+    	<div class="subheader-hallmark d-none d-md-inline-block">
+      	{% if not subheaderEnabled %}
+        <a href="{{ theme.hallmark_url }}" target="_blank" class="">
+          {% if theme.hallmark == 'custom' %}
+            <img src="{{ 'hallmark.png' | url_asset }}" alt="" class="header-hallmark-img">
+          {% else %}
+            {% include ('snippets/'~('-icon' in theme.hallmark ? 'hallmark-icons' : 'hallmarks-minified')~'.rain') with {'hallmark': theme.hallmark} %}
+          {% endif %}
+        </a>
+      	{% endif %}
+    	</div>
+    {% endif %}
+    </div>
+  </div>
+{% elseif position == 'bottom' %}
+  <div class="usp-bar usp-bar-bottom{% if theme.usp_carousel_shadow %} header-has-shadow{% endif %}">
+    <div class="container d-flex align-items-center">
+    {{ _self.uspCarousel(theme, 'usp-carousel-bottom') }}
+      
+    {% if ((shop.links.main and theme.navigation_show_custom_links) or theme.show_navbar_stores_page or theme.show_navbar_service_page) and theme.navigation_custom_links_position == 'topbar' %}
+      {{ _self.customLinks(shop.links.main, theme.show_navbar_stores_page, theme.show_navbar_service_page) }}
+    {% endif %}
+            
+    {% if theme.shopreviews_in_header %}
+        {% include 'snippets/header-rating.rain' with {position: 'carousel_bottom'} %}
+    {% endif %}
+
+    {% if theme.hallmark != 'disabled' %}
+    <div class="subheader-hallmark {% if subheaderEnabled %}d-none{% else %}d-none d-md-block{% endif %}">
+      {% if theme.hallmark == 'custom' %}
+      	<a href="{{ theme.hallmark_url }}" target="_blank" class="d-inline-block">
+        	<img src="{{ 'hallmark.png' | url_asset }}" alt="" class="header-hallmark-img">
+      	</a>
+      {% else %}
+        <a href="{{ theme.hallmark_url }}" target="_blank" class="d-none d-md-inline-block">
+        {% include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.hallmark} %}
+        </a>
+        <a href="{{ theme.hallmark_url }}" target="_blank" class="d-inline-block d-md-none">
+        {% include 'snippets/hallmark-icons.rain' with {'hallmark': theme.hallmark} %}
+        </a>
+      {% endif %}
+    </div>
+    {% endif %}
+    </div>
+  </div>
+{% elseif position == 'hybrid' %}
+
+  {{ _self.uspCarousel(theme, 'usp-carousel-hybrid') }}
+
+{% elseif position == 'hybrid_bottom' %}
+
+  <div class="usp-bar usp-bar-bottom d-md-none">
+    <div class="container d-flex align-items-center">
+    {{ _self.uspCarousel(theme, 'usp-carousel-hybrid-bottom') }}
+      
+      {% if theme.shopreviews_in_header %}
+      <div class="subheader-rating d-md-none">
+        {% include 'snippets/header-rating.rain' %}
+      </div>
+      {% if theme.shopreviews_header_logo != 'disabled' %}
+      <div class="subheader-hallmark pl-2">
+
+        {% if theme.shopreviews_header_logo == 'custom' %}
+        <a href="{{ theme.shopreviews_url | t }}" target="_blank">
+            <img src="{{ 'shopreviews-header-image.png' | url_asset }}" alt="" class="header-hallmark-img">
+        </a>
+        {% else %}
+          {% if not subheaderEnabled %}
+          <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="d-none d-md-inline-block">
+          {% include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.shopreviews_header_logo} %}
+          </a>
+          {% endif %}
+          <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="d-inline-block d-md-none">
+          {% include 'snippets/hallmark-icons.rain' with {'hallmark': theme.shopreviews_header_logo} %}
+          </a>
+        {% endif %}
+      </div>
+      {% endif %}
+    {% endif %}
+
+    {% if theme.hallmark != 'disabled' and vatSwitcherEnabled %}
+    <div class="subheader-hallmark {{ hallmarkClasses }}">
+        <a href="{{ theme.hallmark_url }}" target="_blank" class="d-none d-md-inline-block">
+        {% include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.hallmark} %}
+        </a>
+        <a href="{{ theme.hallmark_url }}" target="_blank" class="d-inline-block d-md-none">
+        {% include 'snippets/hallmark-icons.rain' with {'hallmark': theme.hallmark} %}
+        </a>
+    </div>
+    {% endif %}
+    </div>
+  </div>
+
+{% endif %}

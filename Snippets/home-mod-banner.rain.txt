@@ -1,0 +1,24 @@
+{% if not theme.homebanner_full_width %}
+	<div class="container">
+{% endif %}
+    
+    <picture id="promobanner" class="banner-holder{% if not theme.homebanner_full_width %} br-3 overflow-hidden{% else %} banner-holder-full-width{% endif %}">
+      {% if theme.promobanner_image_mobile_enabled %}<source srcset="{{ 'promobanner-image-mobile.jpg' | url_asset }}" media="(max-width: 576px)" />{% endif %}
+      <img id="promobanner-img" src="{{ 'homebanner-image.jpg' | url_asset }}" class="" loading="lazy" />
+      
+      <a href="{{ theme.homebanner_button_url | t }}" class="banner-content-holder{% if theme.promobanner_overlay %} banner-overlay {% endif %}">
+        <div class="banner-content justify-content-{{ theme.homebanner_text_align }}">
+        <div class="banner-text text-{{ theme.homebanner_text_align == 'end' ? 'right' : theme.homebanner_text_align }} ">
+          <div class="banner-text-block block-acrylic-{{ theme.promobanner_acrylic }}">
+          <h2 class="banner-title" style="color: {{ theme.promobanner_color_title }};">{{ theme.homebanner_title | t }}</h2>
+          <div class="banner-subtitle mt-1 fz-110" style="color: {{ theme.promobanner_color_text }};">{{ theme.homebanner_sub | t }}</div>
+          </div>
+          <span class="mt-3 button banner-button-{{ theme.homebanner_button_type }} with-icon ">{{ theme.homebanner_button_text | t }} <i class="icon-arrow-right"></i></span>
+        </div>
+        </div>
+      </a>
+    </picture>
+    
+{% if not theme.homebanner_full_width %}
+</div>
+{% endif %}

@@ -1,0 +1,18 @@
+{% if theme.promo_product_1_enabled and featured %}
+<div class="margin-top-double">
+  <div class="container">
+    
+		<div class="">
+      <h4 class="headline">{{ theme.homelook_subtitle | t }}</h4>
+      <h3 class="headline" data-text="{{ theme.homelook_title | t }}">{{ theme.homelook_title | t }}</h3>
+    </div>
+    
+    {% for product in featured | limit(offset) %}
+      {% if loop.index >= offset %}
+    		{% include 'snippets/products.rain' with{ 'mode': 'highlight' } %}
+      {% endif %}
+    {% endfor %}
+
+  </div>
+</div>
+{% endif %}

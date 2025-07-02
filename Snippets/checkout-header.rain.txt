@@ -1,0 +1,73 @@
+{% if uspCarouselPosition == 'top' %}
+  	{% include 'snippets/usp-carousel.rain' with {'position': 'checkout', 'type': 'checkout'} %}
+  {% endif %}
+<div id="checkout-header">
+  <div class="container d-flex">
+    <div class="flex-grow-1 mr-3">
+      <a href="{{ '' | url }}">
+    	{% if mobileLogoUrl %}
+        <img class="logo d-none d-sm-inline-block" src="{{ logoUrl }}" alt="{{ shop.title }}">
+        <img class="logo mobile-logo d-inline-block d-sm-none" src="{{ mobileLogoUrl }}" alt="{{ shop.title }}">
+    	{% else %}
+      	<img class="logo" src="{{ logoUrl }}" alt="{{ shop.title }}">
+    	{% endif %}
+      </a>
+    </div>
+    <div class="ml-3 d-flex align-items-center">
+      <a href="{{ 'cart' | url }}" class="fz-090 mr-3 d-none d-sm-inline-block nowrap"><i class="icon-arrow-left valign-middle mr-1"></i> {{ 'Back to cart' | t }}</a>
+      <div id="header-fancy-cart" class="pos-relative" style="z-index:1;">
+        <a href="{{ 'cart' | url }}" id="cart-header-link" class="cart header-link justify-content-center">
+            <i id="header-icon-cart" class="icon-{{ theme.cart_icon }}"></i><span id="cart-qty" class="{{ theme.cart_icon }}">{{ cartqty }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# {% set subheaderEnabled = (theme.navigation_mode == 'button') %}
+{% set uspsInSubheader = false %}
+
+{# Can be top, hybrid or bottom, depending on settings and environment #
+{% set uspCarouselPosition = theme.usp_carousel_position %}
+
+{% set amountOfSubheaderFeatures = 0 %}
+
+{% set amountOfSubheaderFeatures = (theme.navigation_mode == 'button') ? (amountOfSubheaderFeatures + 1) : amountOfSubheaderFeatures %}
+{% set amountOfSubheaderFeatures = (shop.links.main and theme.navigation_show_custom_links) ? (amountOfSubheaderFeatures + 1) : amountOfSubheaderFeatures %}
+{% set amountOfSubheaderFeatures = (theme.hallmark != 'disabled') ? (amountOfSubheaderFeatures + 1) : amountOfSubheaderFeatures %}
+{% set amountOfSubheaderFeatures = (vatSwitcherEnabled) ? (amountOfSubheaderFeatures + 1) : amountOfSubheaderFeatures %}
+{% set amountOfSubheaderFeatures = (theme.shopreviews_in_header) ? (amountOfSubheaderFeatures + 1) : amountOfSubheaderFeatures %}
+
+{% if (not (shop.links.main and theme.navigation_show_custom_links) or (theme.hallmark == 'disabled')) and theme.navigation_mode == 'button' %}
+	{% set uspsInSubheader = true %}
+{% endif %}
+
+{# Determine if the usp carousel can be hybrid, or should be put below.. #
+{% if uspCarouselPosition == 'hybrid' and (amountOfSubheaderFeatures > 3 or not subheaderEnabled)  %}
+	{% set uspCarouselPosition = 'bottom' %}
+{% endif %}
+
+<header id="header" class="usp-carousel-pos-{{ uspCarouselPosition }}{% if theme.navigation_mode == 'menubar' %} header-scrollable{% endif %}">
+  
+<div id="header-holder" class="usp-carousel-pos-{{ uspCarouselPosition }}{% if theme.navigation_mode != 'menubar' %} header-scrollable{% endif %}">
+  
+  {% if uspCarouselPosition == 'top'  and type != 'default' %}
+  	{% include 'snippets/usp-carousel.rain' with {'position': 'top'} %}
+  {% endif %}
+  
+  <div id="header-content" class="container logo-{{ theme.logo_position }} d-flex align-items-center {% if theme.logo_position =='center' %}justify-content-between{% endif %}">
+    
+    	{% if mobileLogoUrl %}
+        <img class="logo d-none d-sm-inline-block" src="{{ logoUrl }}" alt="{{ shop.title }}">
+        <img class="logo mobile-logo d-inline-block d-sm-none" src="{{ mobileLogoUrl }}" alt="{{ shop.title }}">
+    	{% else %}
+      	<img class="logo" src="{{ logoUrl }}" alt="{{ shop.title }}">
+    	{% endif %}
+    
+  </div>
+</div>
+  
+  {% if uspCarouselPosition != 'top' and type != 'default' %}
+		{% include 'snippets/usp-carousel.rain' with {'position': 'bottom'} %}
+  {% endif %}
+</header> #}

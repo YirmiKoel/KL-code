@@ -1,0 +1,116 @@
+{% if position == 'subheader' %}
+  <div class="subheader-rating d-none d-md-flex align-items-center">
+    {% if theme.shopreviews_stars_in_header %}
+    <div class="stars d-none d-sm-inline-block fz-080 text-right mr-1">
+    	{% for i in 1..5 %}<i class="icon-star-s valign-middle {{ i > (shopReviewsStars) ? 'empty opacity-30' : 'header-star-fill' }}{% if loop.last %} mr-0{% endif %}"></i>{% endfor %}
+      {% if theme.header_rating_show_amount %}
+      	<div>{{ '$1 reviews' | t('<strong>'~theme.shopreviews_amount~'</strong>') | raw }}</div>
+      {% endif %}
+    </div>
+    {% endif %}
+    <a href="{{ theme.shopreviews_url | t }}" class="header-rating{{ theme.shopreviews_score_max == 10 ? ' header-rating-circle' : '' }}{% if theme.shopreviews_stars_in_header and theme.header_rating_show_amount %} ml-1{% endif %}{% if not theme.header_rating_show_score %} d-md-none{% endif %}">
+      <strong class="total">{{ shopReviewsScore }}</strong>
+      {% if theme.shopreviews_score_max != 10 %}<span class="header-rating-max">/{{ theme.shopreviews_score_max }}</span>{% endif %}
+    </a>
+  </div>
+
+  {% if theme.shopreviews_header_logo != 'disabled' %}
+    <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="subheader-review-hallmark d-none d-md-block pl-2 fz-090">
+      {% if theme.shopreviews_header_logo == 'custom' %}
+        <img src="{{ 'shopreviews-header-image.png' | url_asset }}" alt="" class="header-hallmark-img">
+      {% else %}
+        {# include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.shopreviews_header_logo} #}
+      {% include ('snippets/'~('-icon' in theme.shopreviews_header_logo ? 'hallmark-icons' : 'hallmarks-minified')~'.rain') with {'hallmark': theme.shopreviews_header_logo} %}
+      {% endif %}
+    </a>
+  {% endif %}
+
+{% elseif position == 'carousel' %}
+
+  <div class="subheader-rating d-flex align-items-center {{ subheaderEnabled ? 'd-md-none' : '' }}">
+    {% if theme.shopreviews_stars_in_header %}
+    <div class="stars d-none d-sm-inline-block fz-080 text-right mr-1">
+    	{% for i in 1..5 %}<i class="icon-star-s valign-middle {{ i > (shopReviewsStars) ? 'star-empty' : 'header-star-fill' }}{% if loop.last %} mr-0{% endif %}"></i>{% endfor %}
+      {% if theme.header_rating_show_amount %}
+      	<div>{{ '$1 reviews' | t('<strong>'~theme.shopreviews_amount~'</strong>') | raw }}</div>
+      {% endif %}
+  	</div>
+    {% endif %}
+    <a href="{{ theme.shopreviews_url | t }}" class="header-rating{{ theme.shopreviews_score_max == 10 ? ' header-rating-circle' : '' }}{% if theme.shopreviews_stars_in_header and theme.header_rating_show_amount %} ml-1{% endif %}{% if not theme.header_rating_show_score %} d-md-none{% endif %}">
+      <strong class="total">{{ shopReviewsScore }}</strong>
+      {% if theme.shopreviews_score_max != 10 %}<span class="header-rating-max">/{{ theme.shopreviews_score_max }}.0</span>{% endif %}
+    </a>
+  </div>
+
+  {% if theme.shopreviews_header_logo != 'disabled' %}
+  <div class="subheader-hallmark pl-1">
+
+    {% if theme.shopreviews_header_logo == 'custom' %}
+    <a href="{{ theme.shopreviews_url | t }}" target="_blank">
+        <img src="{{ 'shopreviews-header-image.png' | url_asset }}" alt="" class="header-hallmark-img">
+    </a>
+    {% else %}
+      {% if not subheaderEnabled %}
+      <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="d-none d-md-inline-block">
+      {# include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.shopreviews_header_logo} #}
+      {% include ('snippets/'~('-icon' in theme.shopreviews_header_logo ? 'hallmark-icons' : 'hallmarks-minified')~'.rain') with {'hallmark': theme.shopreviews_header_logo} %}
+      </a>
+      {% endif %}
+      <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="d-inline-block d-md-none">
+      {% include 'snippets/hallmark-icons.rain' with {'hallmark': theme.shopreviews_header_logo} %}
+      </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+{% elseif position == 'carousel_bottom' %}
+
+  <div class="subheader-rating {{ subheaderEnabled ? 'd-md-none' : '' }}">
+    {% if theme.shopreviews_stars_in_header %}
+    <div class="stars d-none d-sm-inline-block fz-080">
+    	{% for i in 1..5 %}<i class="icon-star-s valign-middle {{ i > (shopReviewsStars) ? 'star-empty' : 'header-star-fill' }}"></i>{% endfor %}
+  	</div>
+    {% endif %}
+    <a href="{{ theme.shopreviews_url | t }}" class="header-rating{{ theme.shopreviews_score_max == 10 ? ' header-rating-circle' : '' }}">
+      <strong class="total">{{ shopReviewsScore }}</strong>
+      {% if theme.shopreviews_score_max != 10 %}<span class="header-rating-max">/{{ theme.shopreviews_score_max }}</span>{% endif %}
+    </a>
+  </div>
+
+  {% if theme.shopreviews_header_logo != 'disabled' %}
+  <div class="subheader-hallmark pl-1">
+
+    {% if theme.shopreviews_header_logo == 'custom' %}
+    <a href="{{ theme.shopreviews_url | t }}" target="_blank">
+        <img src="{{ 'shopreviews-header-image.png' | url_asset }}" alt="" class="header-hallmark-img">
+    </a>
+    {% else %}
+      {% if not subheaderEnabled %}
+      <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="d-none d-md-inline-block">
+      {# include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.shopreviews_header_logo} #}
+      {% include ('snippets/'~('-icon' in theme.shopreviews_header_logo ? 'hallmark-icons' : 'hallmarks-minified')~'.rain') with {'hallmark': theme.shopreviews_header_logo} %}
+      </a>
+      {% endif %}
+      <a href="{{ theme.shopreviews_url | t }}" target="_blank" class="d-inline-block d-md-none">
+      {% include 'snippets/hallmark-icons.rain' with {'hallmark': theme.shopreviews_header_logo} %}
+      </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+{% else %}
+
+
+
+<!-- score: {{shopReviewsScore}}/{{ theme.shopreviews_score_max }} - shopReviewRating: {{shopReviewsRating}} - shopReviewStars: {{ shopReviewsStars }} -->
+<div class="stars d-none d-sm-inline-block">      
+  <!--
+  {% for i in 1..5 %}
+    --><i class="icon-star-s {{ i > (shopReviewsStars) ? 'empty' : 'header-star-fill' }}"></i><!--
+  {% endfor %}
+  -->
+</div>
+<a href="{{ theme.shopreviews_url | t }}" class="rating">
+  <strong class="total">{{ shopReviewsScore }}</strong>/{{ theme.shopreviews_score_max }}
+</a>
+{% endif %}

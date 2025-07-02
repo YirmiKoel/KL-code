@@ -1,0 +1,158 @@
+<div id="navbar-holder" class="{% if theme.navbar_borders != 'none' %}navbar-border-{{ theme.navbar_borders }}{% endif %}{% if theme.navigation_shadow_effect %} header-has-shadow{% endif %} hidden-xxs hidden-xs hidden-sm">
+  <div class="container">
+      <nav id="navbar" class="navbar-type-{{ type }} d-flex justify-content-center{% if not theme.navbar_submenu_fullwidth %} pos-relative{% endif %}{% if theme.compact_navbar %} navbar-compact{% endif %}">
+
+<ul id="navbar-items" class="flex-grow-1 item-spacing-{{ theme.navbar_item_spacing }} {% if type == 'small' %} smallmenu{% else %} megamenu{% endif %}{% if theme.compact_navbar %} compact{% endif %}{% if theme.navbar_uppercase %} items-uppercase{% endif %}{% if vatSwitcherEnabled %} with-vat-switcher{% endif %}{% if not vatSwitcherEnabled or true %} text-{{ theme.navbar_text_position }}{% endif %}">
+        
+  		<li class="navbar-item navbar-main-item{% if template == 'pages/index.rain' %} navbar-item-active{% endif %}"><a href="{{ '' | url }}" class="navbar-main-link{% if template == 'pages/index.rain' %} navbar-link-active{% endif %}">{{ 'Home' | t }}</a></li>
+  
+        {% for category in shop.categories %}
+  				{% set main_category_id = category.id %}
+        <li class="navbar-item navbar-main-item{% if category.subs %} navbar-main-item-dropdown{% endif %}{% if category.url is active %} navbar-main-item-active active{% endif %}" data-navbar-id="{{ category.id }}">
+          <a href="{{ category.url | url }}" class="navbar-main-link{% if category.subs %} navbar-main-link-dropdown{% endif %}{% if category.url is active %} navbar-link-active{% endif %}">{{ category.title }}</a>
+
+{% if type == 'mega' %}
+          {% if category.subs %}
+          <ul class="navbar-sub megamenu pt-4 pb-3 px-3">
+            <li>
+              <div class="container">
+              <div class="row">
+              
+              <div class="col maxheight">
+              {% if theme.navbar_sub_title %}
+                <div class="mb-3 font-headings fz-140 opacity-40">{{ category.title }}</div>
+              {% endif %}
+              <div class="row">
+              {% for category in category.subs %}
+                <div class="col-3 sub-holder mb-3">
+                  <a href="{{ category.url | url }}" class="fz-110 bold">{{ category.title }}</a>
+                  
+                  {% if category.subs %}
+                    <ul class="sub2 mt-1">
+                      {% for category in category.subs %}
+                      <li>
+                        <a href="{{ category.url | url }}">{{ category.title }}</a>
+                        
+                        {% if category.subs %}
+                          <ul class="sub3">
+                            {% for category in category.subs %}
+                            <li>
+                              <a href="{{ category.url | url }}">{{ category.title }}</a>
+                            </li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+                
+              {% endfor %}
+              </div>
+              </div>
+              
+              {% if theme.navbar_sub_brands %}
+                <div class="col-3 col-lg-2 navbar-brands-col mb-3" data-category-id="{{ main_category_id }}">
+                  <div class="mb-3 font-headings fz-140 opacity-40">{{ 'Brands' | t }}</div>
+                  <div class="navbar-brands-list">
+                    {#<div class="loader-holder px-2 py-4 gray-border"><div class="loader-icon loader-icon-small"></div></div>#}
+                  </div>
+                </div>
+              {% endif %}
+                
+              {% if category.image and theme.category_images_in_subnav %}
+              <div class="col-auto pb-3 text-center">
+                <div class="pos-relative gray-overlay">
+                <img src="{{ category.image | url_image('240x240x1') }}" class="img-responsive subcat-image br-2" width="240" height="240" alt="{{ category.title }}" loading="lazy">
+                </div>
+              </div>
+              {% endif %}
+              
+              </div>
+                  </div>
+            </li>
+          </ul>
+          {% endif %}          
+{% elseif type == 'small' %}
+
+
+          {% if category.subs %}
+          <ul class="navbar-sub">
+            {% for category in category.subs %}
+            <li class="navbar-item">
+                {% if category.subs %}
+                <a href="{{ category.url | url }}" class="navbar-sub-link nav-item-with-arrow">{{ category.title }}</a>
+                <ul class="navbar-sub navbar-sub-sub">
+                  {% for category in category.subs %}
+                  <li class="navbar-item">
+                    <a href="{{ category.url | url }}" class="navbar-sub-link">{{ category.title }}</a>
+                  </li>
+                  {% endfor %}
+                </ul>
+                {% else %}
+                <a href="{{ category.url | url }}" class="navbar-sub-link">{{ category.title }}</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+{% endif %}
+
+        </li>
+        {% endfor %}
+  
+        {% if theme.show_navbar_blogs and shop.blogs %}
+        {% for blog in shop.blogs | limit (2) %}
+          <li class="navbar-main-item{% if blog.url is active %} navbar-main-item-active{% endif %}">
+            <a href="{{ blog.url | url }}" class="navbar-main-link{% if blog.url is active %} navbar-link-active{% endif %}">{{ blog.title }}</a>
+          </li>
+        {% endfor %}
+        {% endif %}
+        
+        {% if theme.show_navbar_brands %}
+        <li class="navbar-main-item{% if template == 'pages/brands.rain' %} navbar-main-item-active{% endif %}">
+          <a href="{{ 'brands' | url }}" class="navbar-main-link{% if template == 'pages/brands.rain' %} navbar-link-active{% endif %}">{{ 'Brands' | t }}</a>
+        </li>
+        {% endif %}
+  
+        {# if theme.show_navbar_stores_page %}
+        <li class="navbar-main-item{% if false %} navbar-main-item-active{% endif %}">
+          <a href="{{ 'service/stores' | url }}" class="navbar-main-link{% if false %} navbar-link-active{% endif %}">{{ 'Customer service' | t }}</a>
+        </li>
+        {% endif %}#}
+  
+        {% if theme.show_navbar_service_page and theme.navigation_custom_links_position == 'navbar' %}
+        <li class="navbar-main-item{% if template == 'pages/service.rain' %} navbar-main-item-active{% endif %}">
+          <a href="{{ 'service' | url }}" class="navbar-main-link{% if template == 'pages/service.rain' %} navbar-link-active{% endif %}">{{ 'Customer service' | t }}</a>
+        </li>
+        {% endif %}
+        
+        {% if shop.links.main and (theme.navigation_show_custom_links) and theme.navigation_custom_links_position == 'navbar' %}
+        	{% for link in shop.links.main %}
+					<li class="navbar-main-item">
+            <a href="{{ link.url | url }}"{% if 'service/presets' in link.url %} id="demo-preset-link"{% endif %} class="navbar-main-link" {% if link.new_window %} target="_blank"{% endif %}>{{ link.title }}</a>
+          </li>
+          {% endfor %}
+        {% endif %}
+  
+        {% if theme.nav_sale_enabled %}
+  				<li class="navbar-main-item{% if (theme.nav_sale_url | t | url) is active %} navbar-main-item-active{% endif %}">
+        	<a href="{{ theme.nav_sale_url | t | url }}" class="nav-sale-link{% if (theme.nav_sale_url | t | url) is active %} navbar-link-active{% endif %}">{{ theme.nav_sale_label | t }}</a>
+  				</li>
+        {% endif %}
+  
+      </ul>
+
+    <form id="subheader-search" class="d-flex {% if vatSwitcherEnabled %}d-lg-none mr-2{% else %}d-md-none{% endif %} pos-relative flex-grow-1 as-body my-2" action="{{ 'search' | url }}" method="GET">
+      <input type="text" maxlength="50" name="q" id="subheader-search-input" class="search-input subheader-search-input" placeholder="{{ 'Search' | t }}..">
+      <button class="search-button" type="submit" name="search"><i class="icon-search"></i></button>
+    </form>
+        
+        {% if vatSwitcherEnabled %}
+          {% include 'snippets/vat-switcher.rain' %}
+        {% endif %}
+            
+    </nav>
+  </div>  
+</div>

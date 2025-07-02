@@ -1,0 +1,58 @@
+{% set productsAType = theme.home_products_a_type %}
+{% if (productsAType == 'featured' and featured) or (productsAType == 'newest' and newest) or (productsAType == 'popular' and popular) %}
+{# had margin-top-double, but parent also has margin-top #}
+<div class="home-main-products container">    
+    {% if theme.products_module_a_carousel %}
+    <div class="pos-relative">
+        <h3 class="headline mb-n2" data-text="{{ theme.main_grid_title | t }}">{{ theme.main_grid_title | t }}</h3>
+      
+            <div class="title-swiper-arrows">
+              <i class="swiper-home-main-prev title-swiper-arrow icon-angle-left"></i>
+              <i class="swiper-home-main-next title-swiper-arrow icon-angle-right"></i>
+            </div>
+      </div>
+  
+          <div class="swiper-container homepage-product-slider margin-top home-slide-a">
+            <div class="swiper-wrapper homepage-product-slider-wrapper static-products-holder">
+              {% if productsAType == 'featured' %}
+                    {% include 'snippets/products.rain' with {'products': featured, 'mode': 'grid', 'in_slider': true, 'lazyOffset' : 0, 'offset': featuredOffset, 'limit': featuredLimit } %}
+              {% else %}
+                    {% include 'snippets/products.rain' with {'products': _context[productsAType], 'mode': 'grid', 'in_slider': true, 'lazyOffset' : 0, 'limit':8 } %}
+              {% endif %}
+            </div>
+          </div>
+
+      {% if theme.home_products_a_button %}
+      <div class="margin-top text-center">
+        <a href="{{ 'collection' | t }}?sort={{ productsAType }}" class="button buttolarge with-icon lined">{{ theme.home_products_a_button | t }} <i class="icon-arrow-right"></i></a>
+      </div>
+      {% endif %}
+    {% else %}
+
+    <div class="row">
+      <div class="col-md-12">
+        <h3 class="headline mb-n2 with-link" data-text="{{ theme.main_grid_title | t }}">{{ theme.main_grid_title | t }}</h3>
+        
+        <div class="row">
+          <div class="col-md-12">
+            <div class="row productsrow product-grid static-products-holder">
+              {% if productsAType == 'featured' %}
+                    {% include 'snippets/products.rain' with {'products': featured, 'mode': 'grid', 'lazyOffset' : 0, 'col_width':3, 'offset': featuredOffset, 'limit':featuredLimit } %}
+              {% else %}
+                    {% include 'snippets/products.rain' with {'products': _context[productsAType], 'mode': 'grid', 'lazyOffset' : 0, 'col_width':3, 'limit': 8 } %}
+              {% endif %}
+            </div>
+          </div> 
+        </div>
+          
+      </div>
+    </div>
+  {% if theme.home_products_a_button %}
+    <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}?sort={{ productsAType }}" class="button buttolarge with-icon lined">{{ theme.home_products_a_button | t }} <i class="icon-arrow-right"></i></a>
+  	</div>
+  {% endif %}
+    {% endif %}
+    
+</div>
+{% endif %}

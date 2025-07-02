@@ -1,0 +1,72 @@
+<div id="theme-messages" class="theme-messages">
+{% if page.messages %}
+
+<!-- <div id="theme-messages" class="theme-messages-static"> -->
+  
+  {% if page.messages.info %}
+  <div class="theme-message message-info">
+    <i class="icon-x-l fz-090 theme-message-close"></i>
+    
+    <i class="theme-message-icon icon-question-l"></i>
+    
+    <div class="content">
+      <ul class="info">
+        {% for message in page.messages.info %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if page.messages.success %}
+  <div class="theme-message message-success">
+    <i class="icon-x-l fz-090 theme-message-close"></i>
+    
+    <i class="theme-message-icon icon-check"></i>
+    
+    <div class="content">
+      <ul class="success">
+        {% for message in page.messages.success %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+  
+  {% if page.messages.error %}
+  <div class="theme-message message-error">
+    <i class="icon-x-l fz-090 theme-message-close"></i>
+    
+    <i class="theme-message-icon icon-x"></i>
+    
+    <div class="content">
+      <ul class="error">
+        {% for message in page.messages.error %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+  
+<!-- </div> -->
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function()
+  {
+    setTimeout( function()
+		{
+      var msgElements = $('.theme-message');
+    
+      msgElements.animate({'right':'-500px', 'opacity': 0}, 300, function()
+      {
+        msgElements.remove();
+      });
+    }, 5000);
+  });
+</script>
+{% endif %}
+</div>

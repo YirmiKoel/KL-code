@@ -1,0 +1,158 @@
+{% macro generateSlider(theme, i) %}
+	{% set sliderType = theme.slider_type %}
+
+	{% set blockPosition = theme['slider_'~i~'_justify_content'] %}
+	{% set textPosition = 'center' %}
+	
+	{% if blockPosition != 'center' %}
+		{% set textPosition = (blockPosition == 'end') ? 'right' : 'left' %}
+	{% endif %}
+
+  {% if theme['slider_'~i~'_enabled'] %}
+	
+	{% set imgUrl = ('slider-'~i~'.jpg') | url_asset %}
+	{% set mobileImageEnabled = theme['slider_'~i~'_mobile_image_enabled'] %}
+	{% set lazy = (i > 1) %}
+
+  <div class="slider-{{ i }} home-slider-slide home-slider-slide-{{ sliderType }} swiper-slide banner-holder">
+    
+    {% if sliderType == 'adaptive' %}
+    <img id="img-slide-1" class="w-100" src="{{ imgUrl }}">
+    {% endif %}
+    
+    {% if sliderType == 'fixed' %}   
+    <picture class="slider-picture">
+      {% if mobileImageEnabled %}<source id="slider-source-{{ i }}" {% if lazy %}data-{% endif %}srcset="{{ ('slider-'~i~'-mobile.jpg') | url_asset }}" media="(max-width: 576px)" class="{% if lazy %}lazy {% endif %}" />{% endif %}
+      <img id="slider-img-{{ i }}" {% if lazy %}data-{% endif %}src="{{ imgUrl }}" class="{% if lazy %}lazy {% endif %}homepage-slider-img"{% if false %} loading="lazy"{% endif %} alt="{{ theme['slider_'~i~'_title'] | t }}" />
+    </picture>
+    {% endif %}
+    
+    <a href="{{ theme['slider_'~i~'_url'] | t }}" class="banner-content-holder">
+      
+      <div class="banner-content slider-content justify-content-{{ blockPosition }} align-items-{{ theme['slider_'~i~'_align_items'] }}">
+      
+      <div class="banner-text text-{{ textPosition }} {% if theme['slider_'~i~'_block_bg'] %}banner-text-block-bg{% endif %}">
+        {% if theme['slider_'~i~'_pre'] %}
+          <div class="banner-pre{% if sliderType != 'fixed' %} d-none d-sm-block{% endif %}">{{ theme['slider_'~i~'_pre'] | t }}</div>
+        {% endif %}
+        
+        <div class="banner-text-block block-acrylic-{{ theme['slider_'~i~'_acrylic'] }}">
+        {% if theme['slider_'~i~'_title'] %}
+          <h2 class="banner-title{% if sliderType != 'fixed' %} hidden-xs hidden-xxs{% endif %}">{{ theme['slider_'~i~'_title'] | t }}</h2>
+        {% endif %}
+        {% if theme['slider_'~i~'_sub'] %}
+          <div class="banner-subtitle margin-top-5{% if sliderType != 'fixed' %} hidden-xs hidden-xxs{% endif %}">{{ theme['slider_'~i~'_sub'] | t }}</div>
+        {% endif %}
+        </div>
+
+        {% if theme['slider_'~i~'_button'] %}
+          <span class="margin-top-15 button banner-button-{{ theme['slider_'~i~'_button_type'] }} with-icon {% if sliderType != 'fixed' %} d-none d-sm-inline-block{% endif %}">{{ theme['slider_'~i~'_button'] | t }} <i class="icon-arrow-right"></i></span>
+        {% endif %}
+
+        {% if theme['slider_'~i~'_timer'] %}
+        <div class="countdown-block slider">
+          <div class="countdown-slider-1" data-countdown="{{ theme['slider_'~i~'_timer'] }}"></div>
+        </div>
+        {% endif %}
+      </div>
+      </div>
+    </a>
+  </div>
+  {% endif %}
+{% endmacro %}
+
+{% set sliderColClass = theme.slider_side_block == 'disabled' or theme.slider_fullwidth ? 'col-12' : 'col-lg-8' %}
+{% set sliderColClass = theme.slider_side_block == 'deal' ? 'col-12 col-md-6 col-lg-7 col-xl-8' : sliderColClass %}
+
+{% set highlightsCount = theme.highlight_1_enabled %}
+{% set highlightsCount = highlightsCount + theme.highlight_2_enabled %}
+
+{% if (theme.slider_1_enabled or theme.slider_2_enabled or theme.slider_3_enabled) %}
+
+  {% if not theme.slider_fullwidth or (theme.slider_side_block != 'disabled' and not theme.slider_fullwidth) %}
+		<div class="container">
+      <div class="row">
+    		<div class="{{ sliderColClass }}">
+  {% endif %}
+
+  {# start slider carousel #}
+  <div id="home-slider-holder" class="slider-side-block-{{ theme.slider_side_block }} {% if theme.slider_overlay_enabled %}slider-with-overlays{% endif %}{% if theme.slider_fullwidth %} full-width{% endif %}">
+    <div id="home-slider" class="swiper-container slider-type-{{ theme.slider_type }}{% if not theme.slider_fullwidth %} rounded-2{% endif %} slider-height-{{ theme.slider_height }} {% if theme.slider_side_block == 'products' %} slider-with-side-products{% endif %}">
+      <div class="swiper-wrapper">
+        {% for i in range(1,3) %}
+          {{ _self.generateSlider(theme, i) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% if slidesActive > 1 %}
+    <div id="home-slide-prev" class="swiper-left"><i class="icon-angle-left"></i></div>
+    <div id="home-slide-next" class="swiper-right"><i class="icon-angle-right"></i></div>
+    <div class="swiper-pagination"></div>
+    {% endif %}
+  </div>
+  {# end slider carousel #}
+	
+	{% if not theme.slider_fullwidth or theme.slider_side_block != 'disabled' %}
+    </div>
+	{% endif %}
+        
+	{% if theme.slider_side_block != 'disabled' and not theme.slider_fullwidth %}
+  	{% if theme.slider_side_block == 'deal' %}
+      <div class="col-12 col-md-6 col-lg-5 col-xl-4 d-flex flex-column mt-3 mt-md-0">
+          {% include 'snippets/products.rain' with {'products': featured, 'mode': 'homedeal_new', 'limit' : 1} %}
+      </div>
+		{% elseif theme.slider_side_block == 'highlights' %}
+      <div id="home-highlights" class="col-lg-4">
+        <div class="row flex-lg-column">
+        {% for i in range (1,2) %}
+          {% if theme['highlight_'~i~'_enabled'] %}
+          <div class="col-12 col-sm">
+            <a href="{{ theme['highlight_'~i~'_button_url'] | t }}" class="home-highlight br mt-4{% if loop.first %} mt-lg-0{% endif %}">
+              <div class="banner-holder highlight-{% if highlightsCount == 1 %}medium{% else %}tiny{% endif %}">
+                <picture class="">
+                  <img src="{{ ('highlight-'~i~'-image.jpg') | url_asset }}" class="home-highlight-img banner-img">
+                </picture>
+                <div class="banner-content-holder banner-overlay">
+                <div class="banner-content justify-content-{{  theme['highlight_'~i~'_text_position'] }} align-items-{{  theme['highlight_'~i~'_text_align_items'] }}">
+                  <div class="banner-text">
+                    <h3 class="c-inherit banner-footer-title title-size-{{ theme.highlights_title_size }}">{{  theme['highlight_'~i~'_title'] | t }}</h3>
+                    <div class="banner-subtitle">{{  theme['highlight_'~i~'_sub_title'] | t }}</div>
+                  </div>
+                </div>
+                </div>
+              </div>
+              <div class="banner-footer-textblock">
+                <span>{{  theme['highlight_'~i~'_button_text'] | t }}</span>
+                <i class="button button-icon-circle ml-1 icon-arrow-right"></i>
+              </div>
+            </a>
+          </div>
+          {% endif %}
+        {% endfor %}
+        </div>
+      </div>
+    {% elseif theme.slider_side_block == 'products' %}
+      <div class="col-lg-4 d-flex flex-column static-products-holder home-side-products">
+        <h4 class="headline">{{ theme.slider_side_products_title | t }}</h4>
+          
+        <div class="align-self-stretch h-100">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-1 mb-auto dynamic-products col-loading" data-products-url="{{ (theme.slider_side_products_url | t) | url }}?request_type=ajax&amp;request_action=collection&amp;mode=mini_list&amp;limit=4&amp;sort={{ theme.slider_side_products_sort }}">
+          <div class="gray-bg mt-3">
+          	<div class="lds-dual-ring"></div>
+          </div>
+          </div>
+        </div>
+        <div class="text-center margin-top-s">
+          <a href="{{ (theme.slider_side_products_url | t) | url }}" class="button lined with-icon">{{ 'View all' | t }} <i class="icon-arrow-right"></i></a>
+        </div>
+      </div>
+    {% endif %}
+	{% endif %}
+      
+  {% if not theme.slider_fullwidth or theme.slider_side_block != 'disabled' %}
+        
+      </div>
+    </div>
+	{% endif %}
+
+{% endif %}

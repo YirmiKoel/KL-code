@@ -1,0 +1,100 @@
+{% set pagination = collection | paginate %}
+
+{% if theme.collection_pagination_mode == 'live' %}
+	{% if type == 'previous' and pagination.previous %}
+
+    <div class="custom-pagination pagination-previous text-center">
+      {% if pagination.previous %}
+      <div class="">
+        <a class="collection-load-more button button-small" data-direction="previous" data-current-page="{{ collection.page }}" href="{{ pagination.previous.url | url }}">
+          {{ 'Show more products' | t }}
+        </a>
+      </div>
+      
+      <div class="items">
+        {{ 'Showing $1 - $2 of $3' | t( ('<strong>'~collection.items_from ~'</strong>'), ('<strong>'~collection.items_to ~'</strong>'), collection.count) | raw }}
+      </div>
+      {% endif %}
+    </div>
+
+	{% elseif type == 'next' %}
+
+    <div class="custom-pagination pagination-next text-center mt-4">
+      <div class="items">
+        {{ 'Showing $1 - $2 of $3' | t( ('<strong>'~collection.items_from ~'</strong>'), ('<strong>'~collection.items_to ~'</strong>'), collection.count) | raw }}
+      </div>
+      {% if pagination.next %}
+      <div class="">
+        <a class="collection-load-more button" data-direction="next" data-current-page="{{ collection.page }}" href="{{ pagination.next.url | url }}">
+          {{ 'Show more' | t }}
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+	{% endif %}
+{% else %}
+
+
+
+{% if type == 'previous' %}
+	{% if collection.pages > 1 and collection.page > 1 and theme.collection_pagination_mode == 'live' %}
+  	{% set pagination = collection | paginate %}
+  	<div class="live-pagination prev custom-pagination text-center margin-top">
+      {% if pagination.previous %}
+        <div class="load">
+          <a class="load-prev button" data-current-page="{{ collection.page }}" href="{{ pagination.previous.url | url }}&amp;action=collection">
+            {{ 'Show more' | t }}
+          </a>
+        </div>
+
+        <div class="items">
+        	{{ 'Showing $1 - $2 of $3' | t( ('<strong>'~collection.items_from ~'</strong>'), ('<strong>'~collection.items_to ~'</strong>'), collection.count) | raw }}
+        </div>  
+      {% endif %}
+    </div>
+  {% endif %}
+{% else %}
+
+	{% if collection.pages > 1 and  theme.collection_pagination_mode == 'live' %}
+  {% set pagination = collection | paginate %}
+  
+  <div class="live-pagination custom-pagination next text-center margin-top">
+    <div class="items">
+      {{ 'Showing $1 - $2 of $3' | t( ('<strong>'~collection.items_from ~'</strong>'), ('<strong>'~collection.items_to ~'</strong>'), collection.count) | raw }}
+    </div>
+    {% if pagination.next %}
+    <div class="load">
+      <a class="load-more button" data-current-page="{{ collection.page }}" href="{{ pagination.next.url | url }}&amp;action=collection">
+        {{ 'Show more' | t }}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+  {% elseif collection.pages > 1 %}
+  <div class="collection-pagination custom-pagination text-center margin-top">
+    <div class="items">
+      {{ 'Showing $1 - $2 of $3' | t( ('<strong>'~collection.items_from ~'</strong>'), ('<strong>'~collection.items_to ~'</strong>'), collection.count) | raw }}
+    </div>
+    
+    {% set pagination = collection | paginate %}
+    <div class="paginate margin-top-half">
+      <ul>
+      {% if pagination.previous %}
+        <li class="prev"><a href="{{ pagination.previous.url | url }}" title="{{ 'Previous page' | t }}"><i class="icon-angle-left" aria-hidden="true"></i></a></li>
+      {% endif %}
+      {% for part in pagination.parts %}
+        {% if part.url %} 
+            <li class="number{% if part.active %} active{% endif %}"><a href="{{ part.url | url }}" class="{% if part.active %}highlight-bg{% endif %}">{{ part.title }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if pagination.next %}
+        <li class="next"><a href="{{ pagination.next.url | url }}" title="{{ 'Next page' | t }}"><i class="icon-angle-right" aria-hidden="true"></i></a></li>
+      {% endif %}
+      </ul>
+  	</div>
+  </div>
+  {% endif %}
+
+{% endif %}
+{% endif %}

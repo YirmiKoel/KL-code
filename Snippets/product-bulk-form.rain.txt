@@ -1,0 +1,186 @@
+{% set variantCodeKey = theme.product_bulk_code_identifier %}
+
+<div class="row mt-4">
+  <div class="col-md-12">
+      <div class="productform{% if theme.dyapps_advanced_variants %} dyapps-advanced-variants select-opacity-0{% endif %}">
+        <div class="fz-110 bold">{{ 'Make a choice' | t }}</div>
+        <div id="#pp-bulk-variants">
+          {% if not product.variants %}
+          
+          {% set vStockText = 'In stock' %}
+          {% set vStockType = 'in-stock' %}
+
+          {% if product.stock.track %}
+            {% if not product.stock.available and not product.stock.on_stock %}
+              {% set vStockText = 'Out of stock' %}
+              {% set vStockType = 'out-of-stock' %}
+            {% elseif product.stock.available and not product.stock.on_stock %}
+              {% set vStockText = 'Backorder' %}
+              {% set vStockType = 'backorder' %}
+            {% endif %}
+          {% endif %}
+          
+          {% set showStockLevel = (false and vStockType == 'in-stock') %}
+          
+          {% set showDeliveryText = (theme.product_bulk_variants_show_delivery or request.get.product_bulk_variants_show_delivery == 'true') %}
+          
+          {% set metadata = {
+            id: product.id,
+            vid: product.vid,
+            variant: ((product.variant | lower) == "default" ? '' : (product.variant | replace({"'": "#039;"}))),
+            title: (product.title | replace({"'": "#039;"})),
+            price: (product.price),
+            image: ( product.image ? (product.image | url_image(imageSize)) : '')
+          } | json_encode %}
+          
+        	<form action="{{ ('cart/add/' ~ product.vid) | url }}" class="product-mini-list p-2 mt-2" method="post">
+            <div class="variant-bulk-title flex-grow-1">
+              <div class="bold">{{ product.variant ?: product.title }}</div>
+                {% if product[variantCodeKey] %}
+                  <div class="d-sm-none d-md-block d-lg-none opacity-90 fz-080">
+                    {{ product[variantCodeKey] }}
+                  </div>
+                {% endif %}
+              <div class="c-{{ vStockType }} nowrap fz-090">
+                <i class="icon-check-b"></i> <span class="">{{ vStockText | t }}</span>{% if showStockLevel %} ({{ product.stock.level }}){% endif %}
+              </div>       
+              
+                {% if showDeliveryText and product.stock.delivery.title %}
+                <div class="lh-1 fz-090">
+                  <span class="">{{ product.stock.delivery.title | t }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if product[variantCodeKey] %}
+              <div class="ml-2 d-none d-sm-block d-md-none d-lg-block opacity-90 fz-080{% if showDeliveryText %} nowrap{% endif %}">
+                {{ product[variantCodeKey] }}
+              </div>
+            {% endif %}
+            
+            <div class="ml-3">
+              {% if product.price.price_old %}
+                <span class="price-old price-incl">{{ product.price.price_old_incl | money_without_currency }}</span>
+                <span class="price-old price-excl">{{ product.price.price_old_excl | money_without_currency }}</span>
+                {% if shopLegalMode == 'strict' %}<span>{{ 'SRP' | t }}</span>{% endif %}<br>
+              {% endif %}
+              <span class="price-incl bold">{{ product.price.price_incl | money_without_currency }}</span>
+              <span class="price-excl bold">{{ product.price.price_excl | money_without_currency }}</span>
+            </div>
+            
+            <div class="ml-2 d-flex">
+              <div class="qty" data-type="single">
+                <input type="number" min="0" name="quantity" class="qty-input qty-fast body-bg" value="{{ product.quantity }}">
+                <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+                <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+              </div>
+
+              <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button trigger-add-to-cart" data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a>
+            </div>
+          </form>
+          
+          {% else %}
+        {% for variant in product.variants %}
+          {% set vStockText = 'In stock' %}
+          {% set vStockType = 'in-stock' %}
+
+          {% if product.stock.track %}
+            {% if not variant.stock.available and not variant.stock.on_stock %}
+              {% set vStockText = 'Out of stock' %}
+              {% set vStockType = 'out-of-stock' %}
+            {% elseif variant.stock.available and not variant.stock.on_stock %}
+              {% set vStockText = 'Backorder' %}
+              {% set vStockType = 'backorder' %}
+            {% endif %}
+          {% endif %}
+          
+          {% set showStockLevel = (false and vStockType == 'in-stock') %}
+          
+          {% set showDeliveryText = (theme.product_bulk_variants_show_delivery or request.get.product_bulk_variants_show_delivery == 'true') %}
+          
+          {% set metadata = {
+            id: product.id,
+            vid: variant.id,
+            variant: ((variant.title | lower) == "default" ? '' : (variant.title | replace({"'": "#039;"}))),
+            title: (product.title | replace({"'": "#039;"})),
+            price: (product.price),
+            image: ( product.image ? (product.image | url_image(imageSize)) : '')
+          } | json_encode %}
+          
+        	<form action="{{ ('cart/add/' ~ variant.id) | url }}" class="product-mini-list p-2 mt-2" method="post" data-bulk-variant="{{ variant.title | lower | replace({' ':'-'}) }}">
+            <div class="variant-bulk-title flex-grow-1">
+              <div class="fz-110 bold">{{ variant.title }}</div>
+              
+            {% if variant[variantCodeKey] %}
+              <div class="d-sm-none d-md-block d-lg-none opacity-90 fz-080">
+                {{ variant[variantCodeKey] }}
+              </div>
+            {% endif %}
+              
+              <div class="c-{{ vStockType }} nowrap fz-090">
+                <i class="icon-check-b"></i> <span class="">{{ vStockText | t }}</span>{% if showStockLevel %} ({{ variant.stock.level }}){% endif %}
+              </div>
+              
+              {% if showDeliveryText and variant.stock.delivery.title %}
+              <div class="lh-1 fz-090">
+                <span class="">{{ variant.stock.delivery.title | t }}</span>
+              </div>
+              {% endif %}
+              
+      {# if theme.keep_stock or (theme.show_delivery_time == 'custom' or (theme.show_delivery_time == 'product' and product.stock.delivery.title != '')) %}
+        <div class="deliverytime-content fz-080  lh-1 c-{{ vStockType }}">
+          {% if theme.show_delivery_time == 'custom' or (theme.show_delivery_time == 'product' and product.stock.delivery.title != '') %}
+            {{ theme.show_delivery_time == 'custom' ? (theme.delivery_time_custom_text | t) : product.stock.delivery.title  }}
+          {% endif %}
+        </div>
+      {% endif #}
+              
+            </div>
+            
+            {% if variant[variantCodeKey] %}
+              <div class="ml-2 d-none d-sm-block d-md-none d-lg-block opacity-90 fz-080{% if showDeliveryText %} nowrap{% endif %}">
+                {{ variant[variantCodeKey] }}
+              </div>
+            {% endif %}
+            
+            <div class="ml-3">
+              {% if variant.price.price_old %}
+                <span class="price-old price-incl">{{ variant.price.price_old_incl | money_without_currency }}</span>
+                <span class="price-old price-excl">{{ variant.price.price_old_excl | money_without_currency }}</span>
+                {% if shopLegalMode == 'strict' %}<span>{{ 'SRP' | t }}</span>{% endif %}<br>
+              {% endif %}
+              <span class="price-incl bold">{{ variant.price.price_incl | money_without_currency }}</span>
+              <span class="price-excl bold">{{ variant.price.price_excl | money_without_currency }}</span>
+            </div>
+            
+            <div class="ml-2 d-flex">
+              <div class="qty" data-type="single">
+                <input type="number" min="0" name="quantity" class="qty-input qty-fast body-bg" value="{{ product.quantity }}">
+                <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+                <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+              </div>
+
+              <a href="{{ ('cart/add/' ~ variant.id) | url }}" class="button quick-order-button trigger-add-to-cart" data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a>
+            </div>
+          </form>
+        {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+  </div>
+</div>
+  
+{% if productFeatures['group_by'] %}
+<div class="group-by-variants mt-3">
+  {% if productFeatures['group_by_title'] %}
+  <div class="fz-110 bold">{{ productFeatures['group_by_title'] | t }}</div>
+  {% endif %}
+
+  {% set groupBySearchVal = product[ productFeatures['group_by'] ] %}
+  <div class="dynamic-products dy-product-group-variants dy-needs-addons" data-group-by="{{ productFeatures['group_by'] }}" data-products-url="{{ ('search/'~groupBySearchVal) | url }}?request_type=ajax&amp;request_action=collection&amp;mode=variants&amp;limit=12&amp;sort=popular&amp;product_id={{ product.id }}">
+  <div class="mt-3 w-100 p-3">
+    <div class="loader-icon loader-icon-small"></div>
+  </div>
+  </div>
+</div>
+{% endif %}

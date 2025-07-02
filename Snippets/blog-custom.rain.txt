@@ -1,0 +1,213 @@
+{% include 'snippets/breadcrumbs.rain' %}
+
+<div id="blog-custom" class="container">
+  
+  <h1>{{ blog.title }}{% if blog.tag %}: {{ blog.tag.title }}{% endif %}</h1>
+  
+  {% if theme.blog_tag_carousel_enabled and blog.tags %}
+  <div class="pos-relative mt-3">
+  	<div id="blog-tags-carousel" class="d-flex horizontal-scroller horizontal-scroller-with-nav">
+			{% for tag in blog.tags %}
+  			<a class="button button-lined-soft mr-2 nowrap {% if blog.tag and tag.id == blog.tag.id %}underlined{% endif %}" href="{{ tag.url | url }}" style="padding:9px 20px;">{{ tag.title }}</a>
+    	{% endfor %}
+  	</div>
+  </div>
+  {% endif %}
+  
+  <div class="row">
+    {% for article in blog.articles | limit(1) %}
+    <div class="col-12 col-sm-6 col-md-{{ (blog.articles | length > 1) ? (blog.pagination.previous ? '6' : '8') : '12' }} mt-4">
+      <div class="blog-custom-article" id="blog-custom-first">
+        <div class="pos-relative">
+          <a href="{{ article.url | url }}" class="d-block">
+        <picture class="article-picture gray-bg gray-overlay">
+          {% if article.image %}
+          <img src="{{ article.image | url_image('', article.title) }}" alt="{{ article.title }}" class="article-image">
+          {% endif %}
+        </picture>
+          
+          
+        <div class="article-date ">
+            <span class="article-date-day">{{ article.date | date('d') }}</span>
+            <span class="article-date-month">{{ article.date | date('M') | t }}</span>
+          	<span class="article-date-year">{{ article.date | date('Y') }}</span>
+          </div>
+          
+            <div class="article-image-header">
+							<div class="article-title mx-2 block-acrylic-dark">
+                <h1 class="c-white blog-custom-article-title fz-180">{{ article.title }}</h1>
+              </div>
+            </div>
+            </a>
+        </div>
+        
+        <div class="blog-custom-summary p-4 box-shadow">              
+          <div>{{ article.summary | striptags | limit(150) }}...</div>
+          <div class="text-right mt-2">
+          	<a href="{{ article.url | url }}" class="button button-small">{{ 'Read more' | t }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    
+    {% for article in blog.articles %}
+      {% if loop.index > 1 %}
+    
+    <div class="col-12 col-sm-6 col-md-{{ loop.index == 2 ? (blog.pagination.previous ? '6' : '4') : '4' }} mt-4">
+      <div class="blog-custom-article" id="">
+        <div class="pos-relative">
+          <a href="{{ article.url | url }}" class="d-block">
+        <picture class="article-picture gray-bg gray-overlay">
+          {% if article.image %}
+          <img src="{{ article.image | url_image('', article.title) }}" alt="{{ article.title }}" class="article-image">
+          {% endif %}
+        </picture>
+          
+          
+        <div class="article-date ">
+            <span class="article-date-day">{{ article.date | date('d') }}</span>
+            <span class="article-date-month">{{ article.date | date('M') | t }}</span>
+          	<span class="article-date-year">{{ article.date | date('Y') }}</span>
+          </div>
+          
+            <div class="article-image-header">
+							<div class="article-title mx-2 block-acrylic-dark">
+                <h1 class="c-white blog-custom-article-title fz-130">{{ article.title }}</h1>
+              </div>
+            </div>
+            </a>
+        </div>
+        
+        <div class="blog-custom-summary p-4 box-shadow">
+          <div>
+            {{ article.summary | striptags | limit(150) }}...
+          </div>
+          <div class="text-right mt-2">
+          	<a href="{{ article.url | url }}" class="button button-small">{{ 'Read more' | t }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    	{% endif %}
+    {% endfor %}
+  </div>
+  
+      <ul class="paginate mt-3">
+            {% if blog.pagination.previous %}
+            <li class="previous gray-bg"><a href="{{ blog.pagination.previous | url }}" title="{{ 'Previous page' | t }}"><i class="icon-angle-left"></i></a></li>
+            {% endif %}
+            <li class="static-text">{{ 'Page $1 of $2' | t('<strong>' ~ blog.pagination.page ~ '</strong>', blog.pagination.pages) | raw }}</li>
+            {% if blog.pagination.next %}
+            <li class="next gray-bg"><a href="{{ blog.pagination.next | url }}" title="{{ 'Next page' | t }}"><i class="icon-angle-right"></i></a></li>
+            {% endif %}
+          </ul>
+  
+</div>
+
+{#<div class="blog-custom container blogs">
+  <h1>{{ blog.title }}{% if blog.tag %}: {{ blog.tag.title }}{% endif %}</h1>
+  
+  <div class="row">
+    <div class="col-md-{% if theme.blogs_sidebar %}9{% else %}12{% endif %}">
+      
+      <div class="article-highlight margin-top">
+        <div class="image blog-block" style="background-image:url({{ article.image | url_image }})">
+          <div class="date">
+            <span class="day">{{ article.date | date('d') }}</span>
+            <span class="month">{{ article.date | date('M') | t }}</span>
+          </div>
+          
+          <h2 class="title">{{ article.title }}</h2>
+          
+        </div>
+        
+        <div class="summary p-compact text-center">
+          {% if article.tags %}
+          	<div class="tags highlight-bg rounded">
+              {% for tag in article.tags | limit(3) %}
+              	<span>{{ tag.title }}{% if not loop.last %},{% endif %}</span>
+              {% endfor %}
+              
+              {% if article.tags | length > 3 %}<span class="more">+{{ (article.tags | length) - 3 }}</span>{% endif %}
+          	</div>
+          {% endif %}
+          
+          {% if article.author %}
+          <div class="meta">
+            <span class="author"><strong>{{ 'By' | t }}</strong>: {{ article.author }}</span> <span class="comments"><strong>{{ 'Comments' | t }}</strong>: {{ article.comments_count }}</span>
+          </div>
+          {% endif %}
+          <p class="margin-top">{{ article.summary | striptags }}</p>
+          <a href="{{ article.url | url }}" class="button-txt">{{ 'Read more' | t }}  <i class="fas fa-angle-right"></i></a>
+        </div>
+      </div>
+      {% endfor %}
+      
+      <div class="row">
+      {% for article in blog.articles %}
+      	{% if loop.index > 1 %}        
+        <div class="col-md-6 margin-top">
+          <div class="blog-block full-width">
+            <div class="img-holder">
+              <div class="date">
+                <span class="day">{{ article.date | date('d') }}</span>
+                <span class="month">{{ article.date | date('M') | t }}</span>
+              </div>
+              {% if article.image %}
+                <a href="{{ article.url | url }}"><img src="{{ article.image | url_image('300x150x1') }}" alt="{{ article.title }}" class="img-responsive"></a>
+              {% else %}
+              <div class="article-dummy-header small gray-bg"></div>
+              {% endif %}
+            </div>
+            <div class="summary p-compact">
+              {% if article.tags %}
+                <div class="tags highlight-bg rounded">
+                  {% for tag in article.tags | limit(3) %}
+                    <span>{{ tag.title }}{% if not loop.last %},{% endif %}</span>
+                  {% endfor %}
+
+                  {% if article.tags | length > 3 %}<span class="more">+{{ (article.tags | length) - 3 }}</span>{% endif %}
+                </div>
+              {% endif %}
+              
+              <h3 class="title">{{ article.title }}</h3>
+              
+              <p>
+                {{ article.summary | striptags | limit(150) }}...
+              </p>
+              
+              <a href="{{ article.url | url }}" class="button-txt">{{ 'Read more' | t }} <i class="fas fa-angle-right"></i></a>
+            </div>
+          </div>
+        </div>
+        
+      	{% endif %}
+      {% endfor %}
+      </div>
+      
+    </div>
+    
+    {% if theme.blogs_sidebar %}
+    <div class="col-md-3">
+        {% include 'snippets/sidebar.rain' with {'type':'blog'} %}
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="row margin-top">
+    <div class="col-md-12 text-center">
+      {% set pagination = blog.pagination | paginate %}
+      <ul class="paginate">
+            {% if blog.pagination.previous %}
+            <li class="previous gray-bg"><a href="{{ blog.pagination.previous | url }}" title="{{ 'Previous page' | t }}"><i class="fa fa-angle-left"></i></a></li>
+            {% endif %}
+            <li class="static-text">{{ 'Page $1 of $2' | t('<strong>' ~ blog.pagination.page ~ '</strong>', blog.pagination.pages) | raw }}</li>
+            {% if blog.pagination.next %}
+            <li class="next gray-bg"><a href="{{ blog.pagination.next | url }}" title="{{ 'Next page' | t }}"><i class="fa fa-angle-right"></i></a></li>
+            {% endif %}
+          </ul>
+    </div>
+  </div>
+</div>#}

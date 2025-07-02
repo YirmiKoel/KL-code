@@ -1,0 +1,17 @@
+{% if page.breadcrumbs | length > 1 or request.get.breadcrumbs == 1 or true %}
+<div class="container" id="breadcrumbs">
+<!--   <a href="#" class="button button-lined button-tiny"><i class="icon-angle-left"></i> {{ 'Back' | t }}</a> -->
+    <a href="{{ '' | url }}" title="{{ 'Home' | t }}" class="opacity-50">{{ 'Home' | t }}</a>
+
+    {% for breadcrumb in page.breadcrumbs %}
+  		<span class="bc-seperator">/</span>
+  		{# we need this because xmlhttprequests without format=json messes with sessions #}
+  		{% if 'search' in breadcrumb.url and template != 'pages/collection.rain' %}
+  			{% set lastCategory = product.categories | last %}
+  			<a href="{{ lastCategory.url | url }}" class="hover-underline opacity-50">{{ lastCategory.title }}</a>
+  		{% else %}
+  		<a href="{{ breadcrumb.url | url }}" class="hover-underline {% if not loop.last %}opacity-50{% else %}opacity-90{% endif %}">{{ breadcrumb.title }}</a>
+  		{% endif %}
+    {% endfor %}
+</div>
+{% endif %}

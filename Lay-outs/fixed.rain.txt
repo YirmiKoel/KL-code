@@ -1,0 +1,140 @@
+{% spaceless %}
+	{% set twkInstance = (shop.id in [340681]) ? 'ad9e05c0' : false %}
+	{% set templateOverrides = ['cart', 'blog', 'blog-short', 'article', 'service'] %}
+  {% set isDemoShop = (shop.id in [303272, 310879, 342221, 341897, 342220, 310881, 310880]) %}
+	{% set isFixedLayout = true %}
+  {% set requestType = request.get.request_type %}
+	{% set isCustomCheckout = checkout and ((theme.custom_checkout_enabled and not request.get.native == 1) or request.get.customcheckout == 'true') %}
+
+	{% set devMode = request.get.dev == 1 %}
+  {% set clusterDomain = ('shoplightspeed.com' in shop.domains.assets) ? 'shoplightspeed' : 'webshopapp' %}
+	{% set baseDomain = shop.domains.secure ?: shop.domains.normal %}
+	{% set templateName = template | replace({'pages/': '', '.rain': ''}) %}
+
+  {% set logoUrl = theme.logo_url ?: ('logo.png' | url_asset) %}
+  {% set logoUrlMobile = theme.logo_url_mobile ?: ('logo-mobile.png' | url_asset) %}
+
+	{# Product details #}
+	{% set productTitle = theme.show_fulltitle ? product.fulltitle : product.title %}
+
+  {% set imgCrop = (theme.product_image_fit ? 2 : 1) %}
+  {% set catImgCrop = (theme.category_image_fit ? 2 : 1) %}
+  {% set squareProductImages = (theme.product_image_ratio == 'square') %}
+
+  {% set shopLegalMode = shop.settings.legal.mode %}
+  {# set vatSwitcherEnabled = theme.vat_switcher #}
+  {% set vatSwitcherEnabled = theme.b2b_enabled and theme.vat_switcher_enabled %}
+
+  {# Shop reviews #}
+  {% set shopReviewsScore = theme.shopreviews_score | replace({',': '.'}) | number_format(1) %}
+  {% set shopReviewsScore = shopReviewsScore > theme.shopreviews_score_max ? theme.shopreviews_score_max : shopReviewsScore %}
+  {% set shopReviewsRating = (shopReviewsScore / theme.shopreviews_score_max)  %}
+  {% set shopReviewsStars = (shopReviewsRating * 5) | round %}
+
+	{# Shop images #}
+  {% set imgRatio = squareProductImages ? '1:1' : '13:15' %}
+  {% set imageLargeSize = squareProductImages ? ('650x650x'~imgCrop) : ('650x750x'~imgCrop) %}
+  {% set imageSize = squareProductImages ? ('325x325x'~imgCrop) : ('325x375x'~imgCrop) %}
+  {% set imageThumbSize = squareProductImages ? ('65x65x'~imgCrop) : ('65x75x'~imgCrop) %}
+  {% set imgLargeHeight = squareProductImages ? '650' : '750' %}
+  {% set imgLargeWidth = squareProductImages ? '650' : '650' %}
+  {% set imgHeight = squareProductImages ? '325' : '375' %}
+  {% set imgWidth = squareProductImages ? '325' : '325' %}
+  {% set imgThumbHeight = squareProductImages ? '65' : '75' %}
+  {% set imgThumbWidth = squareProductImages ? '65' : '65' %}
+	{% set imagePlaceholderSquare = 'placeholder-square.svg' | url_asset %}
+	{% set imagePlaceholderPortrait = 'placeholder-portrait.svg' | url_asset %}
+  {% set imagePlaceholder = squareProductImages ? imagePlaceholderSquare : imagePlaceholderPortrait %}
+
+  {% set isAjaxRequest = request.get.request_type == 'ajax' %}
+  {% set data01Features = ['timer', 'bundle', 'advanced_variants', 'variants_type', 'colors'] %}
+
+  {% set slidesActive = 0 %}
+  {% set slidesActive = slidesActive + theme.slider_1_enabled %}
+  {% set slidesActive = slidesActive + theme.slider_2_enabled %}
+  {% set slidesActive = slidesActive + theme.slider_3_enabled %}
+
+  {% set cartqty = 0 %} 
+
+  {% for product in page.cart.products %}
+    {% set cartqty = cartqty + product.quantity %}
+  {% endfor %}
+
+	{# Header USP's #}
+  {% set subheaderEnabled = (theme.navigation_mode == 'button') %}
+  {% set uspCarouselPosition = theme.usp_carousel_position %} {# Can be top, hybrid or bottom, depending on settings and environment #}
+  {% set uspsInSubheader = (uspCarouselPosition == 'hybrid' and theme.navigation_mode == 'button') %}
+  {% set amountOfSubheaderFeatures = 0 %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.navigation_mode == 'button') %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.navigation_custom_links_position == 'navbar' and shop.links.main and theme.navigation_show_custom_links) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.hallmark != 'disabled') %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (vatSwitcherEnabled) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.shopreviews_in_header) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + ((theme.show_navbar_blogs and shop.blogs) or theme.show_navbar_brands) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.navigation_custom_links_position == 'navbar' and (theme.show_navbar_stores_page or theme.show_navbar_service_page)) %}
+  {# Determine if the usp carousel can be hybrid, or should be put below.. #}
+  {# set uspCarouselPosition = (uspCarouselPosition == 'hybrid' and (amountOfSubheaderFeatures > 3 or not subheaderEnabled)) ? 'bottom' : uspCarouselPosition  #}
+	{% set uspCarouselPosition = (uspCarouselPosition == 'hybrid' and (amountOfSubheaderFeatures > 3 or not subheaderEnabled)) ? 'bottom' : uspCarouselPosition  %}
+{% endspaceless %}
+{% if requestType == 'ajax' %}
+	{% include template %}
+{% else %}
+<!DOCTYPE html>
+<html lang="{{ shop.language }}">
+  <head>    
+    {% include 'snippets/head.rain' %}
+  </head>
+  <body class="layout-fixed usp-carousel-pos-{{ theme.usp_carousel_position }}{% if shop.b2b %} b2b{% endif %}{% if theme.b2b_enabled %} vat-switcher-{{ theme.b2b_default_pricing }}{% endif %}{% if checkout %} page-checkout checkout-{{ checkout.theme }} checkout-step-{{ step }} checkout-progress-step-{{ checkout.step }}{% endif %}">
+    
+    <div id="mobile-nav-holder" class="fancy-box from-left overflow-hidden p-0">
+    	<div id="mobile-nav-header" class="p-3 border-bottom-gray gray-border-bottom">
+        <div class="flex-grow-1 font-headings fz-160">{{ 'Menu' | t }}</div>
+        <div id="mobile-lang-switcher" class="d-flex align-items-center mr-3 lh-1">
+          <span class="flag-icon flag-icon-{{ shop.language2.code }} mr-1"></span> <span class="">{{ shop.currency2.code }}</span>
+        </div>
+        <i class="icon-x-l close-fancy"></i>
+      </div>
+      <div id="mobile-nav-content"></div>
+    </div>
+    
+    {% if isCustomCheckout %}
+    	{% include 'snippets/checkout.rain' %}
+    {% else %}
+      {% include 'snippets/header.rain' %}
+      <div id="subnav-dimmed"></div>
+    
+      {% if 'service/stores' in request.url %}
+        {% include 'snippets/our-stores.rain' %}
+      {% elseif templateName in templateOverrides and not request.get.native == 1 %}
+    		{% include 'snippets/messages.rain' %}
+        {% include [('snippets/'~templateName~'-custom.rain'), template] %}
+      {% else %}
+    
+        {% if template != 'pages/index.rain' %}
+          {% include 'snippets/breadcrumbs.rain' %}
+        {% endif %}
+    
+    {% if twkInstance and template != 'pages/collection.rain' %}
+      <div id="tweakwise-output"></div>
+    {% endif %}
+    
+      <div class="container">
+        <div class="row mt-3">
+          <div class="col">
+              {% include template %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    
+      {% include 'snippets/footer.rain' %}
+
+      <div id="dimmed" class="dimmed full"></div>
+      <div class="dimmed flyout"></div>
+    	<div id="fancy-backdrop"></div>
+    {% endif %}{# custom checkout #}
+    
+    {% include 'snippets/footer-js.rain' %}
+</body>
+</html>
+{% endif %} {# end request_type #}

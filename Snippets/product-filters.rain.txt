@@ -1,0 +1,76 @@
+<h4 class="gray-bg d-inline-block padding-10 margin-top">{{ 'Filters' | t }}</h4>
+
+<form action="{{ collection.internal.url | url }}" method="get" class="custom_filter_form {{ type }} margin-top-s">
+  <input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+	<input type="hidden" name="brand" value="{{ collection.filters.brand }}" />
+	<input type="hidden" name="mode" value="{{ collection.filters.mode }}" />
+	<input type="hidden" name="limit" value="{{ collection.filters.limit }}" />
+	<input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+	<input type="hidden" name="max" value="{{ collection.filters.max }}" class="custom_filter_form_max" />
+	<input type="hidden" name="min" value="{{ collection.filters.min }}" class="custom_filter_form_min" />
+  
+  <div class="filter-holder">
+    <div class="row">
+      
+      <div class="custom-filter-col">
+				<div class="price-filter-block">
+					<h5>{{ 'Price'  | t }}</h5>
+					
+          <div class="sidebar-filter-slider">
+						<div class="collection-filter-price"></div>
+					</div>
+					<div class="price-filter-range cf">
+						<div class="min">{{ 'Min' | t }}: {{ shop.currency2.symbol }}<span>{{ collection.filters.min }}</span></div>
+						<div class="max">{{ 'Max' | t }}: {{ shop.currency2.symbol }}<span>{{ collection.filters.max }}</span></div>
+					</div>
+				</div>
+			</div>
+      
+      {% if collection.brands %}
+      <div class="custom-filter-col">
+        <div class="custom-filter-block">
+          <h5>{{ 'Brands'  | t }}</h5>
+          
+          <ul class="filter-values">
+            {% for brand in collection.brands %}
+						<li class="{% if loop.index > 5 %}hidden-filter{% endif %}" data-filter-group="brands">
+							<input id="brand_{{ brand.id }}_{{ type }}" type="radio" name="brand" value="{{ brand.id }}" {% if brand.id == collection.filters.brand %} checked="checked"{% endif %} class="fancy-radio" /> <label for="brand_{{ brand.id }}_{{ type }}">{{ brand.title }}</label>
+						</li>
+            {% endfor %}
+
+						{% if collection.brands | length > 5 %}
+						<li class="more">
+							<a href="#" data-filter-group="brands"><i class="fas fa-angle-right"></i> {{ 'View more' | t }}</a>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+      {% endif %}
+      
+			{% for filter in collection.filters.custom | sort %}
+      <div class="custom-filter-col dynamic">
+				<div class="custom-filter-block">
+          <h5>{{ filter.title }}</h5>
+          
+          <ul class="filter-values">
+						{% for value in filter.values %}
+						<li class="{% if loop.index > 5 %}hidden-filter{% endif %}" data-filter-group="{{ filter.id }}">
+							<input id="filter_{{ value.id }}" type="checkbox" name="filter[]" class="fancy-checkbox" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+							<label for="filter_{{ value.id }}">{{ value.title }}{% if not value.active and value.has_count %} <span>({{ value.count }})</span>{% endif %}</label>
+						</li>
+						{% endfor %}
+            
+						{% if filter.values | length > 5 %}
+						<li class="more">
+							<a href="#" data-filter-group="{{ filter.id }}">{{ 'View more' | t }}</a>
+						</li>
+						{% endif %}
+					</ul>
+				</div>
+			</div>
+			{% endfor %}
+    
+    </div>
+  </div>
+</form>

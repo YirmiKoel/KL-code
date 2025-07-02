@@ -1,0 +1,133 @@
+{% if theme.slider_sub_1_enabled or theme.slider_sub_2_enabled %}
+<div id="homepage-subbanners" class="{% if theme.subbanners_fullwidth %}d-flex flex-row flex-wrap{% else %}container{% endif %}">
+{% if not theme.subbanners_fullwidth %}<div class="row">{% endif %}
+	{% set subColSize = '6' %}
+
+  
+  {% for i in range(1,2) %}
+  	{% if theme['slider_sub_'~i~'_enabled'] %}
+      {% set blockPosition = theme['subbanner_'~i~'_justify_content'] %}
+      {% set textPosition = 'center' %}
+
+      {% if blockPosition != 'center' %}
+        {% set textPosition = (blockPosition == 'end') ? 'right' : 'left' %}
+      {% endif %}
+
+      <div class="{% if theme.subbanners_fullwidth %}col-12 col-md p-md-0{% else %}col-12 col-md{% endif %}{% if i > 1 %} mt-3 mt-md-0{% endif %}">
+        <div id="subbanner-{{ i }}" class="banner-holder subbanner-size-{{  theme.subbanners_fullwidth ? 'x' : '' }}{{ theme.subbanners_size }}{% if not theme.subbanners_fullwidth %} br-2{% endif %}">
+          <picture class="banner-picture">
+            {% if theme['subbanner_'~i~'_image_mobile'] and theme['subbanner_'~i~'_image_mobile_enabled'] %}
+            <source srcset="{{ ('subbanner-'~i~'-mobile.jpg') | url_asset }}" media="(max-width: {{ theme.banner_image_mobile_maxwidth }}px)">
+            {% endif %}
+            <img src="{{ ('subbanner-'~i~'-image.jpg') | url_asset }}" class="banner-img" alt="{{ theme['subbanner_'~i~'_title'] | t }}"{% if moduleIndex > 2 %} loading="lazy"{% endif %}>
+          </picture>
+
+          <a href="{{ theme['subbanner_'~i~'_url'] | t }}" class="banner-content-holder{% if theme.subbanners_overlay %} banner-overlay{% endif %}">
+            <div class="banner-content align-items-{{ theme['subbanner_'~i~'_align_items'] }} justify-content-{{ theme['subbanner_'~i~'_justify_content'] }}">
+            <div class="banner-text text-{{ textPosition }}">
+              <div class="banner-text-block block-acrylic-{{theme['subbanner_'~i~'_acrylic'] }}">
+                <h2 class="banner-title c-inherit" style="">{{ theme['subbanner_'~i~'_title'] | t }}</h2>
+                <div class="banner-subtitle mt-1 fz-110" style="">{{ theme['subbanner_'~i~'_subtitle'] | t }}</div>
+              </div>
+
+              {% if theme['subbanner_'~i~'_button'] %}
+              <span class="mt-2 button button-medium banner-button-{{ theme['subbanner_'~i~'_button_type'] }} with-icon ">{{ theme['subbanner_'~i~'_button'] | t }} <i class="icon-arrow-right"></i></span>
+              {% endif %}
+            </div>
+            </div>
+          </a>
+        </div>
+      </div>
+  	{% endif %}
+  {% endfor %}
+
+{# if theme.slider_sub_1_enabled %}
+  
+  <div class="{% if theme.subbanners_fullwidth %}col-12 col-md p-0{% else %}col-12 col-md-6{% endif %}">  
+    <div class="banner-holder banner-holder-subbanner">
+      <picture id="subbanner-1" class="banner-picture">
+          <!--   <source srcset="{{ 'subbanner-1-image.jpg' | url_asset }}" media="(max-width: 576px)"> -->
+          <img src="{{ 'subbanner-1-image.jpg' | url_asset }}" class="banner-img" loading="lazy">
+      </picture>
+      
+      <a href="{{ theme.subbanner_1_url | t }}" class="banner-content-holder{% if theme.subbanners_overlay %} banner-overlay{% endif %}">
+        <div class="banner-content align-items-{{ theme.subbanner_1_align_items }} justify-content-{{ theme.subbanner_1_justify_content }}">
+        <div class="banner-text">
+          <div class="banner-text-block block-acrylic-{{ theme.subbanner_1_acrylic }}">
+            <h2 class="banner-title c-inherit" style="">{{ theme.subbanner_1_title | t }}</h2>
+            <div class="banner-subtitle mt-1 fz-110" style="">{{ theme.subbanner_1_subtitle | t }}</div>
+          </div>
+
+          {% if theme.subbanner_1_button %}
+          <span class="mt-2 button button-medium banner-button-{{ theme.subbanner_1_button_type }} with-icon ">{{ theme.subbanner_1_button | t }} <i class="icon-arrow-right"></i></span>
+          {% endif %}
+        </div>
+        </div>
+      </a>
+    </div>
+  </div> #}
+
+	{#<div class="{% if theme.subbanners_fullwidth %}col-12 col-md p-0{% else %}col-12 col-md-6{% endif %}">    
+        <picture id="subbanner-1" class="banner-holder banner-holder-subbanner br-2 overflow-hidden mt-3">
+          <!--   <source srcset="{{ 'subbanner-1-image.jpg' | url_asset }}" media="(max-width: 576px)"> -->
+          <img src="{{ 'subbanner-1-image.jpg' | url_asset }}" class="banner-img" loading="lazy">
+
+          <a href="{{ theme.subbanner_1_url | t }}" class="banner-content-holder{% if theme.subbanners_overlay %} banner-overlay{% endif %}">
+          <div class="banner-content highlight-content align-items-{{ theme.subbanner_1_text_position }}">
+          <div class="banner-text">
+            <div class="banner-text-block block-acrylic-{{ theme.subbanner_1_acrylic }}">
+              <h2 class="banner-title c-inherit" style="">{{ theme.subbanner_1_title | t }}</h2>
+              <div class="banner-subtitle mt-1 fz-110" style="">{{ theme.subbanner_1_subtitle | t }}</div>
+            </div>
+            
+            {% if theme.subbanner_1_button %}
+            <span class="mt-2 button button-medium banner-button-{{ theme.subbanner_1_button_type }} with-icon ">{{ theme.subbanner_1_button | t }} <i class="icon-arrow-right"></i></span>
+            {% endif %}
+          </div>
+          </div>
+          </a>
+        </picture>
+
+	</div>#}
+
+{# endif %}
+
+{% if theme.slider_sub_2_enabled %}
+	
+	<div class="{% if theme.subbanners_fullwidth %}col-12 col-md p-0{% else %}col-12 col-md-6{% endif %}">
+
+    <picture id="subbanner-2" class="banner-holder banner-holder-subbanner br-2 overflow-hidden mt-3">
+      <!--   <source srcset="{{ 'subbanner-2-image.jpg' | url_asset }}" media="(max-width: 576px)"> -->
+      <img src="{{ 'subbanner-2-image.jpg' | url_asset }}" class="banner-img" loading="lazy">
+
+      <a href="{{ theme.subbanner_2_url | t }}" class="banner-content-holder{% if theme.subbanners_overlay %} banner-overlay{% endif %}">
+			<div class="banner-content highlight-content align-items-{{ theme.subbanner_1_text_position }}">
+      <div class="banner-text">
+        <div class="banner-text-block block-acrylic-{{ theme.subbanner_2_acrylic }}">
+          <h2 class="banner-title c-inherit" style="">{{ theme.subbanner_2_title | t }}</h2>
+          <div class="banner-subtitle mt-1 fz-110" style="">{{ theme.subbanner_2_subtitle | t }}</div>
+        </div>
+
+        {% if theme.subbanner_2_button %}
+        <span class="mt-2 button button-medium banner-button-{{ theme.subbanner_2_button_type }} with-icon ">{{ theme.subbanner_2_button | t }} <i class="icon-arrow-right"></i></span>
+        {% endif %}
+      </div>
+      </div>
+      </a>
+    </picture>
+    
+    {#<div class="banner-holder banner-holder-subbanner mt-3" style="background-image:url({{ 'subbanner-2-image.jpg' | url_asset }});">
+      <div class="subheadline-content">
+        <div class="banner-text-block">
+        	<h3 class="title">{{ theme.subbanner_2_title | t }}</h3>
+        	<div class="sub">{{ theme.subbanner_2_subtitle | t }}</div>
+        	<a href="{{ theme.subbanner_2_url | t }}" class="button">{{ theme.subbanner_2_button | t }}</a>
+        </div>
+      </div>
+    </div>#
+	</div>
+{% endif #}
+  
+  {% if not theme.subbanners_fullwidth %}</div>{% endif %}
+</div>
+{% endif %}

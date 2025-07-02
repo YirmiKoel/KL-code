@@ -1,0 +1,160 @@
+<script>  
+// 	$(document).ready(function()
+//   {  
+//     if( $(window).width() < 768 )
+//     {
+//       // console.log('Win Width less than 768');
+//       console.log('sticky start mobile');
+      
+//       const addToCartButton = document.getElementById('add-to-cart-button');
+//       const elem = $('.addtocart-sticky');
+//       let stickyVisible = false;
+      
+//       const observer = new IntersectionObserver(function(entries)
+//       {
+//         if(entries[0].isIntersecting === true)
+//         {
+//           console.log('sticky intersecting TRUE');
+//           if( stickyVisible )
+//           {
+//             console.log('already visible, remove class');
+//           	elem.removeClass('mobile-visible');
+//           	stickyVisible = false;
+//           }
+//         }
+//         else
+//         {
+//           if( !stickyVisible )
+//           {
+//           	elem.addClass('mobile-visible');
+//           	stickyVisible = true;
+//           }
+//         }
+//       }, { threshold: [0] });
+      
+//       if( addToCartButton )
+//       {
+//       	observer.observe(addToCartButton);
+//       }
+//     }
+//     else
+//     {
+//       var stickyVisible = false;
+      
+//       function checkStickyAddToCart()
+//       {
+//         if( $('.addtocart-holder').length > 1 )
+//         {
+//           var distance = $('.addtocart-holder').offset().top;
+//           var elem = $('.addtocart-sticky');
+
+//           if ( $(window).scrollTop() >= distance )
+//           {
+//             if( !stickyVisible )
+//             {
+//               elem.addClass('visible');
+//               elem.fadeIn(100);
+//               stickyVisible = true;
+//             }
+
+//           }
+//           else
+//           {
+//             if( stickyVisible )
+//             {
+//               elem.removeClass('visible');
+//               elem.fadeOut(100);
+//               stickyVisible = false;
+//             }
+//           }
+
+//           setTimeout(checkStickyAddToCart, 100);
+//         }
+//       }
+
+//       checkStickyAddToCart();
+//     }
+  
+//     if( $(window).width() > 767 && theme.settings.product_mouseover_zoom )
+//     {
+//       /* Zoom on hover image */
+//       $('.zoom').zoom({touch:false});
+//     }
+    
+//     //====================================================
+//     // Product page images
+//     //====================================================
+//     var swiperProdImage = new Swiper('.swiper-productimage', {
+//       lazy: true,      
+//       // pagination: {
+//       //   el: '.swiper-pagination-image',
+//       //   clickable: true,
+//       // },
+// 			on: {
+// 				lazyImageReady: function()
+//         {
+//           $('.productpage .swiper-lazy.swiper-lazy-loaded').animate({opacity: 1}, 200);
+//         },
+//       }
+//     });
+    
+//     var swiperThumbs = new Swiper('.swiper-productthumbs', {
+//       navigation: {
+//       	nextEl: '.thumb-arrow-right',
+//       	prevEl: '.thumb-arrow-left',
+//       },
+//       spaceBetween: 15,
+//       slidesPerView: 5,
+//       breakpoints: {        
+//         991: {
+//           slidesPerView: 4,
+//           spaceBetween: 15,
+//         },
+//         767: {
+//           slidesPerView: 5,
+//           spaceBetween: 15,
+//         },
+//         548: {
+//           slidesPerView: 4,
+//           spaceBetween: 15,
+//         }
+//       },
+//       on: {
+//         init: function () {
+//           this.centerSlides();
+//         },
+//         resize: function () {
+//           this.centerSlides();
+//         }
+//       }
+//     });
+    
+//   	$('.swiper-productthumbs img').on('click', function()
+// 		{
+//       var itemIndex = $(this).parent().index();
+
+//       $('.swiper-productthumbs .swiper-slide').removeClass('active');
+//       $(this).parent().addClass('active');
+//       swiperProdImage.slideTo(itemIndex);
+//       swiperProdImage.update(true);
+//   	});
+// 		//====================================================
+//     // End product page images
+//     //==================================================== 
+    
+// 		$('.bundle-product [data-bundle-pid]').on('click', function(e)
+// 		{
+//       e.preventDefault();
+//       var pid = $(this).attr('data-bundle-pid');
+//       var bid = $(this).attr('data-bundle-id');
+//       $('.bundle-configure[data-bundle-id="'+bid+'"][data-bundle-pid="'+pid+'"]').fadeIn();
+// 		});
+     
+// 		$('.bundle-configure button, .bundle-configure .close').on('click', function(e)
+// 		{
+//       e.preventDefault();
+//       $(this).closest('.bundle-configure').fadeOut();
+// 		});
+
+//   });
+</script>

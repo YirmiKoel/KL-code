@@ -1,0 +1,62 @@
+{% include 'snippets/fancy-boxes.rain' %}
+
+{% if theme.enable_ga4 %}
+{% include 'snippets/dy-ga4.rain' with {'type': 'body'} %}
+{% endif %}
+
+{% include 'snippets/js-variables.rain' with{ 'type': 'body' } %}
+
+<!-- {% if theme.countdowns_enabled %}
+<script type="text/javascript" src="{{ 'countdown-min.js' | url_asset }}" defer></script>
+{% endif %}
+<script type="text/javascript" src="{{ 'swiper-453.js' | url_asset }}" defer></script>
+<script type="text/javascript" src="{{ 'global.js' | url_asset }}" defer></script>
+ -->
+{% if template == 'pages/product.rain' %}
+  {% if theme.product_mouseover_zoom %}
+    <script type="text/javascript" src="{{ 'jquery-zoom-min.js' | url_asset }}" defer></script>
+  {% endif %}
+
+  {% include 'snippets/productpage-js.rain' %}
+  <script type="text/javascript" src="{{ 'fancybox-3-5-7-min.js' | url_asset }}" defer></script>
+  <script type="text/javascript" src="{{ 'theme-products.js' | url_asset }}" defer></script>
+{% endif %}
+
+{% if template == 'pages/collection.rain' %}
+	<script type="text/javascript" src="{{ 'jquery-ui-min.js' | url_asset }}" defer></script>
+{% endif %}
+
+{% if isCustomCheckout %}
+  <script type="text/javascript" src="{{ 'checkout-custom.js' | url_asset }}" defer></script>
+{% endif %}
+
+{% include 'blocks/body.rain' %}
+
+{% set addonsCustomUrl = theme.dyapps_addons_custom_script_url %}
+
+{% if theme.dyapps_addons_enabled and not request.get.addons == 'false' %}
+<script type="text/javascript" src="{{ (theme.dyapps_addons_custom_enabled and theme.dyapps_addons_custom_script_url) ? addonsCustomUrl : ('dy-addons.js' | url_asset) }}" async></script>
+
+<!-- <div id="dy-addons-holder"></div>
+<script>
+(function () {
+  var s = document.createElement('script');
+  s.type = 'text/javascript';
+  s.defer = true;
+  s.src = '{{ theme.dyapps_addons_custom_enabled and theme.dyapps_addons_custom_script_url ? theme.dyapps_addons_custom_script_url : ('dy-addons.js' | url_asset) }}';
+  //document.getElementsByTagName('body')[0].appendChild(s);
+  document.getElementById('dy-addons-holder').appendChild(s);
+})();
+</script> -->
+
+{% endif %}
+
+{% include 'snippets/rich-snippets.rain' %}
+
+<script>
+window.LS_theme = {
+  "developer": "Dyvelopment",
+  "name": "Proxima",
+  "docs":"https://www.dyvelopment.com/manuals/themes/proxima/proxima-en.pdf"
+}
+</script>

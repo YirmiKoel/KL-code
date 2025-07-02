@@ -1,0 +1,27 @@
+{# snippets/rating.rain #}
+{# Herbruikbare rating-component: één decimaal, met aangepaste fill-schaal #}
+
+{% set rawScore       = rating * 5 %}
+{% set preciseRating  = (rawScore * 10)|round / 10 %}
+
+<span class="stars"
+      itemprop="ratingValue"
+      content="{{ preciseRating }}">
+  {% for i in 1..5 %}
+    {% if i <= preciseRating %}
+      <i class="icon-star-s star-fill"></i>
+    {% elseif i - 1 < preciseRating %}
+      {# fractie van de ster #}
+      {% set fraction        = preciseRating - (i - 1) %}
+      {# reduce de zichtbare fill tot 90% van die fractie #}
+      {% set displayFraction = fraction * 0.9 %}
+      <span class="star-wrapper">
+        <i class="icon-star-s star-empty"></i>
+        <i class="icon-star-s star-fill star-half-overlay"
+           style="clip-path: inset(0 {{ ((1 - displayFraction) * 100)|round }}% 0 0);"></i>
+      </span>
+    {% else %}
+      <i class="icon-star-s star-empty"></i>
+    {% endif %}
+  {% endfor %}
+</span>

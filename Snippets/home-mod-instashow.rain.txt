@@ -1,0 +1,13 @@
+{% if (theme.instashow) or request.get.instashow == 1 %}
+<div class="container">
+<div class="instashow-title">
+  <h4 class="with-link">{{ theme.instashow_title | t }}{% if theme.instashow_sub_title or 'nova' in shop.name | lower %}<span class="spacer"></span>{% endif %}{% if 'nova' in shop.name | lower %}<a href="https://www.lightspeedhq.com/ecommerce/store/apps/instashow-lightspeed-instagram-feed/" target="_blank" class="button-txt">{{ 'View app' | t }} <i class="fas fa-angle-right"></i></a>{% elseif theme.instashow_sub_title %}<a href="{{ theme.instashow_sub_title_url | t }}" target="_blank" class="button-txt">{{ theme.instashow_sub_title | t }} <i class="fas fa-angle-right"></i></a>{% endif %}</h4>
+  {% if isDemoShop %}<span class="subtext">3rd party Lightspeed App Instashow support (app 4,99€ / month)</span>{% endif %}
+</div>
+<div class="instashow-holder">
+  {{ theme.instashow | t | raw }}
+  
+  <div data-is data-is-source="#fashion" data-is-columns="5" data-is-rows="2"> </div>
+</div>
+</div>
+{% endif %}

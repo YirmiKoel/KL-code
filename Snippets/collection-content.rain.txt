@@ -1,0 +1,293 @@
+{# Get sub categories from current category only #}
+{% set mainCategory = false %}
+{% set currentCategory = false %}
+{% set lastCategory = false %}
+{% set lastCategoryWithSubs = shop.categories %}
+
+{% for category in shop.categories if not mainCategory %}
+  {% if category.url is active %}
+		{% set mainCategory = category %}
+		{% set currentCategory = category %}
+		{% set lastCategory = category %}
+
+		{% set isEnd = false %}
+	
+		{% for i in range(1, 3) if not isEnd %}
+			{% set isActive = false %}
+			{% set lastCategory = currentCategory %}
+
+			{% if currentCategory.subs %}
+				{% set lastCategoryWithSubs = currentCategory %}
+			{% endif %}
+		
+      {% for category in currentCategory.subs if not isActive %}
+        {% if category.url is active %}
+					{% set currentCategory = category %}
+					{% set isActive = true %}
+        {% endif %}
+      {% endfor %}
+
+			{# if there are no subcats, or if we're already in the current category, quit #}
+			{% if not currentCategory.subs or currentCategory.id == collection.category_id %}
+				{% set isEnd = true %}
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+{% endfor %}
+
+{% set splitBeforeHeader = collection.content | split('[/header]</p>') | raw %}
+
+{% set headerSrc = splitBeforeHeader[0] | replace('<p>[header]', '') | striptags | trim %}
+
+{% set content = collection.content %}
+
+{% if splitBeforeHeader[1] %}
+	{% set content = splitBeforeHeader[1] %}
+{% endif %}
+
+{#<div id="collection-header">
+  
+  {% if headerSrc and false %}  
+  <div id="collection-header-image" class="pos-relative">
+    <img src="{{ headerSrc }}" id="collection-header-img" class="w-100">
+    
+    {% if currentCategory and currentCategory.subs %}
+    <div id="collection-header-cats-holder" class="d-flex align-items-end pos-absolute-stretch">
+      
+      <div class="w-100" style="z-index:1;">
+      <div id="collection-header-cats" class="collection-cats-holder mt-2 p-2">
+        <div class="new-cats collection-cats container d-flex justify-content-center">
+            {% include 'snippets/categories.rain' with {'type': 'collection', 'categories': currentCategory.subs} %}
+        </div>
+      </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="container mt-4 mb-2">
+	<h1 class="page-title">{{ collection.title }}</h1>
+    {% if collection.description %}
+    <p>{{ collection.description }}</p>
+    {% endif %}
+  </div>
+  {% else %}
+  
+  <div class="container">
+	<h1 class="page-title">{{ collection.title }}</h1>
+    {% if collection.description %}
+    <p>{{ collection.description }}</p>
+    {% endif %}
+  </div>
+  
+  	{% if ((currentCategory and currentCategory.subs) or collection.internal.url == 'collection') and theme.collection_subcats_carousel != 'disabled' %}
+        {% include 'snippets/categories.rain' with {'type': 'collection_topbar', 'categories': (collection.internal.url == 'collection' ? shop.categories : currentCategory.subs)} %}
+  	{% endif %}
+  {% endif %}
+</div>#}
+
+<div class="container">
+<h1 class="page-title">{{ collection.title }}</h1>
+  {% if collection.description %}
+  <p>{{ collection.description }}</p>
+  {% endif %}
+  
+{% if ((currentCategory and currentCategory.subs) or collection.internal.url == 'collection') and theme.collection_subcats_carousel != 'disabled' %}
+	{% include 'snippets/categories.rain' with {'type': 'collection_topbar', 'categories': (collection.internal.url == 'collection' ? shop.categories : currentCategory.subs)} %}
+{% endif %}
+</div>
+
+<div class="container">  
+  <div class="row">
+    
+    {% if theme.collection_sidebar %}
+    <div id="collection-sidebar-holder" class="d-none d-lg-block col-md-3 sidebar">
+      <div id="collection-sidebar" class="product-filters sidebar-filters mt-4{% if theme.collection_sidebar_sticky %} sticky-sidebar{% endif %} custom-scrollbar"{% if request.get.filter_type == 'sidebar' %} data-scrolltop="{{ request.get.sidebar_scrolltop }}"{% endif %}>        
+      	{% include 'snippets/collection-filters.rain' with {'type': 'sidebar'} %}
+        
+        {% if false %}
+        {% include 'snippets/usps.rain' with {type: 'list', classList: 'mt-4'} %}
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="col-12{% if theme.collection_sidebar %} col-lg-9{% endif %}">
+
+    	<div class="row">
+      {% if collection.content and theme.text_position == 'top' %}
+        <div class="col-md-12 margin-top">
+          {% if collection.image and theme.collection_show_image %}
+            <div class="row">
+              <div class="col-md-3">
+              <img src="{{ collection.image | url_image }}" alt="" class="img-responsive">
+              </div>
+              <div class="col-md-9">
+              <div class="content">
+                {{ collection.content | raw }}
+              </div>
+              </div>
+            </div>
+          {% else %}
+            <div class="content">
+              {{ collection.content | raw }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+      </div>
+
+      {% include 'snippets/collection-filters.rain' with {'type': 'filter-bar'} %}
+
+      {% include 'snippets/collection-pagination.rain' with{type:'previous'} %}
+
+      {% if not collection.products %}
+      <div class="no-items text-center" style="padding:50px 0;">
+      <h3>{{ 'No products found' | t }}</h3>
+      <a href="{{ '' | url }}" class="button-txt">{{ 'Continue shopping' | t }}</a>
+      </div>
+      {% else %}
+      <div class="row collection-products-row product-grid">
+        {% if request.get.mode == 'bulk_list' %}
+        	{% for product in collection.products %}
+        
+          {% set vStockText = 'In stock' %}
+          {% set vStockType = 'in-stock' %}
+
+          {% if product.stock.track %}
+            {% if not variant.stock.available and not variant.stock.on_stock %}
+              {% set vStockText = 'Out of stock' %}
+              {% set vStockType = 'out-of-stock' %}
+            {% elseif variant.stock.available and not variant.stock.on_stock %}
+              {% set vStockText = 'Backorder' %}
+              {% set vStockType = 'backorder' %}
+            {% endif %}
+          {% endif %}
+        
+        <div class="col-12 col-12col-md-6 mt-3">
+          
+          
+					<div class="product-mini-list p-2 mt-2">
+            
+          <a href="{{ product.url | url }}"><img
+               {% if shouldLazyLoad %}data-{% endif %}src="{{ product.image ? (product.image | url_image(imageThumbSize, product.fulltitle)) : imagePlaceholder }}"
+               alt="{{ product.fulltitle }}"
+               title="{{ product.fulltitle }}"
+               width="{{ imgThumbWidth }}"
+               height="{{ imgThumbHeight }}"
+               class="{% if shouldLazyLoad %}lazy{% endif %} product-grid-img" /></a>
+            
+            <div class="flex-grow-1">
+<!--               <form action="{{ ('/cart/add/'~product.vid) | url }}" class="product-mini-list p-2 mt-2" method="post"> -->
+              
+              <div class="fz-110 bold">{{ (theme.show_fulltitle and product.fulltitle and not theme.productgrid_show_brand) ? product.fulltitle : product.title }}</div>
+              
+              <form action="{{ ('/cart/add/'~product.vid) | url }}" class="product-bulk-variant-form d-flex" method="post">
+                <div class="product-bulk-variant-title">
+                  Variant
+                </div>
+              <div class="c-{{ vStockType }} nowrap fz-090 product-bulk-variant-stock">
+                <i class="icon-check-b"></i> <span class="bold">{{ vStockText | t }}</span>{% if showStockLevel %} ({{ variant.stock.level }}){% endif %}
+              </div>
+                <div class="ml-2 fz-090 product-bulk-variant-code">
+                  {{ product[theme.product_bulk_code_identifier] }}
+                </div>
+                <div class="ml-2 product-bulk-variant-price">
+                  <span class="price-old price-incl">€899,00</span>
+                  <span class="price-old price-excl">€742,98</span>
+                  
+                  <span class="price-incl bold">€849,00</span>
+                  <span class="price-excl bold">€701,65</span>
+                </div>
+                <div class="ml-2 d-flex">
+                  <div class="qty qty-small" data-type="single">
+                    <input type="number" min="0" name="quantity" class="qty-input qty-fast body-bg" value="1">
+                    <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+                    <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+                  </div>
+
+                  <a href="{{ ('/cart/add/'~product.vid) | url }}" class="button quick-order-button quick-order-button-auto trigger-add-to-cart"><i class="icon-shopping-cart"></i></a>
+                </div>
+              </form>
+              
+            </div>
+            
+            {#<div class="variant-bulk-title flex-grow-1">              
+              <div class="fz-110 bold">{{ (theme.show_fulltitle and product.fulltitle and not theme.productgrid_show_brand) ? product.fulltitle : product.title }}</div>
+              
+              <div class="d-sm-none d-md-block d-lg-none opacity-90 fz-080">
+                {{ product[theme.product_bulk_code_identifier] }}
+              </div>
+                          
+              <div class="c-in-stock nowrap fz-090">
+                <i class="icon-check-b"></i> <span class="bold">Op voorraad</span>              </div>
+            </div>
+            
+            <div class="ml-2 d-none d-sm-block d-md-none d-lg-block opacity-90 fz-080">
+                {{ product[theme.product_bulk_code_identifier] }}
+              </div>
+                        
+            <div class="ml-3">
+                              <span class="price-old price-incl">€899,00</span>
+                <span class="price-old price-excl">€742,98</span>
+                <br>
+                            <span class="price-incl bold">€849,00</span>
+              <span class="price-excl bold">€701,65</span>
+            </div>
+            
+            <div class="ml-2 d-flex">
+              <div class="qty qty-small" data-type="single">
+                <input type="number" min="0" name="quantity" class="qty-input qty-fast body-bg" value="1">
+                <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+                <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+              </div>
+
+              <a href="{{ ('/cart/add/'~product.vid) | url }}" class="button quick-order-button trigger-add-to-cart"><i class="icon-shopping-cart"></i></a>
+            </div>#}
+          </div> {# end minilist #}
+          
+        </div>
+        	{% endfor %}
+        {% else %}
+      		{% include 'snippets/products.rain' with {'mode': collection.mode, 'col_width': (product_col_width), 'lazyOffset': 4, 'limit': collection.limit} %}
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% include 'snippets/collection-pagination.rain' with{type:'next'} %}
+
+    </div>
+
+    {% if collection.content and theme.text_position == 'bottom' %}
+    <div class="col-md-12 margin-top-double">
+      {% if collection.image and theme.collection_show_image %}
+        <div class="row">
+          <div class="col-md-3">
+            <img src="{{ collection.image | url_image }}" alt="{{ collection.title }}" class="img-responsive">
+          </div>
+          <div class="col-md-9">
+            <div class="content">
+              {{ content | raw }}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="content">
+          {{ content | raw }}
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% set fancyFilterBoxActive = false %}
+
+{% if requestAction == 'collection_page' and request.get.filter_type == 'fancybox' %}
+	{% set fancyFilterBoxActive = true %}
+{% endif %}
+
+<div class="fancy-box fancy-box-right pb-3{% if fancyFilterBoxActive %} active{% endif %}" id="fancy-filters" data-fancy-backdrop="always" style="max-width:350px;">
+  <i class="icon-x-l close-fancy close-icon-absolute d-block d-md-none"></i>
+  {% include 'snippets/collection-filters.rain' with {'type': 'fancybox'} %}
+</div>

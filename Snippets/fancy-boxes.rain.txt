@@ -1,0 +1,464 @@
+{# start locale #}
+<div class="fancy-box hybrid fancy-locale-holder pos-body" id="fancy-language">
+  <div class="fancy-locale">
+    <strong>{{ 'Choose your language' | t }}</strong>
+
+    <div class="codl-12 d-flex align-items-center mt-1">
+      <span class="flag-icon flag-icon-{{ shop.language2.code }} flags-select-icon"></span>
+      <select class="fancy-select fancy-select-small" {{ 'onchange' }}="document.location=this.options[this.selectedIndex].getAttribute('data-url')">
+        {% include 'snippets/languages.rain' %}
+      </select>
+    </div>
+    <strong class="d-block mt-3">{{ 'Choose your currency' | t }}</strong>
+
+    <div class="codl-12 d-flex align-items-center mt-1">
+      <span class="currency-select-icon">{{ shop.currency2.symbol | upper }}</span>
+      <select class="fancy-select fancy-select-small" {{ 'onchange' }}="document.location=this.options[this.selectedIndex].getAttribute('data-url')">
+        {% for currency in shop.currencies %}
+        <option data-url="{{ currency.url | url }}"{% if currency.code == shop.currency2.code %} selected="selected"{% endif %}>{% if currency.symbol != shop.currency2.symbol %}{{ currency.symbol }} - {% endif %}{{ currency.code | t | upper }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+</div>
+{# end locale #}
+
+{# start account #}
+<div class="fancy-box hybrid fancy-account-holder text-left pos-body" id="fancy-account">
+  <div class="fancy-account">
+
+    <div class="x small d-block d-md-none close-fancy"></div>
+
+    <div class="d-flex flex-column">
+
+      <h4 class="fancy-box-top fancy-box-title">{{ 'My account' | t }}</h4>
+
+        <form action="{{ 'account/loginPost' | url }}" method="post" id="form_login" class="theme-form">
+          <input type="hidden" name="key" value="{{ page.key }}">
+
+          <input type="email" name="email" placeholder="{{ 'Email address' | t }}">
+          <input type="password" name="password" placeholder="{{ 'Password' | t }}" autocomplete="current-password">
+          {#<div class="d-flex align-items-center">
+          	<button type="submit" class="button nowrap mr-2" value="1">{{ 'Login' | t }}</button>
+            <a class="forgot-pass text-right flex-grow-1" href="{{ 'account/password' | url }}">{{ 'Forgot your password?' | t }}</a>
+          </div>#}
+          
+						<button type="submit" class="button w-100" value="1">{{ 'Login' | t }}</button>
+            <a class="forgot-pass d-block text-center fz-090 opacity-60 mt-1" href="{{ 'account/password' | url }}">{{ 'Forgot your password?' | t }}</a>
+          
+          {% if false %}
+          <a href="#" id="fb-login-button" class="button button-small mt-2 w-100" rel="nofollow" onclick="gui_facebook('{{ '/account/loginFacebook/?return='~shop.url | url }}'); return false;">
+            <i class="icon-facebook"></i> {{ 'Login with Facebook' | t }}
+          </a>
+          {% endif %}
+          
+          <div class="custom-pagination text-center mt-2 pos-relative">
+          	<div class="items">{{ 'or' | t }}</div>
+          	<div><a href="{{ 'account/register' | url }}" class="button button-medium button-lined-soft mt-2">{{ 'Create an account' | t }}</a></div>
+          </div>
+        </form>
+    </div>
+  </div>
+</div>
+{# end account #}
+
+{# start cart #}
+<div class="fancy-box hybrid text-left pos-body" id="fancy-cart">
+  <div class="fancy-cart">
+<!--     <div class="x small d-block d-md-none close-fancy"></div> -->
+
+    <div class="contents d-flex flex-column">
+
+      <h4 class="fancy-box-title">
+        {{ 'Recently added' | t }}
+        
+        <i class="icon-x-l close-fancy ml-3 d-block d-md-none"></i>
+      </h4>
+
+      <div class="cart-items-holder flex-grow-1 fancy-box-middle">      
+
+        {% for product in page.cart.products | reverse | limit(3) %}
+          <div class="fancy-cart-item {{ product.vid }} d-flex align-items-center mt-3 pb-3">
+            <div class="mr-2 img-holder gray-overlay">
+              <img src="{{ product.image | url_image('32x32x2',product.fulltitle) }}" width="32" height="32" alt="{{ product.fulltitle }}"> 
+            </div>
+            <div class="mr-2 flex-grow-1 fancy-cart-item-title">
+              <a href="{{ product.url | url }}" class="bold">{{ product.title }}</a>
+              {% if product.bundled | length %}
+              <div class="fancy-cart-item-bundle">
+                {% for bundledProduct in product.bundled %}
+                + {{ bundledProduct.title }}
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            <div class="mr-2 price nowrap">
+              {% if product.quantity > 1 %}<span class="quantity opacity-70">{{ product.quantity }}x </span>{% endif %}
+              {% if vatSwitcherEnabled %}
+              <span class="price-incl">{{ product.price.price_incl | money_without_currency }}</span>
+              <span class="price-excl">{{ product.price.price_excl | money_without_currency }}</span>
+              {% else %}
+              <span>{{ product.price.price | money_without_currency }}</span>
+              {% endif %}
+            </div>
+            <div class="">
+              <a href="{{ ((product.is_gift_card ? 'cart/deleteGiftCardProduct/' : 'cart/delete/') ~ product.qid) | url }}" class="fz-080 opacity-30" data-product-qid="{{ product.qid }}">
+                <i class="icon-x"></i>
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+
+
+        <div class="fancy-cart-total row mt-3 fz-110">
+          <div class="col-6">
+            <strong>{% if shop.b2b %}{{ 'Total excl. VAT' | t }}{% else %}{{ 'Total incl. VAT' | t }}{% endif %}</strong>
+          </div>
+          <div class="col-6 text-right">
+            <strong>{{ page.cart.total.price | money_without_currency }}</strong>
+          </div>
+        </div>
+
+        {% if theme.enable_free_shipping_notice %}
+          <div class="fancy-cart-shipping mt-1">
+            {% include 'snippets/freeshipping-bar.rain' with {'type':'fancy'} %}
+          </div>
+        {% endif %}
+
+      <div class="cart-proceed button-holder-vert mt-4">
+        <a href="{{ 'cart' | url }}" class="button">{{ 'View cart' | t }} ({{ cartqty }})</a>
+        {% if theme.enable_cart_quick_checkout %}
+          <a href="{{ 'checkout' | url }}" class="button button-lined-soft d-block text-center">{{ 'Proceed to checkout' | t }} <i class="icon-arrow-right valign-middle"></i></a>
+        {% endif %}
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+{# end cart #}
+
+{# start compare #}
+<div id="fc-holder" class="{% if page.compare %}active{% endif %} fc-pos-{{ theme.footer_compare_position }}">
+  
+  <div id="fc-title" class="d-flex align-items-center">
+    <span id="compare-count" class="mr-2 d-none">{{ page.compare | length }}</span>
+    <h5 class="mr-4 flex-grow-1">{{ 'Compare' | t }}</h5>
+    <i class="icon-angle-down"></i>
+  </div>
+  
+  <div id="fc-list" class="">
+    {% for product in page.compare %}
+    <div class="d-flex align-items-center{% if not loop.last %} gray-border-bottom pb-3{% endif %}{% if not loop.first %} mt-3{% endif %}">
+
+      <div class="gray-overlay pos-relative">
+		<img src="{{ product.image | url_image(imageThumbSize, product.fulltitle) }}" width="{{ imgThumbWidth }}" height="{{ imgThumbHeight }}" />
+      </div>
+      
+      <div class="mx-3 flex-grow-1">
+        <h5>
+          <a href="{{ product.url | url }}" title="{{ product.fulltitle }}">
+            {% if theme.show_fulltitle and product.fulltitle %}{{ product.fulltitle }}{% else %}{{ product.title }}{% endif %}
+          </a>
+        </h5>
+        {% if product.price.price_old %}
+        <span class="price-old">
+          {{ product.price.price_old | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}
+        </span>
+        {% endif %}
+        <span class="price">{{ product.price.price | money_without_currency }}</span>
+      </div>
+      
+      <a href="{{ ('compare/delete/' ~ product.vid) | url}}" class="fz-0-8 opacity-50"><i class="icon-x"></i></a>
+      
+    </div>
+    {% endfor %}
+    
+      <a href="{{ 'compare' | url }}" class="button button-small mt-3 d-block">
+		    {{ 'Start comparison' | t }} <i class="icon-arrow-right"></i>
+  	</a>
+  </div>
+</div>
+{# end compare #}
+
+{# start cart/shippingcosts #}
+{% if cart %}
+<div class="fancy-box fancy-box-right" id="fancy-shippingcosts" data-fancy-backdrop="always">
+  <div class="fancy-shippingcosts">
+    <h4 class="fancy-box-title">{{ 'Calculate shipping costs' | t }} <i class="icon-x-l close-fancy ml-3"></i></h4>
+    
+        <form id="gui-form-shipment" action="{{ 'cart/setShipmentLocation' | url }}" method="post" class="mt-4">
+          <select id="gui-form-country" name="country" >
+            {% for country in cart.shipping.countries %}
+              <option value="{{ country.id }}" {% if country.id == cart.shipping.country %}selected="selected"{% endif %}>{{ country.title }}</option>
+            {% endfor %}
+          </select>
+
+          <div class="d-flex mt-3">
+            <input class="theme-input" type="text" id="gui-form-zipcode" name="zipcode" value="{{ cart.shipping.zipcode }}" placeholder="{{ 'ZIP/Postal Code' | t }}" />
+            <button type="submit" class="button button-small ml-2">{{ 'View' | t }}</button>
+          </div>
+        </form>
+
+        <form id="gui-form-shipping" class="margin-top" action="{{ 'cart/setShipmentMethod' | url }}" method="post">
+          <div class="methods-block{% if not cart.shipping.methods %} hidden{% endif %}">
+            <div class="methods-title title-font">{{ 'Shipping methods' | t }}</div>
+            {% for method in cart.shipping.methods %}
+              <div class="">
+                <input id="gui-form-shipping-{{ method.id }}" type="radio" name="method" value="{{ method.id }}" {% if method.id == cart.shipment.id %}checked="checked"{% endif %} onclick="$('#gui-form-shipping').submit();" />
+                <label for="gui-form-shipping-{{ method.id }}">
+                  <span class="margin-right-10">{{ method.title }}</span>
+                  {% if shop.b2b %}
+                    ({{ method.price_excl | money_without_currency }})
+                  {% else %}
+                    ({{ method.price_incl | money_without_currency }})
+                  {% endif %}
+                </label>
+              </div>
+              {% endfor %}
+          </div>
+
+          <div class="text-center no-shipments{% if cart.shipping.methods or ( cart.shipping.countries[cart.shipping.country].has_region_based_shipping and not cart.shipping.zipcode ) %} d-none{% endif %}">
+            {{ 'No shipping methods found for this country.' | t }}
+          </div>
+
+          <div class="text-center no-zipcode{% if not cart.shipping.countries[cart.shipping.country].has_region_based_shipping or cart.shipping.zipcode %} d-none{% endif %}">
+            {{ 'Please type in your ZIP/Postal Code.' | t }}
+          </div>
+        </form>
+    
+  </div>
+</div>
+{% endif %}
+{# end cart/shippingcosts #}
+
+{# start product/reviews #}
+{% if template == 'pages/product.rain' %}
+<div class="fancy-modal p-3" id="fancy-write-review" data-type="modal">
+	<div class="fancy-modal-inner p-4">
+    <h4 class="d-flex">
+      {{ 'Review $1' | t(product.fulltitle) }}
+    	<i class="icon-x-l close-fancy pl-3 ml-auto"></i>
+    </h4>
+    
+    <form action="{{ ('account/reviewPost/'~product.id) | url }}" method="post" id="form_add_review">
+            <input type="hidden" name="key" value="{{ page.key }}">
+
+            <label for="score" class="mt-4">{{ 'Score' | t }}</label>
+            <select class="fancy-select" name="score" id="score">
+              <option value="1">{{ '1 Star' | t }}</option>
+              <option value="2">{{ '$1 Star(s)' | t(2) }}</option>
+              <option value="3">{{ '$1 Star(s)' | t(3) }}</option>
+              <option value="4">{{ '$1 Star(s)' | t(4) }}</option>
+              <option value="5" selected>{{ '$1 Star(s)' | t(5) }}</option>
+            </select>
+      
+            <label for="review_name" class="mt-3">{{ 'Name' | t }}</label>
+            <input id="review_name" type="text" name="name" placeholder="{{ 'Name' | t }}" class="theme-input">
+
+            <label for="review-textaea" class="mt-3">{{ 'Description' | t }}</label>
+            <textarea id="review-textaea" class="theme-input" name="review" placeholder="{{ 'Review' | t }}" style="width:100%; height:150px;"></textarea>
+
+            <button type="submit" class="button" value="1">{{ 'Add' | t }}</button>
+    </form>
+    
+  </div>
+</div>
+{% endif %}
+{# end product/reviews #}
+
+{# start blogreply #}
+{% if template == 'pages/article.rain' %}
+<div class="fancy-modal p-3" id="fancy-blogreply" data-type="modal">
+	<div class="fancy-modal-inner p-4">
+    <h4 class="d-flex">{{ 'Leave a comment' | t }} <i class="icon-x-l close-fancy pl-3 ml-auto"></i></h4>
+    <form action="{{ ('blogs/commentPost/'~blog.id~'/'~article.id) | url }}" method="post" id="form_add_blogreply">
+      <input type="hidden" name="key" value="{{ page.key }}">
+
+      <label for="reply_name" class="mt-3">{{ 'Name' | t }}</label>
+      <input id="reply_name" type="text" name="name" placeholder="{{ 'Name' | t }}" class="theme-input">
+
+      <label for="reply_email" class="mt-3">{{ 'Email' | t }}</label>
+      <div class="fz-090">{{ 'Your email address will not be published' | t }}</div>
+      <input type="email" id="reply_email" name="email" placeholder="{{ 'Email' | t }}" class="theme-input">
+
+      <label for="reply-comment" class="mt-3">{{ 'Comment' | t }}</label>
+      <textarea id="reply-comment" class="theme-input" name="comment" placeholder="{{ 'Comment' | t }}" style="width:100%; height:150px;"></textarea>
+
+      <button type="submit" class="button" value="1">{{ 'Add' | t }}</button>
+    </form>
+  </div>
+</div>
+{% endif %}
+{# end blogreply #}
+
+{# start quick shop modal #}
+<div id="quickshop-holder" class="fancy-modal quickshop-holder" data-type="modal">
+  <div id="quickshop-modal" class="fancy-modal-inner">
+    
+    <i class="icon-x-l pos-absolute close-fancy offset-r-15"></i>
+    
+    <div id="qs-image-holder" class="left">
+        <div id="swiper-quickimage" class="gray-overlay darker swiper-container product-image">
+          <div class="swiper-wrapper">
+
+          </div>
+        </div>
+
+      <div id="qs-swiper-prev" class="swiper-left"><i class="icon-angle-left"></i></div>
+      <div id="qs-swiper-next" class="swiper-right"><i class="icon-angle-right"></i></div>
+    </div>
+    
+    <div class="right productpage">
+      {% if theme.show_product_brands %}<div class="brand"></div>{% endif %}
+      <h2 id="qs-title"></h2>
+      <div class="stock margin-top-5"></div>
+      <div class="description margin-top-15"></div>
+
+      {% if not request.get.dev %}
+      <form id="qs-form" method="post" action="{{ ('cart/add/' ~ product.vid) | url }}" class="quick-order quickview-addtocart-form">
+        <div id="qs-variants" class="margin-top">
+          
+        </div>
+        
+        <div class="d-flex align-items-center margin-top">
+          <a href="#" class="button button-small button-lined-soft" id="qs-view-product"></a>
+          <div id="qs-price-holder" class="flex-grow-1 text-right">
+            
+          </div>
+        </div>
+
+        <div class="d-flex mt-3">
+          <div class="qty qty-large mr-3" data-type="single" data-id="qs-product">
+            <input id="qs-quantity" type="number" inputmode="numeric" name="quantity" class="qty-input qty-fast" value="1" data-min="1">
+            <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+            <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+          </div>
+          
+          {#<a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button trigger-add-to-cart live-quickview-addtocart"  data-metadata=''>{{'Add to cart' | t}}<i class="icon-{{ theme.cart_icon }}"></i></a> #}
+          <div class="button-content button-cta quickview">
+          <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button trigger-add-to-cart live-quickview-addtocart flex-grow-1 align-self-center px-3"  data-metadata=''>{{'In winkelwagen' | t}}</a>
+          <div class="button-icon">
+          	<i class=" px-3 icon-{{ theme.cart_icon }}"></i>
+          </div>
+          </div>
+        </div>
+      </form>
+      {% else %} {# DEV #}
+      <form id="qs-form" method="post" action="">
+        <div id="qs-variants" class="margin-top">
+          
+        </div>
+        
+        <div class="d-flex align-items-center margin-top">
+          <a href="#" class="button button-small button-lined-soft" id="qs-view-product"></a>
+          <div id="qs-price-holder" class="flex-grow-1 text-right">
+            
+          </div>
+        </div>
+
+        <div class="d-flex mt-3">
+          <div class="qty qty-large mr-3" data-type="single" data-id="qs-product">
+            <input id="qs-quantity" type="number" inputmode="numeric" name="quantity" class="qty-input qty-fast" value="1" data-min="1">
+            <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+            <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+          </div>
+          
+          <button type="submit" name="addtocart" class="fz-110 p-0 w-100 quick-cart button button-cta add-to-cart-button">
+            <span class="button-content">
+              <span class="button-text">{{ 'Add to cart' | t }}</span>
+              <span class="button-icon">
+                <i class="px-3 icon-{{ theme.cart_icon }}"></i>
+              </span>
+            </span>
+          </button>
+        </div>
+      </form>
+      {% endif %} {# DEV #}
+      
+    </div>
+  </div>
+</div>
+{# end quick shop modal #}
+
+{# start cart popup #}
+<div class="fancy-modal p-3" id="fancy-modal-cart" data-fancy-backdrop="always" data-type="modal">
+	<div class="fancy-modal-inner p-2">
+    <div class="success-bar">
+      <div class="d-flex">
+        <i class="icon-check icon-success-large mr-3"></i>
+        <div class="flex-grow-1 pr-3 lh-1">
+      		<h5 class="bold">{{ 'This product has been added to your cart!' | t }}</h5>
+      		<div id="fm-cart-product-title" class="fz-120 mt-1 mb-1"></div>
+          {% if vatSwitcherEnabled %}
+          <div id="fm-cart-price-incl" class="price-incl"></div>
+          <div id="fm-cart-price-excl" class="price-excl"></div>
+          {% else %}
+          <div id="fm-cart-price"></div>
+          {% endif %}
+        </div>
+        <div class="nowrap">
+          <a href="{{ 'cart' | url }}" class="button with-icon">{{ 'Proceed to checkout' | t }} <i class="icon-arrow-right"></i></a>
+          <a href="#" class="d-block mt-1 close-fancy fz-110">{{ 'Continue shopping' | t }}</a>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex p-4">
+      <div id="fm-cart-image">
+        
+      </div>
+      <div id="fm-cart-related" class="flex-grow-1">
+        
+      </div>
+    </div>
+<!--     <div id="fm-cart-bottom-grid" class="row p-4">
+      
+    </div> -->
+  </div>
+</div>
+{# end cart popup #}
+
+{# Start usp fancybox popups #}
+<div class="fancy-modal p-3" id="fancy-modal-usp-1" data-fancy-backdrop="always" data-type="modal">
+	<div class="fancy-modal-inner">
+    <div class="usp-popup-wrap">
+      <div class="title title-font">{{'usp-popup-title-1' | t | raw}}</div>
+      <div class="general-content">{{'usp-popup-text-1' | t | raw}}</div>
+    </div>
+  </div>
+</div>
+
+<div class="fancy-modal p-3" id="fancy-modal-usp-2" data-fancy-backdrop="always" data-type="modal">
+	<div class="fancy-modal-inner">
+    <div class="usp-popup-wrap">
+      <div class="title title-font">{{'usp-popup-title-2' | t | raw}}</div>
+      <div class="general-content">{{'usp-popup-text-2' | t | raw}}</div>
+    </div>
+  </div>
+</div>
+
+<div class="fancy-modal p-3" id="fancy-modal-usp-3" data-fancy-backdrop="always" data-type="modal">
+	<div class="fancy-modal-inner">
+    <div class="usp-popup-wrap">
+      <div class="title title-font">{{'usp-popup-title-3' | t | raw}}</div>
+      <div class="general-content">{{'usp-popup-text-3' | t | raw}}</div>
+    </div>
+  </div>
+</div>
+
+<div class="fancy-modal p-3" id="fancy-modal-usp-4" data-fancy-backdrop="always" data-type="modal">
+	<div class="fancy-modal-inner">
+    <div class="usp-popup-wrap">
+      <div class="title title-font">{{'usp-popup-title-4' | t | raw}}</div>
+      <div class="general-content">{{'usp-popup-text-4' | t | raw}}</div>
+    </div>
+  </div>
+</div>
+{# End usp fancybox popups #}
+
+{# start collection filters #}
+{# if template == 'pages/collection.rain' %}
+<div class="fancy-box fancy-box-right" id="fancy-filters" data-fancy-backdrop="always">
+  {% include 'snippets/collection-filters.rain' with {'type': 'fancybox'} %}
+</div>
+{% endif #}
+{# end locale #}

@@ -1,0 +1,302 @@
+<header id="header" class="usp-carousel-pos-{{ uspCarouselPosition }}{% if theme.navigation_mode == 'menubar' %} header-scrollable{% endif %}">
+<!--
+originalUspCarouselPosition = {{ theme.usp_carousel_position }}
+uspCarouselPosition = {{ uspCarouselPosition }}
+      amountOfSubheaderFeatures = {{ amountOfSubheaderFeatures }}
+      uspsInSubheader = {{ uspsInSubheader  ? 'true' : 'false' }}
+      uspsInSubheader = {{ subheaderEnabled  ? 'true' : 'false' }} -->
+<div id="header-holder" class="usp-carousel-pos-{{ uspCarouselPosition }}{% if theme.navigation_mode != 'menubar' %} header-scrollable{% endif %}{% if theme.header_shadow_effect %} header-has-shadow{% elseif theme.header_bgcolor == theme.navbar_bgcolor and theme.navigation_mode == 'menubar' %} no-shadow-on-scroll{% endif %}">
+  {% if uspCarouselPosition == 'top' %}
+  	{% include 'snippets/usp-carousel.rain' with {'position': 'top'} %}
+  {% endif %}
+  
+  
+  <div id="header-content" class="container logo-{{ theme.logo_position }} d-flex align-items-center {% if theme.logo_position =='center' %}justify-content-md-between{% endif %}">
+    <div id="header-left" class="header-col d-flex align-items-center{% if theme.navigation_mode != 'menubar' %} with-scrollnav-icon{% endif %}">      
+      <div id="mobilenav" class="nav-icon hb-icon d-lg-none" data-trigger-fancy="mobile-nav-holder">
+            <div class="hb-icon-line line-1"></div>
+            <div class="hb-icon-line line-2"></div>
+            <div class="hb-icon-label">{{ 'Menu' | t }}</div>
+      </div>
+      {% if theme.navigation_mode == 'button' %}
+      <div id="scroll-nav" class="nav-icon hb-icon d-none mr-3">
+            <div class="hb-icon-line line-1"></div>
+            <div class="hb-icon-line line-2"></div>
+            <div class="hb-icon-label">{{ 'Menu' | t }}</div>
+      </div>
+      {% endif %}
+      
+      {#<span id="mobilesearch" class="d-xs-inline-block d-lg-none margin-left-10" style="margin-top:4px;">
+        <i class="icon-search" aria-hidden="true"></i>
+      </span>#}
+      
+      {% if theme.logo_position == 'left' %}
+      	{% include 'snippets/header-logo.rain' with {'position': 'left'} %}
+      {% endif %}
+      
+      <form id="header-search" action="{{ 'search' | url }}" method="get" class="d-none{% if theme.logo_position == 'left' %} d-lg-block ml-4{% else %} header-search-small d-md-block header-search-left mr-3{% endif %}{% if twkInstance %} is-dummy{% endif %}"{% if twkInstance %} onsubmit="return false;"{% endif %}>
+        <input id="header-search-input"  maxlength="50" type="text" name="q" class="theme-input search-input header-search-input{% if theme.searchbox_white %} as-body border-none{% endif %}{% if theme.searchbox_rounded %} br-xl pl-20{% endif %}" placeholder="{{ 'Search' | t }}..">
+        <button class="search-button{% if theme.searchbox_rounded %} r-10{% endif %}" type="submit"><i class="icon-search{% if theme.searchbox_white %} c-body-text{% endif %}"></i></button>
+        
+        <div id="search-results" class="as-body px-3 py-3 pt-2 row apply-shadow{% if theme.logo_position == 'center' %} search-results-left{% endif %}"></div>
+      </form>
+    </div>
+    {% if theme.logo_position == 'center' %}
+    <div id="header-center" class="header-col d-flex justify-content-md-center">
+      {% include 'snippets/header-logo.rain' with {'position': 'center'} %}
+    </div>
+    {% endif %}
+    
+    <div id="header-right" class="header-col {{ theme.header_icons_show_label ? 'with' : 'without' }}-labels">
+        
+      {#
+      <div id="header-fancy-language" class="header-item d-none d-md-block" tabindex="0">
+        <span class="header-link" data-tooltip title="{{ 'Language' | t }} & {{ 'Currency' | t }}" data-placement="bottom" data-trigger-fancy="fancy-language">
+          <span id="header-locale-code" data-language-code="{{ shop.language2.code }}">{{ shop.currency2.code | upper }}</span>
+          <span class="flag-icon flag-icon-{{ shop.language2.code }}"></span> 
+        </span>
+        {% include 'snippets/fancy-locale.rain' %}
+      </div>
+			#}
+      
+      <div id="header-fancy-account" class="header-item">
+        
+        {% if page.account %}
+          <a href="{{ 'account' | url }}" class="header-link" data-tooltip title="{{ 'My account' | t }}" data-placement="bottom">
+            <i class="header-icon icon-user"></i>
+            <span class="header-icon-label">
+              <span class="fz-0-8 d-block">{{ 'Welcome' | t }},</span>
+              <strong>{{ page.account.firstname ?: 'My account' | t }}</strong>
+            </span>
+          </a>
+        {% else %}
+        	<span class="header-link" data-tooltip title="{{ 'My account' | t }}" data-placement="bottom" data-trigger-fancy="fancy-account" data-fancy-type="hybrid">
+            <i class="header-icon icon-user"></i>
+            <span class="header-icon-label">{{ 'My account' | t }}</span>
+        	</span>
+        {% endif %}
+      </div>
+
+      {% if shop.settings.wish_list %}
+      <div id="header-wishlist" class="d-none d-md-block header-item">
+        <a href="{{ 'account/wishlist' | url }}" class="header-link" data-tooltip title="{{ 'Wishlist' | t }}" data-placement="bottom"{% if not page.account %} data-fancy="fancy-account-holder"{% endif %}>
+          {% if not request.get.dev %}
+          <i class="header-icon">
+          {#<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" width="24" height="24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+          </svg> #}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" xml:space="preserve" width="24" height="24"><path d="M16.387 10.282H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 4.06H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 3.827H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467z"/><path d="M19.14 4.029H15.967v-0.513c0 -0.206 -0.167 -0.373 -0.373 -0.373h-1.569C13.771 2.666 13.156 1.818 12 1.818s-1.771 0.848 -2.025 1.324h-1.569c-0.206 0 -0.373 0.167 -0.373 0.373v0.513H4.86c-0.206 0 -0.373 0.167 -0.373 0.373v17.407c0 0.206 0.167 0.373 0.373 0.373h14.28c0.206 0 0.373 -0.167 0.373 -0.373V4.402c0 -0.206 -0.167 -0.373 -0.373 -0.373zm-10.173 0.047h1.373c0.158 0 0.3 -0.1 0.352 -0.249l0.022 -0.062c0.004 -0.01 0.367 -1.013 1.286 -1.013 0.903 0 1.269 0.964 1.287 1.014l0.021 0.061a0.373 0.373 0 0 0 0.352 0.249h1.373v1.26H8.967v-1.26zm9.613 17.173H5.42V4.962h2.613v0.933c0 0.206 0.167 0.373 0.373 0.373h7.187c0.206 0 0.373 -0.167 0.373 -0.373v-0.933h2.613v16.287z"/></svg>
+          </i>
+          {% else %}
+          <i class="header-icon icon-heart"></i>
+          {% endif %}
+          
+          <span class="header-icon-label">{{ 'Wishlist' | t }}</span>
+        </a>
+      </div>
+      {% endif %}
+      
+      <div id="header-fancy-cart" class="header-item mr-0">
+        <a href="{{ 'cart' | url }}" id="cart-header-link" class="cart header-link justify-content-center" data-trigger-fancy="fancy-cart">
+            <i id="header-icon-cart" class="icon-{{ theme.cart_icon }}"></i><span id="cart-qty" class="{{ theme.cart_icon }}">{{ cartqty }}</span>
+        </a>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+{% if theme.navigation_mode == 'button' %}
+<div class="subheader-holder subheader-holder-below {% if not uspsInSubheader %} d-nonex xd-md-block{% endif %}{% if theme.navbar_borders != 'none' %} navbar-border-{{ theme.navbar_borders }}{% endif %}{% if theme.navigation_shadow_effect %} header-has-shadow{% endif %}">
+    <div id="subheader" class="container d-flex align-items-center">
+      
+      <nav class="subheader-nav d-none d-lg-block">
+        <div id="main-categories-button">
+          {{ theme.navigation_button_text | t }}
+          <div class="nav-icon arrow-icon">
+            <div class="arrow-icon-line-1"></div>
+            <div class="arrow-icon-line-2"></div>
+          </div>
+        </div>
+        
+        {# if isDemoShop and template == 'pages/index.rain' %}
+        <div class="theme-pop nav-pop" data-pop="navbar">
+          {{ 'hint_navbarstyle' | t | raw }}
+          <div class="x small" data-pop-close="navbar"></div>
+        </div>
+        {% endif #}
+        
+        {# if isDemoShop and template == 'pages/collection.rain' %}
+        <div class="theme-pop collection-pop" data-pop="collection">
+          {{ 'hint_collection' | t | raw }}
+          <div class="x small" data-pop-close="collection"></div>
+        </div>
+        {% endif #}
+        
+        {% include 'snippets/navigation-vertical.rain' %}
+      </nav>
+      
+      {% if (shop.links.main and theme.navigation_show_custom_links and theme.navigation_custom_links_position == 'navbar') or (theme.show_navbar_blogs and shop.blogs) or theme.show_navbar_brands or theme.show_navbar_stores_page or theme.show_navbar_service_page or theme.nav_sale_enabled %}
+      <div class="subheader-links  d-none d-lg-block custom-scrollbar">
+        {% if theme.navigation_custom_links_position == 'navbar' and theme.navigation_show_custom_links %}
+        {% for link in shop.links.main %}
+      		<a href="{{ link.url | t | url }}" target="{% if link.new_window %}_blank{% endif %}" class="subheader-link"{% if isDemoShop and link.title == 'Presets'%} id="demo-preset-link"{% endif %}>{{ link.title | t }}</a>
+        {% endfor %}
+        {% endif %}
+        
+        {# if theme.show_navbar_service_page %}
+          <a href="{{ 'service' | url }}" class="subheader-link">{{ 'Customer service' | t }}</a>
+        {% endif #}
+        
+        {% if theme.show_navbar_blogs and shop.blogs %}
+        {% for blog in shop.blogs | limit (2) %}
+          <a href="{{ blog.url | url }}" class="subheader-link">{{ blog.title }}</a>
+        {% endfor %}
+        {% endif %}
+        
+        {% if theme.show_navbar_brands %}
+          <a href="{{ 'brands' | url }}" class="subheader-link">{{ 'Brands' | t }}</a>
+        {% endif %}
+        
+        {% if theme.show_navbar_stores_page %}
+          <a href="{{ 'service/stores' | url }}" class="subheader-link">{{ 'Our stores' | t }}</a>
+        {% endif %}
+        {% if theme.show_navbar_service_page %}
+          <a href="{{ 'service' | url }}" class="subheader-link">{{ 'Customer service' | t }}</a>
+        {% endif %}
+        
+        {% if theme.nav_sale_enabled %}
+        	<a href="{{ theme.nav_sale_url | t | url }}" class="subheader-link nav-sale-link">{{ theme.nav_sale_label | t }}</a>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+      {% if true %}
+      <form id="subheader-search" class="d-flex d-lg-none pos-relative flex-grow-1" action="{{ 'search' | url }}" method="GET"{% if twkInstance %} onsubmit="return false;"{% endif %}>
+        <input type="text" name="q" id="subheader-search-input" class="search-input subheader-search-input" placeholder="{{ 'Search' | t }}..">
+        <button class="search-button" type="submit" name="search"><i class="icon-search"></i></button>
+      </form>
+      {% endif %}
+      
+      {# if uspsInSubheader #}
+      {% if uspCarouselPosition == 'hybrid' %}
+      <div class="subheader-usps d-none d-md-flex">
+        {# include 'snippets/usps.rain' with {'type': 'header', 'class': 'with-header' } #}
+        {% include 'snippets/usp-carousel.rain' with {'position': 'hybrid'} %}
+      </div>
+      {% endif %}
+      
+    {% if vatSwitcherEnabled %}
+      <div class="subheader-vat">
+        {% include 'snippets/vat-switcher.rain' %}
+      </div>
+    {% endif %}
+      
+    {% if theme.shopreviews_in_header %}
+      {% include 'snippets/header-rating.rain' with {'position': 'subheader'} %}
+    {% endif %}
+      
+    {% if theme.hallmark != 'disabled' %}
+      <a href="{{ theme.hallmark_url }}" target="_blank" class="subheader-hallmark d-none d-md-block"{% if theme.hallmark_url | length < 2 %} onclick="return false;"{% endif %}>
+      {% if theme.hallmark == 'custom' %}
+        <img src="{{ 'hallmark.png' | url_asset }}" alt="" class="header-hallmark-img">
+      {% else %}
+        {# include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.hallmark} #}
+      	{% include ('snippets/'~('-icon' in theme.hallmark ? 'hallmark-icons' : 'hallmarks-minified')~'.rain') with {'hallmark': theme.hallmark} %}
+      {% endif %}
+      </a>
+    {% endif %}
+      
+    </div>
+<!--   </div> -->
+</div>
+  
+  {% if uspCarouselPosition == 'bottom' %}
+  	{% include 'snippets/usp-carousel.rain' with {'position': 'bottom'} %}
+  {% elseif uspCarouselPosition == 'hybrid' %}
+<!--   <div class="container d-md-none"> -->
+    {% include 'snippets/usp-carousel.rain' with {'position': 'hybrid_bottom'} %}
+<!--   </div> -->
+  {% endif %}
+{% endif %}
+
+{% if theme.navigation_mode == 'menubar' %}
+	{% include 'snippets/navbar.rain' with {'type': (request.get.navbar ?: theme.navbar_type) } %}
+  
+  {% if theme.usp_carousel_position != 'top' and theme.usp_carousel_position != 'disabled' %}
+  <div class="subheader-holder below-nav overflow-hidden">
+    
+      {% if false %}
+    <div id="subheader-search-holder" class="container">
+      <form id="subheader-search" class="d-flex pos-relative flex-grow-1 as-body my-2" action="{{ 'search' | url }}" method="GET">
+        <input type="text" maxlength="50" name="q" id="subheader-search-input" class="search-input subheader-search-input" placeholder="{{ 'Search' | t }}..">
+        <button class="search-button" type="submit" name="search"><i class="icon-search"></i></button>
+      </form>
+    </div>
+      {% endif %}
+    
+      {#<div id="subheader" class="container d-flex align-items-center">
+        <div class="subheader-usps">
+        {% include 'snippets/usps.rain' with {'type': 'header', 'class': 'below-nav' } %}
+        </div>
+
+        {% if theme.shopreviews_in_header %}
+        <div class="subheader-rating{% if theme.hallmark != 'disabled' %} with-hallmark{% endif %}">
+          {% include 'snippets/header-rating.rain' %}
+        </div>
+        {% endif %}
+
+        {% if theme.hallmark != 'disabled' %}
+        <div class="subheader-hallmark">
+          <a href="{{ theme.hallmark_url }}" target="_blank" class="d-none d-md-inline-block">
+          {% include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.hallmark} %}
+          </a>
+          <a href="{{ theme.hallmark_url }}" target="_blank" class="d-inline-block d-md-none">
+          {% include 'snippets/hallmark-icons.rain' with {'hallmark': theme.hallmark} %}
+          </a>
+        </div>
+        {% endif %}
+
+      </div>#}
+  </div>
+  
+	{% include 'snippets/usp-carousel.rain' with {'position': 'bottom'} %}
+  
+  {% else %}
+  {#<div class="subheader-holder p-2 d-block d-lg-none">
+      {% if true %}
+      <form id="subheader-search" class="d-flex pos-relative flex-grow-1" action="{{ 'search' | url }}" method="GET">
+        <input type="text" maxlength="50" name="q" id="subheader-search-input" class="search-input subheader-search-input" placeholder="{{ 'Search' | t }}..">
+        <button class="search-button" type="submit" name="search"><i class="icon-search"></i></button>
+      </form>
+      {% endif %}
+  <div>#}
+  {% endif %}
+{% endif %}
+  
+{# endif #}
+</header>
+  
+
+{% if theme.notification_enabled or request.get.notificationbar == 'true' %}
+<div id="notification-holder" class="container{% if theme.notification_fullwidth or request.get.notification_fullwidth == 1 %} notification-full-width{% endif %}" {% if request.get.notificationbar == 'true' %} style="display:block;"{% endif %}>
+<div id="notification">
+  <div>{{ theme.notification_text | t | raw }}</div>
+  <i class="icon-x-l" id="close-notification"></i>
+</div>
+</div>
+<script>
+if( !localStorage.getItem('{{ theme.notification_name }}') )
+{
+  let notificationElement = document.getElementById('notification-holder');
+
+  notificationElement.style.display = 'block';
+
+  document.getElementById('close-notification').addEventListener('click', function()
+  {
+    localStorage.setItem('{{ theme.notification_name }}', true);
+    notificationElement.style.display = 'none';
+  })
+}
+</script>
+{% endif %}

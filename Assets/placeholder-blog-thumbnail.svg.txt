@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 160 130" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <style>
+		.s0 { opacity: .08;fill: #9b9b9b } 
+	</style>
+  </defs>
+  <path id="Layer 2" class="s0" d="M 0 0 L 160 0 L 160 130 L 0 130 L 0 0 Z"/>
+  <image width="70" height="70" id="iconmonstr-picture-thin" style="opacity: 0.4;" x="45" y="32" xlink:href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0yNCAyMmgtMjR2LTIwaDI0djIwem0tMS0xOWgtMjJ2MThoMjJ2LTE4em0tMSAxNmgtMTlsNC03LjQ5MiAzIDMuMDQ4IDUuMDEzLTcuNTU2IDYuOTg3IDEyem0tMTEuODQ4LTIuODY1bC0yLjkxLTIuOTU2LTIuNTc0IDQuODIxaDE1LjU5M2wtNS4zMDMtOS4xMDgtNC44MDYgNy4yNDN6bS00LjY1Mi0xMS4xMzVjMS4zOCAwIDIuNSAxLjEyIDIuNSAyLjVzLTEuMTIgMi41LTIuNSAyLjUtMi41LTEuMTItMi41LTIuNSAxLjEyLTIuNSAyLjUtMi41em0wIDFjLjgyOCAwIDEuNS42NzIgMS41IDEuNXMtLjY3MiAxLjUtMS41IDEuNS0xLjUtLjY3Mi0xLjUtMS41LjY3Mi0xLjUgMS41LTEuNXoiLz48L3N2Zz4="/>
+</svg>

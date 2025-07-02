@@ -1,0 +1,27 @@
+{% if false %}
+<img src="{{ 'payments.svg' | url_asset }}#layer17" class="pay-icon">
+{% else %}
+
+<div class="{{ type == 'plain' ? 'payment-icons-plain' : 'payment-icons' }} {{ classList }}">
+  {% set afterpay = false %}
+  
+  {% if isDemoShop %}
+  <span title="{{ payment.title | t }}" class="payment-icon{% if theme.payment_icon_style == 'light' %} payment-icon-light{% endif %} icon-payment-ideal"></span>
+  {% endif %}
+  
+  {% for payment in shop.payments | sort %}
+  	{% if not theme.enable_custom_payment_icons or request.get.custom_payment_icons == 'false' %}
+  		<img src="{{ payment.icon | url_core }}" class="payment-icon-img" alt="{{ payment.title | t }}" title="{{ payment.title | t }}">
+    {% elseif 'afterpay' in payment.icon %}
+  		{% if afterpay == false %}
+    		<span title="{{ payment.title | t }}" class="payment-icon{% if theme.payment_icon_style == 'light' %} payment-icon-light{% endif %} {{ payment.icon | trim('.png') }}"></span>
+  			{% set afterpay = true %}
+  		{% endif %}
+  	{% else %}
+      <span title="{{ payment.title | t }}" class="payment-icon{% if theme.payment_icon_style == 'light' %} payment-icon-light{% endif %} {{ payment.icon | trim('.png') }}"></span>
+      {# <img src="{{ payment.icon | url_core }}" class="payment-icon-img" alt="{{ payment.title | t }}" title="{{ payment.title | t }}"> #}
+    {% endif %}
+  {% endfor %} 
+  
+</div>
+{% endif %}

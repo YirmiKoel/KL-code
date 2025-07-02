@@ -1,0 +1,39 @@
+{% if shop.blogs %}  
+<div id="home-blogs" class="container margin-top padding-bottom-15">
+
+    {% if theme.pretitle_blogs %}<h5 class="headline">{{ theme.pretitle_blogs | t }}</h5>{% endif %}
+    {% if theme.title_blogs %}
+    <h3 class="headline">{{ theme.title_blogs | t }}</h3>
+    {% endif %}
+
+  {% for blog in shop.blogs | limit(1) %}
+    <div class="row row-cols-1 row-cols-md-2">      
+      	{% for article in blog.articles | limit(4) %}
+      <div class="col home-blog">
+        
+        <div class="d-flex mt-3 align-items-center">
+        	<a href="{{ article.url | url }}"><img src="{{ article.image ? (article.image | url_image('160x130x1')) : ('placeholder-blog-thumbnail.svg' | url_asset) }}" alt="{{ article.title }}" class="home-blog-img rounded-3" loading="lazy" width="160" height="130"></a>
+            <div class="">
+              <h4><a href="{{ article.url | url }}">{{ article.title }}</a></h4>
+              <p class="m-0">
+                {{ article.summary | striptags | limit(150) }}
+              </p>
+              <a href="{{ article.url | url }}" class="underlined bold c-highlight">{{ 'Read more' | t }}</a>
+            </div>
+        </div>
+      </div>
+      {% endfor %}
+      
+      	{# include 'snippets/blogs.rain' with {'type': 'home'} #}
+    </div>
+  
+    <div class="margin-top text-center">
+    	<a href="{{ blog.url | url }}" class="button with-icon">
+        {{ 'View all' | t }} <i class="icon-arrow-right"></i>
+      </a>
+  	</div>
+  
+  {% endfor %}
+    
+</div>
+{% endif %}

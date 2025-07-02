@@ -1,0 +1,150 @@
+{% if type == 'embed' %}
+
+	{% set hasSpecs = false %}
+	{% set hasCodes = (product.code and theme.product_show_articlecode and productFeatures['group_by'] != 'code') or (product.ean and theme.product_show_ean and productFeatures['group_by'] != 'ean') or (product.sku and theme.product_show_sku and productFeatures['group_by'] != 'sku') %}
+
+	{% for spec in product.specs if not (spec.title starts with 'custom_details') and (spec.title | lower) not in ['pros', 'cons'] and not hasSpecs and spec.value %}
+		{% set hasSpecs = true %}
+	{% endfor %}
+
+	{% if hasSpecs or hasCodes %}
+  <div class="mt-0 mt-md-4" id="specifications">
+    <h3 class="pp-section-title toggle-title toggle-title-md gray-border-bottom-lte-md py-2 mb-2 py-md-0 mb-md-2">{{ 'Specifications' | t }}</h3>
+    <div id="product-specs-holder" class="toggle-content toggle-content-md content">
+      <div class="content-fold-overflow">
+        
+        {% if product.code and theme.product_show_articlecode and productFeatures['group_by'] != 'code' %}
+          <div class="spec-holder row">
+            <div class="col-5 spec-title bold">{{ 'Article number' | t }}</div>
+            <div class="col-7 spec-value">{{ product.code }}</div>
+          </div>
+        {% endif %}
+
+        {% if product.ean and theme.product_show_ean and productFeatures['group_by'] != 'ean' %}
+          <div class="spec-holder row">
+            <div class="col-5 spec-title bold">{{ 'EAN Code' | t }}</div>
+            <div class="col-7 spec-value">{{ product.ean }}</div>
+          </div>
+        {% endif %}
+
+        {% if product.sku and theme.product_show_sku and productFeatures['group_by'] != 'sku' %}
+          <div class="spec-holder row">
+            <div class="col-5 spec-title bold">{{ 'SKU' | t }}</div>
+            <div class="col-7 spec-value">{{ product.sku }}</div>
+          </div>
+        {% endif %}
+          
+        {% for spec in product.specs if not (spec.title starts with 'custom_details') and (spec.title | lower) not in ['pros', 'cons'] and spec.value %}
+        {% set valLowerCase = spec.value | lower%}
+        <div class="spec-holder row">
+          <div class="col-5 spec-title bold">{{ spec.title }}</div>
+          <div class="col-7 spec-value">
+            {% if valLowerCase in ['yes', 'ja', 'check', 'y'] %}
+              <i class="icon-check c-success"></i>
+            {% elseif valLowerCase in ['no', 'nee', 'cross', 'n'] %}
+              <i class="icon-x c-non-success"></i>
+            {% else %}
+              {{ spec.value | t }}
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+          
+      </div>
+    </div>
+  </div>
+	{% endif %}
+
+  {# if product.specs or (product.code and theme.product_show_articlecode and productFeatures['group_by'] != 'code') or (product.ean and theme.product_show_ean and productFeatures['group_by'] != 'ean') or (product.sku and theme.product_show_sku and productFeatures['group_by'] != 'sku') %}
+    {% for spec in product.specs if not (spec.title starts with 'custom_details') and (spec.title | lower) not in ['pros', 'cons'] %}
+
+		{% if loop.first %}
+			{% set hasSpecs = true %}
+      <div class="mt-0 mt-md-4" id="specifications">
+        <h3 class="pp-section-title toggle-title toggle-title-md gray-border-bottom-lte-md py-2 mb-2 py-md-0 mb-md-2">{{ 'Specifications' | t }}</h3>
+        <div id="product-specs-holder" class="toggle-content toggle-content-md content">
+          <div class="content-fold-overflow">
+		{% endif %}
+              
+              <h5>{{ spec.title }}</h5>
+
+    {% endfor %}
+              
+    {% if hasSpecs %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endif #}
+
+{% else %}
+
+
+{% set parsedCount = 0 %}
+<div class="specs">
+  {% if (product.code and theme.product_show_articlecode and productFeatures['group_by'] != 'code') or (product.ean and theme.product_show_ean and productFeatures['group_by'] != 'ean') or (product.sku and theme.product_show_sku and productFeatures['group_by'] != 'sku') %} 
+    {% if product.code and theme.product_show_articlecode and productFeatures['group_by'] != 'code' %}
+      <div class="spec-holder">
+        <div class="row">
+          <div class="col-5 spec-title bold">
+              {{ 'Article number' | t }}
+          </div>
+          <div class="col-7 spec-value">
+            {{ product.code }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  
+    {% if product.ean and theme.product_show_ean and productFeatures['group_by'] != 'ean' %}
+      <div class="spec-holder">
+        <div class="row">
+          <div class="col-5 spec-title bold">
+              {{ 'EAN Code' | t }}
+          </div>
+          <div class="col-7 spec-value">
+            {{ product.ean }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  
+    {% if product.sku and theme.product_show_sku and productFeatures['group_by'] != 'sku' %}
+      <div class="spec-holder">
+        <div class="row">
+          <div class="col-5 spec-title bold">
+              {{ 'SKU' | t }}
+          </div>
+          <div class="col-7 spec-value">
+            {{ product.sku }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+  
+  {% for spec in product.specs | limit(limit*2) if (limit > parsedCount and not (spec.title starts with 'custom_details')) %}
+  	{% if spec.value and (spec.title | lower) not in ['pros', 'cons'] %}
+  		{% set valLowerCase = spec.value | lower%}
+  		{% set parsedCount = parsedCount + 1%}
+      <div class="spec-holder{#% if loop.index is odd %} odd gray-bg{% endif %#}">
+        <div class="row">
+          <div class="col-5 spec-title bold">
+              {{ spec.title }}
+          </div>
+          <div class="col-7 spec-value">
+            {% if valLowerCase in ['yes', 'ja', 'check', 'y'] %}
+              <i class="icon-check c-success"></i>
+            {% elseif valLowerCase in ['no', 'nee', 'cross', 'n'] %}
+              <i class="icon-x c-non-success"></i>
+            {% else %}
+              {{ spec.value | t }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+	{% endfor %}
+</div>
+
+{% endif %}

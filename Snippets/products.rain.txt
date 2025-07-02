@@ -1,0 +1,962 @@
+{% set limit = limit ? limit : (request.get.limit ?: (collection.limit ?: 8)) %}
+{% set loopOffset = offset ?: 0 %}
+{% set excludedProductList = exclude ?: [] %}
+
+{% set loopIndex = 0 %}
+
+{% for product in (products ?: collection.products) | limit( limit ) %}
+
+  {% if product.id not in excludedProductList %}
+    {% set loopIndex = loopIndex + 1 %}
+  {% endif %}
+
+{% if loop.index > loopOffset and product.id not in excludedProductList %}
+
+{% set customColorLimit = 5 %}
+{% set productFeatures = {} %} {# e.g. timer: | bundle: | price_promo: | colors: | group_by: | group_bg_title: | pro_cons: | label | tag_label #}
+{% set prodImageSize = lookbook ? (theme.product_image_fit ? '520x600x2' : '520x600x1') : imageSize %}
+
+{% set productImage = product.image ? (product.image | url_image(prodImageSize, product.fulltitle)) : imagePlaceholder %}
+{% set productImagePreload = product.image ? (product.image | url_image('16x16x1', product.fulltitle)) : imagePlaceholder %}
+
+{% if product.data_01 != '' %}
+	{% set params = product.data_01 | split('|') %}
+	
+  {% for paramGroup in params %}
+		{% set param = paramGroup | split(':') %}
+		{% set option = param[0] | trim | lower %}
+		{% set value = paramGroup | replace({(param[0]~':'): ''}) | trim %}
+
+		{% set productFeatures = productFeatures | merge({(option): value}) %}
+	{% endfor %}
+{% endif %}
+<!-- value: {{ productFeatures['timer'] }} -->
+
+{% set productPrice = productFeatures['bundle'] ?: product.price.price %}
+{% set productPriceIncl = productFeatures['bundle'] ?: product.price.price_incl %}
+{% set productPriceExcl = productFeatures['bundle'] ?: product.price.price_excl %}
+{% set productPriceOld = product.price.price_old %}
+{% set productPriceOldExcl = product.price.price_old_excl %}
+{% set productPriceOldIncl = product.price.price_old_incl %}
+{% set discountPercentage = product.price.price_old ? (((productPriceOld - productPrice) / productPrice) * 100) | round | abs : false %}
+{% set labelText = false %}
+{% set pricePromoText = false %}
+{% set pricePromoText = 'Altijd scherp geprijsd' %}
+
+{% set timerVal = theme.countdowns_enabled ? productFeatures['timer'] : false %}
+
+{% set customColors = productFeatures['colors'] ? (productFeatures['colors'] | split(',')) : false %}
+{% set colorLimit = 5 %}
+
+{% if mode == 'grid' %}
+	
+	{% if not col_width %}
+		{% set col_width = 4 %}
+	{% endif %}
+
+	{% if not col_md %}
+		{% set col_md = 4 %}
+	{% endif %}
+
+	{% if not col_sm %}
+		{% set col_sm = 4 %}
+	{% endif %}
+
+	{% set lazyClass = '' %}
+
+	{% if lazyOffset is same as (0) %}
+		{% set lazyClass = ' lazy' %}
+	{% elseif not lazyOffset %}
+		{% set lazyOffset = 999 %}
+	{% endif %}
+
+  {% if type == 'featured' %}
+
+		{% set trueIndex = loop.index - looks_amount %}
+
+  {% else %}
+    {% set trueIndex = loop.index %}
+  {% endif %}
+
+	{% set blockClasses = 'product-col' %}
+	{% if trueIndex is even %}
+		{% set blockClasses = blockClasses ~ ' even' %}
+  {% else %}
+    {% set blockClasses = blockClasses ~ ' odd' %}
+  {% endif %}
+
+	{%  if not in_slider %}
+		{% set blockClasses = blockClasses ~ ' col-lg-' ~ col_width %}
+		{% set blockClasses = blockClasses ~ ' col-md-' ~ col_sm %}
+		{% set blockClasses = blockClasses ~ ' col-sm-6' %}
+		{% set blockClasses = blockClasses ~ ' col-xs-6' %}
+		{% set blockClasses = blockClasses ~ ' col-6' %}
+		{% set blockClasses = blockClasses ~ ' mt-3 mt-sm-4' %}
+  {% else %}
+		{% set blockClasses = blockClasses ~ ' swiper-slide' %}
+		{% if isFirst or loop.index-loopOffset == 1 %}
+			{% set blockClasses = blockClasses ~ ' product-col-first' %}
+		{% endif %}
+		{% if isLast or loop.last %}
+			{% set blockClasses = blockClasses ~ ' product-col-last' %}
+		{% endif %}
+  {% endif %}
+
+	{#{% if homedeal and loop.index == 1 %}#}
+	{% if homedeal and trueIndex == 1 %}
+		{% set blockClasses = blockClasses ~ ' hidden-lg hidden-md' %}
+	{% endif %}
+
+	{# Footer features in blocks #}
+	{% set footerFeatures = 0 %}
+	
+	{% if theme.product_grid_compare %}
+		{% set footerFeatures = footerFeatures + 1 %}
+	{% endif %}
+
+	{% if theme.product_grid_stock %}
+		{% set footerFeatures = footerFeatures + 1 %}
+	{% endif %}
+
+	{% if theme.quickorder_enabled %}
+		{% set footerFeatures = footerFeatures + 1 %}
+	{% endif %}
+
+{% set shadowOnHover = false %}
+{% set blockShadow = false %}
+{% set blockBorder = false %}
+
+{% if theme.product_grid_outline == 'border' %}
+  {% set shadowOnHover = true %}
+  {% set blockShadow = true %}
+  {% set blockBorder = true %}
+{% elseif theme.product_grid_outline == 'shadow' %}
+  {% set shadowOnHover = true %}
+  {% set blockShadow = true %}
+{% endif %}
+
+{% set shouldLazyLoad = trueIndex > lazyOffset or isAjaxRequest %}
+
+{% set style = '' %}
+{# we need this for addons category banners #}
+{% if collection and collection.page == 1 and loop.index <= 4 and 1>0 %} {# stupid markup fix with symbols #}
+	{% if loop.index == 1 %}
+		{% set blockClasses = blockClasses ~ ' order-first' %}
+	{% elseif loop.index == 2 %}
+		{% set blockClasses = blockClasses ~ ' order-first' %}
+	{% elseif loop.index == 3 %}
+		{% set blockClasses = blockClasses ~ ' order-0' %}
+		{% if col_width == 3 %}
+			{% set blockClasses = blockClasses ~ ' order-md-first' %}
+		{% endif %}
+	{% elseif loop.index == 4 %}
+		{% set blockClasses = blockClasses ~ ' order-0' %}
+		{% if col_width == 3 %}
+			{% set blockClasses = blockClasses ~ ' order-lg-first' %}
+		{% endif %}
+  {% endif %}
+{% endif %}
+  
+{% if '[description]' in product.description %}
+  {% set description = product.description | split('[description]')[1] %}
+{% else %}
+  {% set description = (''~product.description~'') %}
+{% endif %}
+
+<div class="{{ blockClasses }}" data-prod-url="{{product.url}}" data-loopindex="{{ loop.index }}" data-trueindex="{{ trueIndex }}" data-homedeal="{{ homedeal }}"{% if style %} style="{{ style }}"{% endif %}>
+  <div class="product-block product-intersect-json text-{{ theme.productgrid_text_align }} {% if theme.product_grid_outline == 'border' %} boxed-border{% endif %}{% if timerVal %} with-deal{% endif %}{% if theme.shadow_on_hover %} shadow-hover{% endif %}{% if theme.product_block_white and false %} white-bg{% endif %}{% if theme.product_grid_outline != 'none' %} default-shadow{% endif %}"{% if timerVal %} data-countdown-id="grid-{{ product.id }}"{% endif %} data-pid="{{ product.id }}" data-vid="{{ product.vid }}" data-json="{{ product.url | url | replace({'.html': '.html?format=json'}) }}" {% if productFeatures['group_by'] %} data-feature-group-by-key="{{ productFeatures['group_by'] }}" data-feature-group-by="{{ product[productFeatures['group_by']] }}"{% endif %}>
+      
+      {% if productFeatures['label'] %}
+      	<div class="product-label highlight-bg {% if productFeatures['timer'] and theme.countdowns_enabled %} product-label-with-timer{% elseif theme.rotated_labels %} product-label-rotated{% endif %}"{% if productFeatures['label_color'] %} style="background:{{ productFeatures['label_color'] }};"{% endif %}>{{ productFeatures['label'] | t }}</div>
+      {% endif %}
+      
+        {% if timerVal %}
+          <div class="countdown-grid-{{ product.id }} countdown-block bg-countdown tiny" data-countdown="{{ timerVal }}" data-type="text" data-id="grid-{{ product.id }}"></div>
+        {% endif %}
+    
+      <a href="{{ product.url | url }}" class="product-grid-img-holder{% if theme.dyapps_addons_enabled and not customColors %} dy-collection-grid-swatch-holder{% endif %}{% if shouldLazyLoad %} lazy-pending{% endif %}{% if theme.product_grid_image_overlay %} gray-overlay{% endif %}{% if theme.product_grid_outline == 'border' %} mx-2 mt-2 mx-sm-3 mt-sm-3{% endif %}">
+        <img
+             {% if shouldLazyLoad %}data-{% endif %}src="{{ productImage }}"
+             alt="{{ product.fulltitle }}"
+             title="{{ product.fulltitle }}"
+             width="{{ imgWidth }}"
+             height="{{ imgHeight }}"
+             class="{% if shouldLazyLoad %}lazy{% endif %} product-grid-img" />
+        
+        {% if not request.get.dev %}
+        
+        	{#<i class="icon-expand quickshop-button{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}"></i> #}
+        
+        {% endif %}
+        
+        {% if customColors and theme.dyapps_addons_enabled %}
+        <div class="dy-collection-color-swatches dy-data01-colors dy-hidden justify-content-{{ theme.productgrid_text_align }}">
+          {% for color in customColors | limit(customColorLimit) %}
+<!--           <span class="dy-collection-custom-color" style="background:{{ color }};"></span> -->
+          <span class="dy-variant-color dy-color-swatch" style="background-color:{{ color }};"></span>
+          {% endfor %}
+          {% if (customColors | length) > customColorLimit %}
+          <span class="dy-collection-custom-colors-more">+{{ (customColors | length) - customColorLimit}}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+        {# <div class="color-circles" data-title="{{product.url}}"> #}
+        <div class="color-circles">
+        	<ul class="ul-reset color-circles-list">
+          </ul>
+        </div>
+      </a>
+      
+      {#{% if shop.settings.wish_list %}
+      <a href="{{ ('account/wishlistAdd/' ~ product.id ~ '?variant_id=' ~ product.vid) | url }}" class="product-block-wishlist gray-border body-bg {% if theme.grid_wishlist_show_hover %} wishlist-on-hover{% if product.price.price_old and theme.sale_percentage %} wishlist-on-hover-sale{% endif %}{% endif %}"{% if not page.account%} data-fancy="fancy-account-holder"{% endif %}>
+        <i class="icon-heart"></i>
+      </a> 
+      {% endif %} #}
+      
+      {% if product.price.price_old and theme.sale_percentage %}
+      <div class="product-sale sale-bg{% if shop.settings.wish_list and not theme.grid_wishlist_show_hover %} with-wishlist{% endif %}">
+          {% if theme.sale_percentage %} {{ (((productPrice / product.price.price_old)*100)-100) | round(0) }}%{% endif %}
+      </div>
+      {% endif %}
+      
+      <div class="product-block-sub px-2 px-sm-3 pb-2 pb-sm-3">
+        {% if theme.productgrid_show_brand and product.brand.title %}
+          <div class="product-col-brand mt-3">{{ product.brand.title ?: ' ' }}</div>
+        {% endif %}
+
+          <a href="{{ product.url | url }}" title="{{ product.fulltitle }}" class="heading product-block-title{% if not theme.productgrid_show_brand or not product.brand.title %} mt-3{% endif %}">
+            {{ (theme.show_fulltitle and product.fulltitle and not theme.productgrid_show_brand) ? product.fulltitle : product.title }}
+          </a>
+      
+        {% if theme.yotpo_id and theme.productgrid_enable_reviews %}
+        <div class="product-grid-reviews yotpo-block">    
+          <div class="yotpo bottomLine html_content" style="" data-appkey="{{ theme.yotpo_id }}" data-domain="{{ shop.domain }}" data-product-id="{{ product[theme.yotpo_product_identifier] }}" data-product-models="{{ product.id }}" data-name="{{ product.title }}" data-url="{{ product.url | url }}" data-image-url="{{ product.image | url_image }}" data-description="{{ description }}" data-bread-crumbs="{{ breadcrumb.title }}"></div>          
+        </div>
+        {% elseif theme.setting_reviews and theme.productgrid_enable_reviews %}
+        <div class="product-grid-reviews stars">
+          <!--
+          {% for i in 1..5 %}
+            --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : 'star-fill' }}"></i><!--
+          {% endfor %}
+          -->
+        </div>
+        {% endif %}
+      
+        {% if theme.show_product_description %}
+        <div class="product-block-desc">
+          {{ description|length > 80 ? description|slice(0, 80) ~ '...' : description }}
+        </div>
+        {% endif %}
+      
+        <div class="mt-auto"></div>
+        
+        {% if 'bundle:' not in product.data_01 | lower or productPrice > 0 %}
+          <div class="product-block-price mt-2 fz-115">
+            {% if product.price.price_old %}
+            	<span class="price-old price-incl">{{ productPriceOldIncl | money_without_currency }}</span>
+            	<span class="price-old price-excl">{{ productPriceOldExcl | money_without_currency }}</span>
+            	{% if shopLegalMode == 'strict' %}<span>{{ 'SRP' | t }}</span>{% endif %}
+            {% endif %}
+            <span class="price-incl{% if theme.product_grid_price_bold %} bold{% endif %}">{{ productPriceIncl | money_without_currency }}</span>
+            <span class="price-excl{% if theme.product_grid_price_bold %} bold{% endif %}">{{ productPriceExcl | money_without_currency }}</span>
+          </div>
+        {% endif %}
+        
+        {% if shop.settings.legal.mode == 'strict' %}
+          <div class="price-strict">* {% if shop.b2b %}{{ 'Excl. VAT' | t }}{% else %}{{ 'Incl. VAT' | t }}{% endif %} {{ 'Excl. $1' | t('<a href="' ~ 'service/shipping-returns' | url ~ '" class="highlight-txt">' ~ 'Shipping costs' | t ~ '</a>') | raw }}</div>
+        {% endif %}
+
+        {#{% if shop.settings.price_per_unit and product.unit %}
+          <div class="unit-price">{{ 'Unit price' | t }}: {{ product.unit.price | money_without_currency }} / {{ product.unit.unit }}</div>
+        {% endif %} #}
+        
+        {% if theme.product_grid_stock_type != 'disabled' %}
+        <div class="{{ theme.product_grid_stock_type == 'delivery' ? 'product-col-delivery fz-090' : 'product-col-stock fz-095' }} preload-hidden lh-110{% if theme.quickorder_enabled and not theme.product_grid_compare %} d-block d-md-none{% endif %}">
+          &nbsp;
+        </div> 
+        {% endif %}
+        
+        {% if theme.product_grid_compare and not theme.quickorder_enabled %}
+          <div class="margin-top-5 w-100 d-none d-md-block">
+            <input id="compare_{{ product.vid }}" type="checkbox" name="compare[]" class="fancy-checkbox tiny" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+            <label for="compare_{{ product.vid }}" class="compare" data-url="{{ ('compare/add/'~product.vid) | url }}"{% if page.compare | length == 5 %} data-tooltip title="Max. 5" data-placement="left"{% endif %}>
+              {{ 'Compare' | t }}
+            </label>
+          </div>
+        {% endif %}  
+        
+    {% if theme.quickorder_enabled %} {#or (theme.product_grid_compare and theme.quickorder_enabled) %}#}
+      <div class="product-block-footer d-flex align-items-center mt-2">
+          {% if theme.product_grid_compare %}
+        <div class="d-none d-md-block flex-grow-1">
+            <input id="compare_{{ product.vid }}" type="checkbox" name="compare[]" class="fancy-checkbox tiny" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+            <label for="compare_{{ product.vid }}" class="compare" data-url="{{ ('compare/add/'~product.vid) | url }}"{% if page.compare | length == 5 %} data-tooltip title="Max. 5" data-placement="left"{% endif %}>
+              {{ 'Compare' | t }}
+            </label>
+        </div>
+          {# elseif theme.product_grid_stock_type == 'stock' #}
+          {% elseif theme.product_grid_stock_type != 'disabled' %}
+        <div class="d-none d-md-block flex-grow-1">
+            <div class="{{ theme.product_grid_stock_type == 'delivery' ? 'product-col-delivery fz-090' : 'product-col-stock fz-095' }} preload-hidden mr-1 lh-110">
+              &nbsp;
+            </div> 
+        </div>
+          {% endif %}
+        
+        {% if theme.quickorder_enabled %}
+          {% set metadata = {
+            id: product.id,
+            vid: product.vid,
+            variant: ((product.variant | lower) == "default" ? '' : product.variant),
+            title: product.title,
+            price: product.price,
+            image: ( product.image ? (product.image | url_image(imageSize)) : '')
+          } | json_encode(constant('JSON_HEX_APOS')) %}
+        
+          <form action="{{ ('cart/add/' ~ product.vid) | url }}" class="quick-order d-flex align-items-center justify-content-end flex-grow-1">
+            
+            {% if request.get.dev %}
+            
+              {% if 'bundle:' not in product.data_01 | lower %}
+              <input type="text" class="qty-fast" name="quantity" value="1" aria-label="{{ 'Quantity' | t }}">
+              <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button trigger-add-to-cart"
+                 data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a>
+              {% else %}
+                <a href="{{ product.url | url }}" class="button button-lined button-40 zquick-order-button"><i class="icon-search"></i></a>
+              {% endif %}
+            
+            {% else %}
+            
+            	{#<i class="icon-expand quickshop-button{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}"></i>#}
+            	{#{% if 'bundle:' not in product.data_01 | lower %}
+              <input type="text" class="qty-fast" name="quantity" value="1" aria-label="{{ 'Quantity' | t }}">
+            	#}
+            	<a href="{{ 'account/wishlist' | url }}" class="product-wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" xml:space="preserve" width="24" height="24"><path d="M16.387 10.282H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 4.06H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 3.827H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467z"/><path d="M19.14 4.029H15.967v-0.513c0 -0.206 -0.167 -0.373 -0.373 -0.373h-1.569C13.771 2.666 13.156 1.818 12 1.818s-1.771 0.848 -2.025 1.324h-1.569c-0.206 0 -0.373 0.167 -0.373 0.373v0.513H4.86c-0.206 0 -0.373 0.167 -0.373 0.373v17.407c0 0.206 0.167 0.373 0.373 0.373h14.28c0.206 0 0.373 -0.167 0.373 -0.373V4.402c0 -0.206 -0.167 -0.373 -0.373 -0.373zm-10.173 0.047h1.373c0.158 0 0.3 -0.1 0.352 -0.249l0.022 -0.062c0.004 -0.01 0.367 -1.013 1.286 -1.013 0.903 0 1.269 0.964 1.287 1.014l0.021 0.061a0.373 0.373 0 0 0 0.352 0.249h1.373v1.26H8.967v-1.26zm9.613 17.173H5.42V4.962h2.613v0.933c0 0.206 0.167 0.373 0.373 0.373h7.187c0.206 0 0.373 -0.167 0.373 -0.373v-0.933h2.613v16.287z"/></svg>
+            	</a>
+              {#<a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}"
+                 data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a> #}
+            	<a href="{{ product.url | url }}" class="button quick-order-button{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}"
+                 data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a>
+              {#{% else %}
+                <a href="{{ product.url | url }}" class="button button-lined button-40 zquick-order-button"><i class="icon-search"></i></a>
+              {% endif %}#}
+            
+            {% endif %}
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
+    	</div>
+  </div>
+</div>
+
+{% if collection and requestType != 'ajax' %}
+  {% if loop.index == 3 and col_width == 4 %}
+  <div id="dy-cat-banner-holder" class="col-12 dy-cat-banner-holder order-first order-md-0"></div>
+  {% elseif trueIndex == 4 and col_width == 3 %}
+  <div id="dy-cat-banner-holder" class="col-12 dy-cat-banner-holder order-first"></div>
+  {% endif %}
+{% endif %}
+
+{% elseif mode == 'homedeal' %}
+
+  <div class="homedeal-compact-holder margin-top-50 product-block{% if true %} grey{% endif %} rounded hidden-sm hidden-xs hidden-xxs">
+    
+    {% if labelText %}<div class="product-label highlight-bg product-label-rotated">{{ labelText | t }}</div>{% endif %}
+    
+    <div class="homedeal-compact">
+      
+      <div class="img-holder">
+        <a href="{{ product.url | url }}"><img src="{{ product.image | url_image(imageSize) }}" alt="{{ product.title }}"></a>
+      </div>
+
+      <h4 class="margin-top">
+        <a href="{{ product.url | url }}">{{ product.title }}</a>
+      </h4>
+    	{% if description %}
+      	<p class="margin-top-15">{{ description }}</p>
+      {% endif %}
+
+      <div class="price-holder">
+        {% if product.price.price_old %}
+        	<span class="price-old">{{ product.price.price_old | money_without_currency }}</span>
+        {% endif %}
+        <span class="price">{{ product.price | money_without_currency }}</span>
+    	</div>
+      
+      {% if timerVal %}
+        <div class="homedeal-countdown-holder">
+          <div class="countdown compact" data-countdown="{{ timerVal }}"></div>
+    		</div>
+      {% endif %}
+      
+      <a href="{{ product.url | url }}" class="button margin-top">{{ 'View product' | t }}</a>
+    </div>
+  </div>
+
+{% elseif mode == 'homedeal_new' %}
+<div class="deal-holder gray-border d-flex flex-grow-1">
+<div class="homedeal-inner align-self-center">
+  <img src="{{ product.image | url_image('260x260x2') }}" class="max-width-100">
+  <div class="price-circle">
+    <div class="price-circle-inner lh-110">
+      {% if product.price.price_old %}
+        <span class="price-old opacity-80">
+          {{ product.price.price_old | money_without_currency }}
+        </span>
+      {% endif %}
+    <span class="price">
+      {{ product.price.price | money_without_currency }}
+    </span>
+    </div>
+  </div>
+  <h3 class="h-max-double">{{ product.title }}</h3>
+  <p class="max-lines-2">{{ description | limit(80) }}</p>
+      
+    {% if labelText %}<div class="product-label highlight-bg ">{{ labelText | t }}</div>{% endif %}
+  
+    {% if timerVal %}
+  	<div class="countdown-holder mt-3">
+    	<div class="countdown-x{{ product.id }} countdown-block tiny" data-countdown="{{ timerVal }}"></div>
+    </div>
+  {% endif %}  
+  
+<!--     <a href="" class="button mt-3">{{ 'Buy now' | t }}</a> -->
+<!--   <a href="" class="button wijth-icon lined mt-3">{{ 'View' | t }}</a> -->
+  
+</div>
+</div>
+<a href="" class="button deal-button with-icon">{{ 'View product' | t }} <i class="icon-arrow-right"></i></a>
+
+{% elseif mode == 'highlight' %}
+
+      <div class="look-holder align-{{ position }} margin-top" data-json="{{ product.url | url | replace({'.html': '.html?format=json'}) }}" data-url="{{ product.url | url }}" data-promo-type="{{ promo_type }}">
+
+        <div class="look-images">    
+          <div class="look-sub-images">
+            <div class="sub-image first d-block d-md-none" style="zzzzbackground-image:url({{ product.image | url_image('520x600x2', product.fulltitle) }});">
+<!--               <img data-src="{{ product.image | url_image('520x600x2', product.fulltitle) }}" alt="" class="d-block d-md-none lazy"> -->
+              <img src="{{ product.image | url_image('520x600x2', product.fulltitle) }}" alt="{{ product.fulltitle }}" class="promo-product-image-sub promo-product-{{ promo_type }}-fit" loading="lazy">
+            </div>
+          </div>
+          <div class="look-main-image d-none d-md-block" data-src="{{ product.image | url_image('520x600x2', product.fulltitle) }}">
+            <img src="{{ product.image | url_image('520x600x2', product.fulltitle) }}" alt="{{ product.fulltitle }}" class="promo-product-image-sub promo-product-{{ promo_type }}-fit" loading="lazy">
+          </div>
+        </div>
+
+        <div class="look-content text-center">
+          <h2>{{ product.title }}</h2>
+          <p class="margin-top-15">{{ description }}</p>
+          {% if vatSwitcherEnabled %}
+          	<div class="price-incl fz-130 bold"></div>
+          	<div class="price-excl fz-130 bold"></div>
+          {% else %}
+          	<div class="price fz-130 bold">{% if product.price.price %}{{ product.price.price | money_without_currency }}{% endif %}</div>
+          {% endif %}
+
+         {% if timerVal %}
+          <div class="countdown countdown-highlight-{{ product.id }} countdown-block mt-3" data-countdown="{{ timerVal }}"></div>
+      {% endif %}
+          
+          <a href="{{ product.url | url }}" class="button mt-3 mt-xl-{% if not timerVal %}3{% else %}4{% endif %} with-icon d-block d-xl-inline-block mr-0 mr-xl-3">{{ button | t }} <i class="icon-arrow-right"></i></a>
+          {% if shop.settings.wish_list %}
+          <a href="{{ ('account/wishlistAdd/' ~ product.id ~ '?variant_id=' ~ product.vid) | url }}" class="button button-lined-soft mt-2 mt-xl-{% if not timerVal %}3{% else %}4{% endif %} with-icon d-block d-xl-inline-block"{% if not page.account%} data-fancy="fancy-account-holder"{% endif %}>{{ 'Add to wishlist' | t }} <i class="icon-heart"></i></a>
+          {% endif %}
+        </div>
+
+      </div>
+
+{% elseif mode == 'search' or mode == 'grid_list' %}
+
+	{% if mode == 'grid_list' and loop.first %}<div class="row row-cols-1 row-cols-lg-2 mx-n1">{% endif %}
+    
+		<div data-mode="grid_list-{{ mode }}" class="{% if mode == 'grid_list' %}col px-1 mt-2{% else %}col-6 px-1 mt-2{% endif %}">
+			<a href="{{ product.url | url }}" class="product-mini-list mini-list-search d-flex{% if theme.shadow_on_hover %} shadow-hover-x2 clear-bg{% endif %}">
+      <div class="mini-list-image gray-overlay pos-relative">
+  			<img src="{{ product.image | url_image(imageThumbSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgThumbWidth }}" height="{{ imgThumbHeight }}" class="gray-overlay img-responsive" />
+  		</div>
+  
+      <div class="mini-list-title lh-1">
+        {% set brandShown = (theme.productgrid_show_brand and theme.show_product_brands and product.brand) %}
+        {% if brandShown %}
+        <span class="brand">{{ product.brand.title }}</span>
+        {% endif %}
+        <h5>
+          {{ (theme.show_fulltitle and product.fulltitle and not brandShown) ? product.fulltitle : product.title }}
+        </h5>
+        {% if theme.setting_reviews %}
+        <div class="product-grid-reviews stars">
+          <!--
+          {% for i in 1..5 %}
+            --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : 'star-fill' }}"></i><!--
+          {% endfor %}
+          -->
+        </div>
+        {% endif %}
+      </div>
+  
+      <div class="mini-list-price">
+        {% if product.price.price_old %}
+          <div class="price-old">
+            {% if vatSwitcherEnabled %}
+              <span class="price-incl">{{ productPriceOldIncl | money_without_currency }}</span>
+              <span class="price-excl">{{ productPriceOldExcl | money_without_currency }}</span>
+            {% else %}
+              {{ productPriceOld | money_without_currency }}
+            {% endif %}
+
+            {% if shopLegalMode == 'strict' %}{{ 'SRP' | t }}{% endif %}
+          </div>
+        {% endif %}
+
+        <div class="price bold">
+          {% if vatSwitcherEnabled %}
+            <span class="price-incl">{{ productPriceIncl | money_without_currency }}</span>
+            <span class="price-excl">{{ productPriceExcl | money_without_currency }}</span>
+          {% else %}
+            {{ productPrice | money_without_currency }}
+          {% endif %}
+        </div>
+      </div>
+  
+      <div class="margin-left-10">
+        <i class="icon-angle-right fz-0-9 mini-list-view-icon"></i>
+      </div>  
+			</a>
+		</div>
+	{% if mode == 'grid_list' and loop.last %}</div>{% endif %}
+
+{% elseif mode == 'mini_list' %}
+<div class="{{ as_col ? 'col col-12' : '' }} {{ loopIndex == 1 and request.get.fclass ? request.get.fclass : 'mt-2' }}{% if amount_show and loop.index > amount_show %} d-none{% endif %}{% if loop.index == 4 and amount_show and loop.index > amount_show %}d-flex d-lg-none{% endif %}" data-mode="{{ mode }}" data-fclass="{{ request.get.fclass }}">
+<a href="{{ product.url | url }}" class="product-mini-list d-flex h-100{% if theme.shadow_on_hover %} shadow-hover-x2 clear-bg{% endif %}">
+  
+  <div class="mini-list-image gray-overlay pos-relative">
+  	<img src="{{ product.image | url_image(imageThumbSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgThumbWidth }}" height="{{ imgThumbHeight }}" class="gray-overlay" loading="lazy" />
+  </div>
+  
+  <div class="mini-list-title">
+    {% set brandShown = (theme.productgrid_show_brand and theme.show_product_brands and product.brand) %}
+    {% if brandShown %}
+    <span class="brand">{{ product.brand.title }}</span>
+    {% endif %}
+    <div class="bold lh-1">
+      {{ (theme.show_fulltitle and product.fulltitle and not brandShown) ? product.fulltitle : product.title }}
+    </div>
+    {% if theme.productgrid_enable_reviews and theme.setting_reviews and not theme.yotpo_id %}
+    <div class="product-grid-reviews stars">
+      <!--
+      {% for i in 1..5 %}
+        --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : 'star-fill' }}"></i><!--
+      {% endfor %}
+      -->
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="mini-list-price">
+    {% if product.price.price_old %}
+    	<div class="price-old">
+        {% if vatSwitcherEnabled %}
+        	<span class="price-incl">{{ productPriceOldIncl | money_without_currency }}</span>
+          <span class="price-excl">{{ productPriceOldExcl | money_without_currency }}</span>
+        {% else %}
+          {{ productPriceOld | money_without_currency }}
+        {% endif %}
+        
+        {% if shopLegalMode == 'strict' %}{{ 'SRP' | t }}{% endif %}
+  		</div>
+    {% endif %}
+    
+    <div class="price bold">
+      {% if vatSwitcherEnabled %}
+        <span class="price-incl">{{ productPriceIncl | money_without_currency }}</span>
+        <span class="price-excl">{{ productPriceExcl | money_without_currency }}</span>
+      {% else %}
+        {{ productPrice | money_without_currency }}
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="margin-left-10">
+    <i class="icon-angle-right mini-list-view-icon"></i>
+  </div>
+  
+<!--   <span class="skewed-arrow-button small-button quickshop" data-json="{{ (product.url | url) | replace({'.html':'.html?format=json'}) }}" data-pid="{{ product.id }}"><i class="fas fa-angle-right"></i></span> -->
+  
+</a>
+</div>
+
+{% elseif mode == 'list_mini' %}
+ 
+<div class="d-flex py-3 align-items-center{% if not loop.last %} gray-border-bottom{% endif %}">
+    <a href="{{ product.url | url }}" class="mini-list-image xgray-overlay pos-relative">
+      <img src="{{ product.image | url_image(imageThumbSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgThumbWidth }}" height="{{ imgThumbHeight }}" loading="lazy" />
+    </a>
+    
+    <a href="{{ product.url | url }}" class="mini-list-title">
+      {% set brandShown = (theme.productgrid_show_brand and theme.show_product_brands and product.brand) %}
+      {% if brandShown %}
+      <span class="product-col-brand">{{ product.brand.title }}</span>
+      {% endif %}
+      <div class="bold fz-110 lh-1">
+        {{ (theme.show_fulltitle and product.fulltitle) ? product.fulltitle : product.title }}
+      </div>
+      {% if theme.productgrid_enable_reviews and theme.setting_reviews and not theme.yotpo_id %}
+      <div class="product-grid-reviews stars fz-090">
+        <!--
+        {% for i in 1..5 %}
+          --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : 'star-fill' }}"></i><!--
+        {% endfor %}
+        -->
+      </div>
+      {% endif %}
+    {% if theme.product_grid_stock_type != 'disabled' %}
+      <div class="mt-1 {% if product.available %}in-stock{% else %}out-of-stock{% endif %} fz-090">{{ (product.available ? 'In stock' : 'Out of stock') | t }}</div>
+<!--     <div class="mt-1 {{ theme.product_grid_stock_type == 'delivery' ? 'product-col-delivery fz-090' : 'product-col-stock fz-095' }} preload-hidden lh-110">
+      &nbsp;
+    </div>  -->
+    {% endif %}
+    </a>
+  
+    <div class="mini-list-price">
+      {% if product.price.price_old %}
+        <div class="price-old">
+          {% if vatSwitcherEnabled %}
+            <span class="price-incl">{{ productPriceOldIncl | money_without_currency }}</span>
+            <span class="price-excl">{{ productPriceOldExcl | money_without_currency }}</span>
+          {% else %}
+            {{ productPriceOld | money_without_currency }}
+          {% endif %}
+        </div>
+      {% if shopLegalMode == 'strict' %}<span class="fz-080 opacity-70">{{ 'SRP' | t }}</span>{% endif %}
+      {% endif %}
+
+      <div class="price bold">
+        {% if vatSwitcherEnabled %}
+          <span class="price-incl">{{ productPriceIncl | money_without_currency }}</span>
+          <span class="price-excl">{{ productPriceExcl | money_without_currency }}</span>
+        {% else %}
+          {{ productPrice | money_without_currency }}
+        {% endif %}
+        {% if shopLegalMode == 'strict' %}*{% endif %}
+      </div>
+    </div>
+
+    <div class="margin-left-10">
+      {% if theme.quickorder_enabled and not productFeatures['bundle'] %}
+          {% set metadata = {
+            id: product.id,
+            vid: product.vid,
+            variant: ((product.variant | lower) == "default" ? '' : product.variant),
+            title: product.title,
+            price: product.price,
+            image: ( product.image ? (product.image | url_image(imageSize)) : '')
+          } | json_encode(constant('JSON_HEX_APOS')) %}
+        
+          <form action="{{ ('cart/add/' ~ product.vid) | url }}" class="quick-order d-flex align-items-center justify-content-end flex-grow-1">
+            <input type="text" class="d-none qty-fast" name="quantity" value="1" aria-label="{{ 'Quantity' | t }}">
+            <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button quick-order-button-small trigger-add-to-cart"
+               data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a> 
+          </form>
+      {% else %}
+      <a href="{{ product.url | url }}" class="button button-small button-lined-soft d-flex p-2 py-md-1 px-md-2">
+        <span class="d-none d-md-block">{{ 'View' | t }}</span>
+        <i class="icon-angle-right d-block d-md-none fz-080r"></i>
+<!--         <i class="button button-icon-circle button-bg icon-arrow-right"></i> -->
+      </a>
+<!--       <a href="{{ product.url | url }}" class="button button-cta button-40{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}" data-pid="{{ product.id }}" data-vid="{{ product.vid }}" data-json="{{ product.url | url | replace({'.html': '.html?format=json'}) }}" {% if productFeatures['group_by'] %} data-feature-group-by-key="{{ productFeatures['group_by'] }}" data-feature-group-by="{{ product[productFeatures['group_by']] }}"{% endif %}><i class="icon-search bold"></i></a> -->
+      {% endif %}
+    </div>
+</div>
+  
+{% elseif mode == 'cart_upsell' %}
+  <div href="{{ product.url | url }}" class="product-mini-list mini-list-cart mb-1{% if theme.shadow_on_hover %} xshadow-hover-x2 clear-bg{% endif %}">
+
+    <div class="mini-list-image gray-overlay pos-relative">
+      <img src="{{ product.image | url_image(imageThumbSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgThumbWidth }}" height="{{ imgThumbHeight }}" class="img-responsive" />
+    </div>
+
+    <div class="mini-list-title">
+      {% set brandShown = (theme.productgrid_show_brand and theme.show_product_brands and product.brand) %}
+      {% if brandShown %}
+      <div class="brand-label">{{ product.brand.title }}</div>
+      {% endif %}
+      <a href="{{ product.url | url }}" class="d-inline-block bold lh-1">
+        {{ (theme.show_fulltitle and product.fulltitle and not brandShown) ? product.fulltitle : product.title }}
+      </a>
+    </div>
+
+    <div class="mini-list-price">
+      {% if product.price.price_old %}
+        <div class="price-old">
+          {% if vatSwitcherEnabled %}
+            <span class="price-incl">{{ productPriceOldIncl | money_without_currency }}</span>
+            <span class="price-excl">{{ productPriceOldExcl | money_without_currency }}</span>
+          {% else %}
+            {{ productPriceOld | money_without_currency }}
+          {% endif %}
+
+          {% if shopLegalMode == 'strict' %}{{ 'SRP' | t }}{% endif %}
+        </div>
+      {% endif %}
+
+      <div class="price bold">
+        {% if vatSwitcherEnabled %}
+          <span class="price-incl">{{ productPriceIncl | money_without_currency }}</span>
+          <span class="price-excl">{{ productPriceExcl | money_without_currency }}</span>
+        {% else %}
+          {{ productPrice | money_without_currency }}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="margin-left-10">
+<!--       <button class="button button-tiny">{{ 'Add' | t }}</button> -->
+      <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button button-tiny button-lined-soft body-bg">{{ 'Add' | t }}</a>
+    </div>
+
+  </div>
+
+{% elseif mode == 'mini_list_cta' %}
+  <div>mini_list_cta</div>
+{% elseif mode == 'mini_list_grid' %}
+
+{#<div class="col-md-3 margin-top">
+<div class="product-list-mini-holder">
+  <div class="product-list-mini grid">
+    <div class="image">
+      
+      {% if product.image %}
+      	{% if theme.product_image_fit %}
+          <img src="{{ product.image | url_image(imageSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgWidth }}" height="{{ imgHeight }}" />
+          {% else %}
+          <img src="{{ product.image | url_image(imageSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgWidth }}" height="{{ imgHeight }}" />
+          {% endif %}
+      {% else %}
+      	<img src="{{ imagePlaceholder }}" alt="{{ product.title }}" title="{{ product.title }}" width="{{ imgWidth }}" height="{{ imgHeight }}" />
+      {% endif %}
+      
+    </div>
+    <div class="title">
+      <h5>
+        <a href="{{ product.url | url }}" title="{{ product.fulltitle }}">
+          {% if theme.show_fulltitle and product.fulltitle %}{{ product.fulltitle }}{% else %}{{ product.title }}{% endif %}
+        </a>
+      </h5>
+      
+      <div class="price">
+        {% if product.price.price_old %}
+        <span class="price-old">
+          {{ product.price.price_old | money }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}
+        </span>
+        {% endif %}
+        {{ productPrice | money }}
+      </div>      
+    </div>
+  </div>
+</div>
+  
+  <div class="quick-order">
+  <form id="quick-order-{{ product.id }}" action="{{ ('cart/add/' ~ product.vid) | url }}" class="text-center">
+          <input type="text" class="qty-fast" name="quantity" value="1">
+          <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-cart small-button"><i class="fas fa-{{ theme.cart_icon }}"></i></a>
+  </form>
+  </div>
+  
+</div>#}
+{% elseif mode == 'variants' %}
+
+	<a href="{{ product.url }}" class="dy-product-group-variant dy-item-selectable{% if request.get.product_id == product.id %} active dy-active{% endif %}">
+    <img src="{{ product.image | url_image(imageThumbSize, product.fulltitle) }}" alt="{{ product.fulltitle }}" title="{{ product.fulltitle }}" width="{{ imgThumbWidth }}" height="{{ imgThumbHeight }}" class="gray-overlay img-responsive" />
+	</a>
+
+{% elseif mode == 'list' %}
+
+	{% set productListSide = theme.quickorder_enabled %}
+
+<div class="col-12 product-col product-list product-intersect-json mt-4" data-prod-url="{{product.url}}" data-pid="{{ product.id }}" data-json="{{ product.url | url | replace({'.html': '.html?format=json'}) }}"{% if timerVal %} data-countdown-id="list-{{ product.id }}"{% endif %}>
+  <div class="row gray-border-bottom pb-4">
+    
+    <div class="product-list-left col pr-0">
+      <a href="{{ product.url | url }}" class="product-grid-img-holder{% if theme.dyapps_addons_enabled and not customColors %} dy-collection-grid-swatch-holder{% endif %}{% if shouldLazyLoad %} lazy-pending{% endif %}{% if theme.product_grid_image_overlay %} gray-overlay{% endif %}">
+        <img
+             {% if shouldLazyLoad %}data-{% endif %}src="{{ productImage }}"
+             alt="{{ product.fulltitle }}"
+             title="{{ product.fulltitle }}"
+             width="{{ imgWidth }}"
+             height="{{ imgHeight }}"
+             class="{% if shouldLazyLoad %}lazy{% endif %} product-grid-img" />
+        
+        {% if theme.dyapps_addons_enabled and customColors %}
+        <div class="dy-collection-color-swatches dy-data01-colors dy-hidden">
+          {% for color in customColors | limit(customColorLimit) %}
+          <span class="dy-collection-custom-color" style="background:{{ color }};"></span>
+          {% endfor %}
+          {% if (colors | length) > customColorLimit %}
+          <span class="dy-collection-custom-colors-more">+{{ (colors | length) - customColorLimit}}</span>
+          {% endif %}
+        </div>
+        {% endif %}
+      </a>
+      
+        {% if theme.product_grid_compare %}
+      <div class="d-block d-md-none mt-2">
+          <input id="mcompare_{{ product.vid }}" type="checkbox" name="compare[]" class="fancy-checkbox tiny" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+          <label for="mcompare_{{ product.vid }}" class="compare mr-2" data-url="{{ ('compare/add/'~product.vid) | url }}"{% if page.compare | length == 5 %} data-tooltip title="Max. 5" data-placement="left"{% endif %}>
+            {{ 'Compare' | t }}
+          </label>
+        
+      </div>
+        {% endif %}
+    </div>
+    
+    <div class="product-list-right d-flex col flex-wrap">
+    <div class="product-list-content">
+    	{% if productFeatures['label'] %}
+      	<div class="product-label highlight-bg pos-static nowrap mb-2 d-inline-block"{% if productFeatures['label_color'] %} style="background:{{ productFeatures['label_color'] }};"{% endif %}>{{ productFeatures['label'] | t }}</div>
+  		{% endif %}
+        {% if theme.productgrid_show_brand %}
+          <div class="product-col-brand">{{ product.brand.title ?: ' ' }}</div>
+        {% endif %}
+      <div class="product-list-title d-flex flex-wrap align-items-center">
+      <a href="{{ product.url | url }}" class="h4 flex-grow-1 pr-2">
+        {{ product.title }}
+      </a>
+    </div>
+      
+          {% if theme.yotpo_id and theme.productgrid_enable_reviews %}
+          <div class="product-grid-reviews yotpo-block">    
+            <div class="yotpo bottomLine html_content" style="" data-appkey="{{ theme.yotpo_id }}" data-domain="{{ shop.domain }}" data-product-id="{{ product[theme.yotpo_product_identifier] }}" data-product-models="{{ product.id }}" data-name="{{ product.title }}" data-url="{{ product.url | url }}" data-image-url="{{ product.image | url_image }}" data-description="{{ description }}" data-bread-crumbs="{{ breadcrumb.title }}"></div>          
+          </div>
+          {% elseif theme.setting_reviews and theme.productgrid_enable_reviews %}
+          <div class="product-grid-reviews stars">
+            <!--
+            {% for i in 1..5 %}
+              --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : '' }}"></i><!--
+            {% endfor %}
+            -->
+          </div>
+          {% endif %}
+
+      <div class="product-list-desc mt-1 d-none d-md-block">
+        <span class="opacity-80">{{ description | limit(150) }}{{ description | length > 150 ? '...' : '' }}</span>
+        {% if description %}
+        <a href="{{ product.url | url }}" class="c-highlight underlined">{{ 'More' | t }}</a>
+        {% endif %}
+      </div>
+      
+      <span class="opacity-80 d-block d-md-none mt-1">{{ description | limit(70) }}{{ description | length > 70 ? '...' : '' }}</span>
+      
+      {% if theme.product_grid_compare or shop.settings.wish_list %}
+      <div class="mt-3 d-none d-md-block">
+        {% if shop.settings.wish_list %}
+        <a href="{{ ('account/wishlistAdd/' ~ product.id ~ '?variant_id=' ~ product.vid) | url }}" class="button button-tiny button-lined-soft mr-2"{% if not page.account%} data-fancy="fancy-account-holder"{% endif %}>
+          <svg class="bestellijst-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" xml:space="preserve" width="24" height="24"><path d="M16.387 10.282H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 4.06H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 3.827H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467z"></path><path d="M19.14 4.029H15.967v-0.513c0 -0.206 -0.167 -0.373 -0.373 -0.373h-1.569C13.771 2.666 13.156 1.818 12 1.818s-1.771 0.848 -2.025 1.324h-1.569c-0.206 0 -0.373 0.167 -0.373 0.373v0.513H4.86c-0.206 0 -0.373 0.167 -0.373 0.373v17.407c0 0.206 0.167 0.373 0.373 0.373h14.28c0.206 0 0.373 -0.167 0.373 -0.373V4.402c0 -0.206 -0.167 -0.373 -0.373 -0.373zm-10.173 0.047h1.373c0.158 0 0.3 -0.1 0.352 -0.249l0.022 -0.062c0.004 -0.01 0.367 -1.013 1.286 -1.013 0.903 0 1.269 0.964 1.287 1.014l0.021 0.061a0.373 0.373 0 0 0 0.352 0.249h1.373v1.26H8.967v-1.26zm9.613 17.173H5.42V4.962h2.613v0.933c0 0.206 0.167 0.373 0.373 0.373h7.187c0.206 0 0.373 -0.167 0.373 -0.373v-0.933h2.613v16.287z"></path></svg>{{ 'Add to wishlist' | t }}
+        </a>
+        {% endif %}
+        {% if theme.product_grid_compare %}
+          <input id="compare_{{ product.vid }}" type="checkbox" name="compare[]" class="fancy-checkbox tiny" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+          <label for="compare_{{ product.vid }}" class="compare mr-2" data-url="{{ ('compare/add/'~product.vid) | url }}"{% if page.compare | length == 5 %} data-tooltip title="Max. 5" data-placement="left"{% endif %}>
+            {{ 'Compare' | t }}
+          </label>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+      {% if timerVal %}
+        <div class="countdown-holder mt-3">
+          <div class="countdown-list-{{ product.id }} countdown-block tiny countdown-left" data-countdown="{{ timerVal }}" data-type="product" data-id="list-{{ product.id }}"></div>
+        </div>
+      {% endif %}
+      
+  {% if timerVal %}
+      <!--
+  	<div class="countdown-holder">
+    	<div class="countdown-grid-{{ product.id }} countdown-block bg-countdown tiny" data-countdown="{{ timerVal }}" data-type="text" data-id="grid-{{ product.id }}"></div>
+    </div> -->
+  {% endif %}
+      
+    </div>
+    
+    {% if productListSide or true %}
+    <div class="product-list-cta ml-0 ml-lg-3 mt-3 mt-lg-0 d-flex flex-column">
+        {% if random(1, 3) == 3 and false %}
+        <div class="price-promo-text ml-3 mb-2 align-self-end">
+          {{ pricePromoText | t }}
+        </div>
+        {% endif %}
+      
+      <div class="d-flex flex-column align-items-endtext-right lh-120">
+        
+      <div class="product-list-price">
+        {% if 'bundle:' not in product.data_01 | lower or productPrice > 0 %}
+          <div class="product-list-price fz-120{% if pricePromoText and false %} pr-4 flex-grow-1{% endif %}">
+            {% if product.price.price_old %}
+            	<span class="price-old price-incl fz-100r">{{ productPriceOldIncl | money_without_currency }}</span>
+            	<span class="price-old price-excl fz-100r">{{ productPriceOldExcl | money_without_currency }}</span>
+            	{% if shopLegalMode == 'strict' %}<span class="fz-100r">{{ 'SRP' | t }}</span>{% endif %}
+            {% endif %}
+            <strong class="price-incl">{{ productPriceIncl | money_without_currency }}</strong>
+            <strong class="price-excl">{{ productPriceExcl | money_without_currency }}</strong>
+          </div>
+        {% endif %}
+      </div>
+        
+        {% if product.price.price_old %}
+        <strong class="fz-090 c-highlight">{{ 'You save' | t }} {{ discountPercentage }}%</strong>
+        {% endif %}
+      
+      {% if theme.product_grid_stock_type != 'disabled' %}
+      <div class="product-col-stock mt-3 bold fz-110 preload-hidden">
+        &nbsp;
+      </div>
+        <span class="product-col-delivery preload-hidden fz-090 opacity-80 mt-1">
+<!--           <i class="icon-truck"></i> -->
+           &nbsp;
+        </span>
+      {% endif %}
+      
+        {% if theme.quickorder_enabled %}
+          {% set metadata = {
+            id: product.id,
+            vid: product.vid,
+            variant: ((product.variant | lower) == "default" ? '' : product.variant),
+            title: product.title,
+            price: product.price,
+            image: ( product.image ? (product.image | url_image(imageSize)) : '')
+          } | json_encode(constant('JSON_HEX_APOS')) %} 
+  
+              {#<form action="{{ ('cart/add/' ~ product.vid) | url }}" class="d-flex align-items-center quick-order mt-3">
+                {% if 'bundle:' not in product.data_01 | lower %}
+                <input type="text" class="qty-fast" name="quantity" value="1">
+                <a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button" data-title="{{ product.title }}" data-price="{{ product.price.price | money_without_currency }}" data-variant="{{ product.variant }}" data-image="{{ product.image | url_image(imageSize) }}"><i class="icon-{{ theme.cart_icon }}"></i></a>
+                {% else %}
+                  <a href="{{ product.url | url }}" class="button lined product-as-bundle with-icon">{{ 'View' | t }} <i class="icon-arrow-right"></i></a>
+                {% endif %}
+              </form> #}
+        
+            <form action="{{ ('cart/add/' ~ product.vid) | url }}" class="quick-order d-flex align-items-center justify-content-end flex-grow-1">
+            	{#<i class="icon-expand quickshop-button{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}"></i>#}
+            	{#{% if 'bundle:' not in product.data_01 | lower %}
+              <input type="text" class="qty-fast" name="quantity" value="1" aria-label="{{ 'Quantity' | t }}">
+            	#}
+            	<a href="{{ 'account/wishlist' | url }}" class="product-wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" xml:space="preserve" width="24" height="24"><path d="M16.387 10.282H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 4.06H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 3.827H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467z"/><path d="M19.14 4.029H15.967v-0.513c0 -0.206 -0.167 -0.373 -0.373 -0.373h-1.569C13.771 2.666 13.156 1.818 12 1.818s-1.771 0.848 -2.025 1.324h-1.569c-0.206 0 -0.373 0.167 -0.373 0.373v0.513H4.86c-0.206 0 -0.373 0.167 -0.373 0.373v17.407c0 0.206 0.167 0.373 0.373 0.373h14.28c0.206 0 0.373 -0.167 0.373 -0.373V4.402c0 -0.206 -0.167 -0.373 -0.373 -0.373zm-10.173 0.047h1.373c0.158 0 0.3 -0.1 0.352 -0.249l0.022 -0.062c0.004 -0.01 0.367 -1.013 1.286 -1.013 0.903 0 1.269 0.964 1.287 1.014l0.021 0.061a0.373 0.373 0 0 0 0.352 0.249h1.373v1.26H8.967v-1.26zm9.613 17.173H5.42V4.962h2.613v0.933c0 0.206 0.167 0.373 0.373 0.373h7.187c0.206 0 0.373 -0.167 0.373 -0.373v-0.933h2.613v16.287z"/></svg>
+            	</a>
+              {#<a href="{{ ('cart/add/' ~ product.vid) | url }}" class="button quick-order-button" data-title="{{ product.title }}" data-price="{{ product.price.price | money_without_currency }}" data-variant="{{ product.variant }}" data-image="{{ product.image | url_image(imageSize) }}"><i class="icon-{{ theme.cart_icon }}"></i></a> #}
+              <a href="{{ product.url | url }}" class="button quick-order-button{% if not productFeatures['bundle'] %} trigger-quickshop{% endif %}" data-pid="{{ product.id }}" data-json="{{ product.url | url | replace({'.html': '.html?format=json'}) }}" data-metadata='{{ metadata | raw }}'><i class="icon-{{ theme.cart_icon }}"></i></a>
+        </form>
+       
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endif %} {# end loop offset #}
+{% endfor %}

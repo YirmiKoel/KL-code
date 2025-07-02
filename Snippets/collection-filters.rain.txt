@@ -1,0 +1,239 @@
+{# ---------- SET UP ---------- #}
+{% set activeFilters = {} %}
+{% set activeGroups = {} %}
+  
+  {% for customfilter in collection.filters.custom %}
+    {# for k, v in customfilter.values|filter((v, k) => (v.active == true)) - #}
+    {% for k, v in customfilter.values if v.active == true -%}
+      {% set activeFilters = ({(v.id): v.title}) + activeFilters %}
+      {% set activeGroups = activeGroups | merge([customfilter.id]) %}
+    {% endfor %}
+  {% endfor %}
+
+{% set activeFilterCount = activeFilters | length %}
+
+{% if collection.filters.brand %}
+	{% set activeFilterCount = activeFilterCount + 1 %}
+{% endif %}
+
+{% if collection.filters.min > collection.price_min or collection.price_max > collection.filters.max %}
+	{% set activeFilterCount = activeFilterCount + 1 %}
+{% endif %}
+
+{% macro cats(categories, index, current_id) %}
+	{% for category in categories %}
+		
+		{% if index > 1 or category.url is active or forced %}
+			<li class="index-{{ index }}{% if category.url is active %} active{% endif %}">
+				{% if category.subs and category.url is active %}
+        	<a href="{{ category.url | url }}" class="cat-list-title hover-underline{% if index == 1 %} bold fz-110{% endif %}{% if category.url is active %} bold{% endif %}">
+            {% if index == 1 and category.id != current_id %}<i class="icon-angle-left fz-10"></i> {% endif %}{{ category.title }}
+        	</a>
+        	<ul class="cat-list {% if index > 1 %} cat-list-sub{% endif %} level-{{ index }}">{{ _self.cats(category.subs, (index+1)) }}</ul>
+        {% else %}
+        	<a href="{{ category.url | url }}" class="cat-list-title hover-underline{% if category.url is active %} bold{% endif %}">{{ category.title }}</a>
+        {% endif %}
+			</li>
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+{# -------- END SET UP -------- #}
+
+{% if type == 'sidebar' or type == 'fancybox' %}
+<form id="filters_{{ type }}" action="{{ collection.internal.url | url }}" data-filter-type="{{ type }}" method="get" class="custom-filter-form{% if type =='sidebar' %} custom-filter-form-live{% else %} d-flex h-100 flex-column{% endif %}{% if type == 'fancybox' %} mr-n2{% endif %}">
+  <div class="filter-content flex-grow-1 pb-3{% if type == 'fancybox' %} pr-2 custom-scrollbar{% endif %}" style="height:auto; overflow-y:auto;">
+  <input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+	<input type="hidden" name="brand" value="{{ collection.filters.brand }}" />
+	<input type="hidden" name="mode" value="{{ collection.filters.mode }}" />
+	<input type="hidden" name="limit" value="{{ collection.filters.limit }}" />
+	<input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+  
+  {% if (currentCategory.subs or lastCategory.subs or collection.internal.url == 'collection' ) and type == 'sidebar' and theme.collection_sidebar_categories %}
+    {#{% if currentCategory.id != lastCategory.id and not currentCategory.subs %}
+  	<h4 class="filter-title gray-border-bottom pb-2">{{ 'Categories'  | t }}</h4>
+    <a href="{{ lastCategory.url | url }}" class="button lined button-small mt-1 d-block"><i class="icon-angle-left"></i> {{ lastCategory.title }}</a>
+    {% else %}#}
+    <div class="custom-filter-col{% if collection.brands and theme.collection_filters_brands %} pb-4{% endif %}">
+        <h5 class="filter-title gray-border-bottom pb-2">{{ 'Categories'  | t }}</h5>
+        <div class="filter-values active">
+        
+        {% if lastCategory.subs or parentCategory.subs %}
+        <ul class="cat-list p-0">
+        {{ _self.cats(shop.categories, 1, collection.category_id) }}
+        </ul>
+        {% elseif collection.internal.url == 'collection' %}
+          <ul class="cat-list p-0">
+          {% for category in shop.categories %}
+            <li class="index-1{% if category.url is active %} active{% endif %}">
+              <a href="{{ category.url | url }}" class="cat-list-title hover-underline{% if category.url is active %} bold{% endif %}">
+                {{ category.title }}
+              </a>
+            </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+          
+          {# for category in (currentCategory.subs ?: lastCategory.subs) %}
+          <li>
+            {{ category.title }}
+          </li>
+          {% endfor #}
+          
+          {#<li class="mt-1">
+            {% if currentCategory.id != lastCategory.id and not currentCategory.subs %}
+            	<a href="{{ lastCategory.url | url }}" class="hover-underline d-block filter-category bold">{{ lastCategory.title }}</a>
+            {% else %}
+<!--             	<a href="{{ currentCategory.url | url }}" class="hover-underline d-block filter-category bold">{{ currentCategory.title }}</a> -->
+            {% endif %}
+          </li>
+          {% for category in (currentCategory.subs ?: lastCategory.subs) %}
+          <li class="mt-1">
+            <a href="{{ category.url | url }}" class="hover-underline d-block filter-category {% if category.url is active %} bold{% endif %}">{{ category.title }}</a>
+          </li>
+          {% endfor %}#}
+        </div>
+    </div>
+    {#{% endif %}#}
+  {% endif %}
+  
+  {% if activeFilterCount %}
+<!--     <a href="{{ (request.url | split('?'))[0] }}" class="button elem-input-3x lined justify-content-between mt-3">{{ 'Clear' | t }} <i class="icon-x-l ml-2"></i></a> -->
+  {% endif %}
+  
+  {% if collection.brands and theme.collection_filters_brands %}
+  <div class="custom-filter-col">
+      <h5 class="filter-title gray-border-bottom pb-2">{{ 'Brands'  | t }}</h5>
+    
+    	{% set hiddenBrandActive = false %}
+
+      <ul class="filter-values{% if collection.filters.brand %} active{% endif %} filter-group-brands">
+        {% for brand in collection.brands %}
+        <li class="filter-value {% if loop.index > 5 %}hidden-filter{% endif %}" data-filter-group="brands">
+          <input id="brand_{{ brand.id }}_{{ type }}" type="radio" name="brand" value="{{ brand.id }}" {% if brand.id == collection.filters.brand %} checked="checked"{% endif %} class="fancy-radio" /> <label for="brand_{{ brand.id }}_{{ type }}">{{ brand.title }}</label>
+        </li>
+        	{% if loop.index > 5 and brand.id == collection.filters.brand %}
+        		{% set hiddenBrandActive = true %}
+        	{% endif %}
+        {% endfor %}
+
+        {% if collection.brands | length > 5 and not hiddenBrandActive %}
+        <li class="more zlh-1">
+          <a href="#" class="filter-show-more" data-filter-group="brands"><i class="fas fa-angle-right"></i> {{ 'View more' | t }}</a>
+        </li>
+        {% endif %}
+        {% if hiddenBrandActive %}
+        <style>.filter-group-brands .hidden-filter{ display:block; display:revert; }</style>
+        {% endif %}
+      </ul>
+  </div>
+  {% endif %}
+
+  {% for filter in collection.filters.custom | sort %}
+  <div class="custom-filter-col mt-4 dynamic filter-group" data-filter-id="{{ filter.id }}" data-filter-title="{{ filter.title }}">
+      <h5 class="filter-title filter-title-toggle gray-border-bottom pb-2">{{ filter.title }}</h5>
+
+    {% set hiddenFilterActive = false %}
+    
+      <ul class="filter-values{% if filter.id in activeGroups %} active{% endif %} filter-group-{{ filter.id }}">
+        {% for value in filter.values %}
+        <li class="filter-value {% if loop.index > 5 %}hidden-filter{% endif %}" data-filter-group="{{ filter.id }}">
+          <input id="filter_{{ value.id }}_{{ type }}" type="checkbox" name="filter[]" class="fancy-checkbox" value="{{ value.id }}" data-filter-value-id="{{ value.id }}" data-filter-value-title="{{ value.title }}" {% if value.active %} checked="checked"{% endif %}{% if not value.active and value.has_count %} data-filter-count="{{ value.count }}"{% endif %} />
+          <label for="filter_{{ value.id }}_{{ type }}">{{ value.title }}{% if not value.active and value.has_count and theme.show_amount_of_product_in_category %} <span>({{ value.count }})</span>{% endif %}</label>
+        </li>
+        	{% if loop.index > 5 and value.active %}
+        		{% set hiddenFilterActive = true %}
+        	{% endif %}
+        {% endfor %}
+				
+        {% if filter.values | length > 5 and not hiddenFilterActive %}
+        <li class="more zlh-1">
+          <a href="#" class="filter-show-more" data-filter-group="{{ filter.id }}">{{ 'View more' | t }}</a>
+        </li>
+        {% endif %}
+        
+        {% if hiddenFilterActive %}
+        <style>.filter-group-{{ filter.id }} .hidden-filter{ display:block; display:revert; }</style>
+        {% endif %}
+      </ul>
+  </div>
+  {% endfor %}
+  
+  {% if theme.collection_filters_price %}
+  <div class="custom-filter-col mt-4 pr-3">
+    <h5>{{ 'Price'  | t }}</h5>
+
+    <div class="sidebar-filter-slider mt-3">
+      <div class="collection-filter-price"></div>
+    </div>
+    <div class="price-filter-range d-flex align-items-center mt-3">
+      
+      <span class="mr-2">{{ 'Min' | t }}</span>
+      <input type="number" name="min" pattern="\d*" value="{{ collection.filters.min }}" class="price-filter-min theme-input" />
+      <span class="ml-auto mr-2">{{ 'Max' | t }}</span>
+      <input type="number" name="max" pattern="\d*" value="{{ collection.filters.max }}" class="price-filter-max theme-input" />
+      
+      <input type="submit" name="submitform" value="1" class="d-none">
+    </div>
+  </div>
+  {% endif %}
+  </div>
+  
+  {% if type == 'fancybox' %}
+  <div class="d-flex pt-3" style="box-shadow:0px -10px 20px -16px rgb(0,0,0,0.24);">
+    {% if collection.filters.brand > 0 or collection.filters.min > collection.price_min or  collection.price_max > collection.filters.max or activeFilterCount %}
+  		<button id="fancy-filter-submit" class="button button-cta nowrap mr-2 flex-grow-1">{{ 'Apply' | t }}</button>
+  		<a href="{{ (request.url | split('?'))[0] }}" class="button button-lined">{{ 'Clear all' | t }}</a>
+    {% else %}
+  		<button id="fancy-filter-submit" class="button button-cta d-block nowrap flex-grow-1 mr-2">{{ 'Apply' | t }}</button>
+    	<a href="#" class="button button-lined" onclick="theme.fancyHandler.closeAllAndClear(); return false;">{{ 'Close' | t }}</a>
+  	{% endif %}
+  </div>
+  {% endif %}
+</form>
+{% elseif type == 'filter-bar' %}
+
+<div class="d-flex d-md-none mt-3">
+    	<button class="button button-filters flex-grow-1 zztrigger-fancy" data-fancy-id="fancy-filters" data-trigger-fancy="fancy-filters">{{ 'Filters' | t }}{% if activeFilterCount %}({{ activeFilterCount }}){% endif %} <i class="icon-sliders ml-2"></i></button>
+    {% if activeFilterCount %}
+      <a href="{{ (request.url | split('?'))[0] }}" class="button button-lined ml-2 fw-normal">{{ 'Clear' | t }} <i class="icon-x-l ml-2"></i></a>
+    {% endif %}
+</div>
+
+<div class="d-flex align-items-center mt-3{% if not theme.collection_sidebar %} gray-border-top gray-border-bottom py-3{% endif %}">
+  <div class="collection-view flex-grow-1 nowrap align-items-center d-flex">
+    {% if collection.mode == 'grid' %}
+    	<a href="{{ 'grid' | collection_url('mode') | url }}" class="c-highlight button button-lined-soft lh-1 p-1 mr-2 d-flex br-2"><i class="icon-grid"></i></a>
+    	<a href="{{ 'list' | collection_url('mode') | url }}" class="opacity-50 lh-1 d-flex"><i class="icon-list"></i></a>
+    {% else %}
+    	<a href="{{ 'grid' | collection_url('mode') | url }}" class="opacity-50 lh-1 mr-2 d-flex"><i class="icon-grid"></i></a>
+    	<a href="{{ 'list' | collection_url('mode') | url }}" class="c-highlight button button-lined-soft lh-1 p-1 d-flex br-2"><i class="icon-list"></i></a>
+    {% endif %}
+    {% if theme.show_amount_of_product_in_category %}
+    <span class="ml-2 d-none d-sm-inline">{{ collection.count }}<span class=""> {{ 'Products' | t }}</span></span>
+    {% endif %}
+  </div>
+  
+    {% set limits = [6,12,24,36,48] %}
+    {% set limits = limits + [collection.filters.limit] %}
+  
+  <span class="d-none d-sm-inline-block">{{ 'Show' | t }}:</span>
+  <select name="limit" onchange="document.location=this.options[this.selectedIndex].getAttribute('data-url')" class="fancy-select elem-input-3x ml-2 mr-3">    	
+    {% for limit in limits %}
+    	<option value="{{ limit }}" data-url="{{ limit | collection_url('limit') | url }}"{% if collection.filters.limit == limit %} selected{% endif %}>{{ limit }}</option>
+    {% endfor %}
+  </select>
+  
+  <select name="sort" onchange="document.location=this.options[this.selectedIndex].getAttribute('data-url')" class="fancy-select elem-input-3x">
+    {% for sort in collection.sorts %}
+    <option value="{{ sort.id }}" data-url="{{ sort.id  | collection_url('sort') | url }}"{% if collection.filters.sort == sort.id %} selected="selected"{% endif %}>{{ sort.title }}</option>
+    {% endfor %}
+  </select>
+  
+  {% if true %}
+  	<button class="button elem-input-3x button-filters ml-3 {% if theme.collection_sidebar %}d-none d-md-block d-lg-none{% else %}d-none d-md-block{% endif %}" data-trigger-fancy="fancy-filters">{{ 'Filters' | t }}{% if activeFilterCount %}({{ activeFilterCount }}){% endif %} <i class="icon-sliders ml-2"></i></button>
+    {% if activeFilterCount %}
+      <a href="{{ (request.url | split('?'))[0] }}" class="button elem-input-3x button-lined ml-2 d-none d-md-flex fw-normal">{{ 'Clear all filters' | t }} <i class="icon-x-l ml-2"></i></a>
+    {% endif %}
+  {% endif %}
+</div>
+{% endif %}

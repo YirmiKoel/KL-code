@@ -1,0 +1,63 @@
+{# =======================================================================
+   snippets/product-reviews.rain
+   -----------------------------------------------------------------------
+   Toont de prominente totaalscore en de lijst met individuele reviews,
+   met exacte sterrenweergave op één decimaal via de snippet 'snippets/rating.rain'.
+   ======================================================================= #}
+
+<div id="product-reviews" class="pos-relative">
+
+  {# ----- Prominente totaalscore & CTA ----- #}
+  <div class="d-flex align-items-center mb-3">
+    <div class="review-score-large d-none d-lg-flex mr-3">
+      <span class="review-score-count">
+        {{ (product.score * 5)|number_format(1, ',', '') }}
+      </span>
+      <span class="review-score-seperator ml-1">/</span>
+      <span class="review-score-max">5</span>
+    </div>
+
+    <div class="flex-grow-1 mr-3 d-flex align-items-center">
+      {# **Hier include je de rating-snippet** #}
+      {% include 'snippets/rating.rain' with { rating: product.score } %}
+      <span class="ml-3 fz-110">
+        {{ '$1 sterren op basis van $2 reviews' | t(
+            '<strong>' ~ (product.score * 5)|number_format(1, ',', '') ~ '</strong>',
+            '<strong>' ~ (product.reviews|length) ~ '</strong>'
+        ) | raw }}
+      </span>
+    </div>
+
+    <div class="ml-auto">
+      <a href="#write-review"
+         class="button button-medium button-lined-soft nowrap"
+         data-fancy-id="fancy-write-review"
+         data-trigger-fancy="fancy-write-review">
+        {{ 'Schrijf een review' | t }}
+      </a>
+    </div>
+  </div>
+
+  {# ----- Lijst individuele reviews ----- #}
+  <div class="content-scroll-overflow custom-scrollbar mt-3">
+    {% for review in product.reviews|limit(100) %}
+      <div class="product-mini-list{% if not loop.first %} mt-3{% endif %}">
+        <div class="product-review">
+
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>{{ review.name }}</strong>
+            <div class="date opacity-70 fz-090">
+              {{ 'Geplaatst op $1' | t(review.date|pretty_datetime) }}
+            </div>
+          </div>
+
+          {# **En hier voor elke review** #}
+          {% include 'snippets/rating.rain' with { rating: review.score } %}
+
+          <p class="review-content mt-2">{{ review.content }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>

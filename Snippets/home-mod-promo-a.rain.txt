@@ -1,0 +1,3 @@
+{% if featured %}
+    {% include 'snippets/home-promo-product.rain' with { 'offset': 0, 'position': 'left', 'title': theme.homelook_title, 'subtitle': theme.homelook_subtitle, 'button': theme.homelook_button, 'promo_type': 'a' }%}
+{% endif %}

@@ -1,0 +1,56 @@
+{# snippets/product-calculator.rain #}
+<div class="product-calculator" data-value="{{ value }}">
+  <div class="calculator-content">
+		<header>
+      <p class="p-reset title">{{ 'Bereken aantal stuks' | t }}</p>
+      <a 
+      	href="javascript:;" 
+       	class="close-button"
+       	onclick="$('.product-calculator').toggleClass('active')"
+     	>
+      	<svg 
+        	xmlns="http://www.w3.org/2000/svg" 
+        	fill="none" 
+         	viewBox="0 0 24 24" 
+         	stroke-width="1.5" 
+         	stroke="currentColor" 
+         	class="w-6 h-6"
+       	>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </a>
+    </header>
+    
+    <div class="rekenmodule">
+      <div class="inputs">
+        <div class="input">
+          <label>{{ 'Voeglengte in meter' | t }}</label>
+          <input type="number" value="0" id="lengte">
+        </div>
+        <div class="input">
+          <label>{{ 'Voegbreedte in milimeter' | t }}</label>
+          <input type="number" value="0" id="breedte">
+        </div>
+        <div class="input">
+          <label>{{ 'Voegdiepte in milimeter' | t }}</label>
+          <input type="number" value="0" id="diepte">
+        </div>
+        <div class="button">
+          <a class="calc product-calc-btn btn" href="javascript:;" data-vol="{#{{ product.data_02 }}#}{{ value }}">{{ 'Berekenen' | t }}</a>
+        </div>
+        <div class="result hidden">
+          <span class="smalltitle">{{ 'Op basis van uw invoer heeft u nodig' | t }}:</span>
+          <span class="items title-font">{{ '5 stuks' | t }}</span>
+          <form action="{{ ('cart/add/' ~ product.vid) | url }}">
+            <input type="hidden" value="" name="quantity">
+            <button class="button-cta">
+              {#<a class="btn result-add btn-first" href="#colors-popup" data-fancybox="colors">{{ 'Bestel $1 stuks' | t('<span></span>') | raw }}</a>#}
+              <a class="btn button-cta trigger-add-to-cart" data-metadata='{{ metadata | raw }}' href="{{ ('cart/add/' ~ product.vid) | url }}" data-title="{{ product.title }}" data-price="{{ product.price.price | money_without_currency }}" data-variant="{{ product.variant }}" data-image="{{ product.image | url_image(imageSize) }}">{{ 'Bestel $1 stuks' | t('<span></span>') | raw }}</a>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>

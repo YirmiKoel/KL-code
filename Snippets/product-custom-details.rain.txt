@@ -1,0 +1,13 @@
+{% for spec in product.specs if (spec.title starts with 'custom_details' and ';' in spec.value) %}
+  {% set values = spec.value | split(';') %}
+  <div class="mfb-4">
+    <div class="toggle-title pt-3 pb-3 gray-border-bottom{% if loop.first %} gray-border-top mt-3{% endif %}"><h5>{{ values[0] | trim }}</h5></div>
+    <div class="toggle-content">
+      <ul class="product-custom-detail-list">
+        {% for value in values if value != values[0] %}
+        <li>{{ value | trim | t | raw }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endfor %}

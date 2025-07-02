@@ -1,0 +1,41 @@
+{% if template == 'pages/collection.rain' or template == 'pages/catalog.rain' %}
+	
+	{% set exclude = [] %}
+	{% if request.get.exclude %}
+		{% set exclude = request.get.exclude | split(',') %}
+	{% endif %}
+
+	{% if requestAction == 'search' %}
+
+    {% if collection.products %}
+      {# for product in collection.products #}
+        {% include 'snippets/products.rain' with {'mode': 'search', 'lazyOffset': 0} %}
+      {# endfor #}
+
+      <div class="col-12 p-2 text-center">
+        <a href="#" onclick="$id('header-search').submit(); return false;" class="button">{{ 'View all' | t }} ({{ collection.count }})</a>
+      </div>
+    {% else %}
+      <div class="collection-no-results p-4 text-center ml-auto mr-auto">
+        <i class="icon-search no-results-icon"></i>
+        <h5 class="mt-3">{{ 'No products found' | t }}</h5>
+      </div>
+    {% endif %}
+
+	{% elseif requestAction == 'collection' %}
+        {% include 'snippets/products.rain' with {'mode': (request.get.mode ?: 'grid'), 'col_width': (product_col_width), 'lazyOffset': 0, 'exclude': exclude} %}
+	{% elseif requestAction == 'collection_products' %}
+
+		{% include 'snippets/collection-pagination.rain' with{type:'previous'} %}
+		<div class="product-grid">
+        {% include 'snippets/products.rain' with {'mode': (request.get.mode ?: 'grid'), 'col_width': (product_col_width), 'lazyOffset': 0} %}
+		</div>
+		{% include 'snippets/collection-pagination.rain' with{type:'next'} %}
+
+	{% elseif requestAction == 'collection_page' %}
+		{% include 'snippets/collection-content.rain' %}
+	{% endif %}
+
+{% else %}
+	{% include template %}
+{% endif %}

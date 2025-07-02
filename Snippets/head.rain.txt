@@ -1,0 +1,174 @@
+<link rel="preconnect" href="https://cdn.{{ clusterDomain }}.com">
+{% if not theme.use_custom_font_css and not shop.gdpr_theme %}<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>{% endif %}
+
+<!--
+
+    Theme Proxima | v1.0.0.1903202301_{{ shop.settings.template_editor ? '1' : '0' }}_{{ shop.id }}
+    Theme designed and created by Dyvelopment - We are true e-commerce heroes!
+
+    For custom Lightspeed eCom development or design contact us at www.dyvelopment.com
+
+      _____                  _                                  _   
+     |  __ \                | |                                | |  
+     | |  | |_   ___   _____| | ___  _ __  _ __ ___   ___ _ __ | |_ 
+     | |  | | | | \ \ / / _ \ |/ _ \| '_ \| '_ ` _ \ / _ \ '_ \| __|
+     | |__| | |_| |\ V /  __/ | (_) | |_) | | | | | |  __/ | | | |_ 
+     |_____/ \__, | \_/ \___|_|\___/| .__/|_| |_| |_|\___|_| |_|\__|
+              __/ |                 | |                             
+             |___/                  |_|                             
+-->
+
+{% if twkInstance %}
+<script>
+  window.tweakwiseNavigationCid = '{{ collection.category_id }}';
+  //window.tweakwiseInput = ["header-search-input", "subheader-search-input"];
+</script>
+{% endif %}
+
+{% include 'blocks/head.rain' %}
+
+<title>{{ page.title }} - {{ shop.name }}</title>
+
+{# Do not edit the code below. Doing so will break your apps #}
+<meta name="dyapps-addons-enabled" content="{{ theme.dyapps_addons_enabled ? 'true' : 'false' }}">
+<meta name="dyapps-addons-version" content="2022081001">
+<meta name="dyapps-theme-name" content="Proxima">
+<meta name="dyapps-theme-editor" content="{{ shop.settings.template_editor ? 'true' : 'false' }}">
+{# end #}
+
+<meta name="description" content="{{ shop.description }}" />
+<meta name="keywords" content="{{ shop.keywords }}" />
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if request.get.themecolor == 'true' %}<meta name="theme-color" content="{{ theme.header_bgcolor }}" />{% endif %}
+
+<link rel="shortcut icon" href="{{ 'favicon.ico' | url_asset }}" type="image/x-icon" />
+<link rel="preload" as="image" href="{{ logoUrl }}">
+
+{# Preloading resources #}
+{% if template == 'pages/index.rain' %}
+	{% if theme.home_module_1 == 'slider' and theme.slider_1_enabled %}
+		<link rel="preload" as="image" href="{{ ('slider-1-mobile.jpg') | url_asset }}" media="(max-width: {{ theme.banner_image_mobile_maxwidth }}px)">
+		<link rel="preload" as="image" href="{{ 'slider-1.jpg' | url_asset }}" media="(min-width: {{ theme.banner_image_mobile_maxwidth }}.1px)">
+	{% elseif theme.home_module_1 == 'highlights' and theme.highlight_1_enabled %}
+		<link rel="preload" as="image" href="{{ 'highlight-1-image.jpg' | url_asset }}">
+	{% elseif theme.home_module_2 == 'slider' and theme.slider_1_enabled %}
+		<link rel="preload" as="image" href="{{ ('slider-1-mobile.jpg') | url_asset }}" media="(max-width: {{ theme.banner_image_mobile_maxwidth }}px)">
+		<link rel="preload" as="image" href="{{ 'slider-1.jpg' | url_asset }}" media="(min-width: {{ theme.banner_image_mobile_maxwidth }}.1px)">
+	{% elseif theme.home_module_2 == 'highlights' and theme.highlight_1_enabled %}
+		<link rel="preload" as="image" href="{{ 'highlight-1-image.jpg' | url_asset }}">
+	{% endif %}
+{% endif %}
+
+{% if template == 'pages/product.rain' %}
+	<link rel="preload" as="image" href="{{ product.image | url_image(imageLargeSize, productTitle) }}">
+{% endif %}
+
+<script src="{{ 'jquery-1-12-4-min.js' | url_asset }}"{% if not isFixedLayout and not theme.jquery_render_blocking %} defer{% endif %}></script>
+<script>if(navigator.userAgent.indexOf("MSIE ") > -1 || navigator.userAgent.indexOf("Trident/") > -1) { document.write('<script src="{{ 'intersection-observer-polyfill.js' | url_asset }}">\x3C/script>') }</script>
+
+<style>{% include 'snippets/bootstrap-461.rain' %}</style>
+
+{% if isFixedLayout %}
+  <script src="{{ 'gui.js' | url_core }}"></script>
+
+  {% if theme.load_gui_responsive_20_js or checkout %}
+  	<script src="{{ 'gui-responsive-2-0.js' | url_core }}"></script>
+  {% endif %}
+
+  <link rel="preload" href="{{ 'gui-2-0.css' | url_core }}" as="style">
+  <link rel="stylesheet" href="{{ 'gui-2-0.css' | url_core }}">
+
+  <link rel="preload" href="{{ 'gui-responsive-2-0.css' | url_core }}" as="style">
+  <link rel="stylesheet" href="{{ 'gui-responsive-2-0.css' | url_core }}" />
+
+  <link rel="preload" href="{{ 'gui-nova.css' | url_asset }}" as="style">
+  <link rel="stylesheet" href="{{ 'gui-nova.css' | url_asset }}" />
+{% endif %}
+
+<!-- <link rel="preload" href="{{ 'style.css' | url_asset }}" as="style">-->
+<link rel="stylesheet" href="{{ 'style.css' | url_asset }}?{{ 'now' | date('U') }}" />
+<!-- <link rel="preload" href="{{ 'style.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'"> -->
+
+<link rel="preload" href="{{ 'shopmonkey.css' | url_asset }}?{{ 'now' | date('U') }}" as="style">
+<link rel="stylesheet" href="{{ 'shopmonkey.css' | url_asset }}?{{ 'now' | date('U') }}">
+
+<link rel="stylesheet" href="https://cdn.webshopapp.com/shops/262688/themes/163980/assets/colors.css?2021060713425120201104100027" />
+
+
+{% if theme.use_custom_font_css %}
+  {% if theme.headings_font_css_url %}
+    <link href="{{ theme.headings_font_css_url }}" rel="preload" as="style">
+    <link href="{{ theme.headings_font_css_url }}" rel="stylesheet">
+  {% endif %}
+  {% if theme.body_font_css_url %}
+    <link href="{{ theme.body_font_css_url }}" rel="preload" as="style">
+    <link href="{{ theme.body_font_css_url }}" rel="stylesheet">
+  {% endif %}
+{% elseif shop.gdpr_theme %}
+<style>
+{% set google_font_family = theme.body_google_webfonts %}
+{% include 'snippets/google-css.rain' %}
+{% if theme.headings_google_webfonts != theme.body_google_webfonts %}
+  {% set google_font_family = theme.headings_google_webfonts %}
+  {% include 'snippets/google-css.rain' %}
+{% endif %}
+</style>
+{% else %}
+<link rel="preload" href="https://fonts.googleapis.com/css?family={{ theme.body_google_webfonts | url_encode }}:400,300,700{% if theme.headings_google_webfonts != theme.body_google_webfonts %}%7C{{ theme.headings_google_webfonts | url_encode }}:300,400,700{% endif %}&amp;display=fallback" as="style">
+<link href="https://fonts.googleapis.com/css?family={{ theme.body_google_webfonts | url_encode }}:400,300,700{% if theme.headings_google_webfonts != theme.body_google_webfonts %}%7C{{ theme.headings_google_webfonts | url_encode }}:300,400,700{% endif %}&amp;display=fallback" rel="stylesheet">
+{% endif %}
+
+{% if theme.dyapps_addons_enabled %}
+<link rel="preload" href="{{ 'dy-addons.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+{% endif %}
+
+{% if isCustomCheckout %}
+  <link rel="stylesheet" href="{{ 'checkout-custom.css' | url_asset }}" />
+{% endif %}
+
+<style>
+@font-face {
+  font-family: 'proxima-icons';
+  src:
+    url({{ 'proxima-icons.ttf' | url_asset }}) format('truetype'),
+    url({{ 'proxima-icons.woff' | url_asset }}) format('woff'),
+    url({{ 'proxima-icons.svg' | url_asset }}#proxima-icons) format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+</style>
+<link rel="preload" href="{{ 'settings.css' | url_asset }}" as="style">
+<link rel="preload" href="{{ 'custom.css' | url_asset }}" as="style">
+<link rel="stylesheet" href="{{ 'settings.css' | url_asset }}" />
+<link rel="stylesheet" href="{{ 'custom.css' | url_asset }}" />
+
+<!-- <link rel="preload" href="{{ 'settings.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="{{ 'custom.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'"> -->
+
+{% if template == 'pages/product.rain' %}
+	{# keep or not to keep? #}
+	<link rel="preload" href="{{ 'fancybox-3-5-7-min.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+{% endif %}
+
+{% if theme.yotpo_id %}
+  <script type="text/javascript">
+    (function e(){var e=document.createElement("script");e.type="text/javascript",e.async=true,e.src="//staticw2.yotpo.com/{{ theme.yotpo_id }}/widget.js";var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t)})();
+  </script>
+{% endif %}
+
+{% include 'snippets/js-variables.rain' with{ 'type': 'head' } %}
+
+{% if theme.enable_ga4 %}
+{% include 'snippets/dy-ga4.rain' with {'type': 'head'} %}
+{% endif %}
+
+{% if theme.countdowns_enabled %}
+<script type="text/javascript" src="{{ 'countdown-min.js' | url_asset }}" defer></script>
+{% endif %}
+<script type="text/javascript" src="{{ 'swiper-453-min.js' | url_asset }}" defer></script>
+<script type="text/javascript" src="{{ 'global.js' | url_asset }}?{{ 'now' | date('U') }}" defer></script>
+<script type="text/javascript" src="{{ 'shopmonkey.js' | url_asset }}" defer></script>

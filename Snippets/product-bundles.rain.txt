@@ -1,0 +1,185 @@
+{% if type == 'aside' %}
+
+  {% set imageBundleThumbSize = squareProductImages ? ('91x91x'~imgCrop) : ('91x105x'~imgCrop) %}
+  {% set imgBundleThumbHeight = squareProductImages ? '91' : '105' %}
+  {% set imgBundleThumbWidth = squareProductImages ? '91' : '91' %}
+
+	{% for bundle in product.bundles %}
+  <div class="product-bundle-holder rounded shadow-hover">
+    <form id="bundle_configure_form_{{ bundle.id }}">
+      <input name="main_product_variant" value="{{ product.vid }}" type="hidden">
+      
+      <div class="d-flex align-items-center">
+        <div class="flex-grow-1">
+      		<div class="fz-110 bold">{{ bundle.title }}</div>
+          <div class="opacity-70 fz-090">
+            <span>{{ product.title }}</span>
+          {% for bundleProduct in bundle.products %}
+            <span class="bold">+</span> <span>{% if bundleProduct.quantity > 1 %}{{ bundleProduct.quantity }} x {% endif %}{{ bundleProduct.title }}</span>
+          {% endfor %}
+          </div>
+        </div>
+        {% if bundle.percentage %}
+        <div class="product-sale sale-bg pos-static ml-3">
+             -{{ bundle.percentage | percentage }}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="mt-3">
+      <div class="product-bundle-items">
+
+        <div class="product-bundle-item">
+            <div class="gray-overlay pos-relative d-inline-block">
+              <img src="{{ product.image | url_image(imageBundleThumbSize) }}" alt="">
+            </div>
+        </div>
+
+        {% for bundleProduct in bundle.products %}
+        <div class="bold fz-120 align-self-center">+</div>
+          <div class="product-bundle-item pos-relative">
+            
+                <a href="{{ bundleProduct.url | url }}" class="gray-overlay pos-relative d-inline-block">
+                  <img src="{{ bundleProduct.image | url_image(imageBundleThumbSize) }}" alt="" loading="lazy">
+                </a>
+
+            {% if bundleProduct.variants %}
+            <a href="#" class="open-bundle-item-options d-block text-center pos-absolute w-100 fz-090 opacity-80 lh-1" data-bundle-id="{{ bundle.id }}" data-bundle-pid="{{ bundleProduct.id }}">{{ 'Options' | t }}...</a>
+            {% endif %}
+
+          </div>
+
+          {% if bundleProduct.variants %}
+          <div class="bundle-configure" data-bundle-id="{{ bundle.id }}" data-bundle-pid="{{ bundleProduct.id }}">
+            <div class="flex-container middle">
+              <div class="flex-item">
+            <h5>{{ bundleProduct.title }}</h5>
+            {{ bundleProduct | html_bundle_item_configure(product, bundle) | raw }}
+            <button class="button close-bundle-item-options margin-top">{{ 'Save' | t }}</button>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-end mt-3 gray-border-top pt-3">
+        <div class="text-right">
+          {% if bundle.stock.in_stock %}
+            <div class="in-stock"><i class="icon-check"></i> {{ 'In stock' | t }}</div>
+          {% else %}
+          	<div class="out-of-stock"><i class="icon-times"></i> {{ 'Out of stock' | t }}</div>
+          {% endif %}
+
+          {% if bundle.price.price_old %}
+          	{% if vatSwitcherEnabled %}
+            <span class="price-excl old-price price-old mr-2">{{ bundle.price.price_old_excl | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}</span>
+          	<span class="price-incl old-price price-old mr-2">{{ bundle.price.price_old_incl | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}</span>
+          	{% else %}
+          	<span class="old-price price-old mr-2">{{ bundle.price.price_old | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}</span>
+          	{% endif %}
+          {% endif %}
+          
+          {% if vatSwitcherEnabled %}
+            <span class="price-excl price bold fz-110">{{ bundle.price.price_excl | money_without_currency }}</span>
+            <span class="price-incl price bold fz-110">{{ bundle.price.price_incl | money_without_currency }}</span>
+            {% if shop.settings.legal.mode == 'strict' %} <small>*</small>{% endif %}
+          {% else %}
+            <span class="price bold fz-110">{{ bundle.price.price | money_without_currency }}</span>
+          	{% if shop.settings.legal.mode == 'strict' %} <small>*</small>{% endif %}
+            {% if shop.b2b %}<small class="price-tax">{{ 'Excl. VAT' | t }}</small>{% endif %}
+          {% endif %}
+
+        </div>
+        
+          <button class="button quick-order-button ml-3{% if not bundle.stock.in_stock %} d-none{% endif %}" type="submit" onclick="javascript: add_product_bundle('{{ bundle.id }}'); return false;">
+            <i class="icon-{{ theme.cart_icon }}"></i>
+          </button>
+        
+      </div>
+
+    </form>
+  </div>
+	{% endfor %}
+{% else %}
+
+<div class="product-bundle-holder rounded shadow-hover">
+  <form id="bundle_configure_form_{{ bundle.id }}">
+    <input name="main_product_variant" value="{{ product.vid }}" type="hidden">
+    <h5>{{ bundle.title }}</h5>
+
+    <div class="product-label highlight-bg">{{ bundle.percentage | percentage }} {{ 'Discount' | t }}</div>
+    
+    <div class="bundle-product-titles">
+      <span>{{ product.title }}</span>
+    {% for bundleProduct in bundle.products %}
+      <i class="fas fa-plus"></i> <span>{% if bundleProduct.quantity > 1 %}{{ bundleProduct.quantity }} x {% endif %}{{ bundleProduct.title }}</span>
+    {% endfor %}
+    </div>
+
+    <div class="bundle-products flex-container">
+
+      <div class="bundle-product">
+        
+        <div class="image" data-tooltip title="{{ product.title }}">
+          <div class="img-holder rounded overflow-hidden">
+          	<img src="{{ product.image | url_image(imageThumbSize) }}" alt="">
+        	</div>
+        </div>
+        {#<span class="title">{{ product.title }}</span>#}
+        
+      </div>
+
+      {% for bundleProduct in bundle.products %}
+        <div class="bundle-product">
+          
+          <div class="image" data-tooltip title="{{ bundleProduct.title }}">
+            <div class="img-holder rounded overflow-hidden">
+              <a href="{{ bundleProduct.url | url }}"><img src="{{ bundleProduct.image | url_image(imageThumbSize) }}" alt=""></a>
+            </div>
+          </div>
+          {#<span class="title">{{ bundleProduct.title }}</span>#}
+          
+          {% if bundleProduct.variants %}
+          <a href="#" class="options" data-bundle-id="{{ bundle.id }}" data-bundle-pid="{{ bundleProduct.id }}">{{ 'Options' | t }} <i class="fas fa-cog"></i></a>
+          {% endif %}
+          
+        </div>
+      
+      	{% if bundleProduct.variants %}
+      	<div class="bundle-configure" data-bundle-id="{{ bundle.id }}" data-bundle-pid="{{ bundleProduct.id }}">
+          <div class="flex-container middle">
+            <div class="flex-item">
+          <h5>{{ bundleProduct.title }}</h5>
+          {{ bundleProduct | html_bundle_item_configure(product, bundle) | raw }}
+          <button class="button margin-top">{{ 'Save' | t }}</button>
+            </div>
+          </div>
+      	</div>
+      	{% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-xs-5 margin-top-15">
+        {% if bundle.stock.in_stock %}
+        	<div class="in-stock"><i class="fa fa-check"></i> {{ 'In stock' | t }}</div>
+        {% endif %}
+        
+        {% if bundle.price.price_old %}
+          <span class="old-price price-old">{{ bundle.price.price_old | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}</span>
+        {% endif %}
+        
+        <span class="price">{{ bundle.price.price | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} <small>*</small>{% endif %}</span>
+        {% if shop.b2b %}<small class="price-tax">{{ 'Excl. VAT' | t }}</small>{% endif %}
+        
+      </div>
+      <div class="col-md-6 col-xs-7 text-right margin-top-15">
+    		<button class="button" type="submit" onclick="javascript: add_product_bundle('{{ bundle.id }}'); return false;">{{ 'Add to cart' | t }}</button>
+      </div>
+    </div>
+    
+  </form>
+</div>
+{% endif %}

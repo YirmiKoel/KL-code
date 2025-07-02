@@ -1,0 +1,229 @@
+{% set cta_blocks_enabled = theme.service_cta_1_title or theme.service_cta_2_title or theme.service_cta_3_title %}
+{% set store_locator_enabled = theme.store_1_enabled or theme.store_2_enabled or theme.store_2_enabled %}
+
+{% if theme.service_header_image_enabled %}
+<div id="service-header">
+  <img id="service-image" src="{{ 'service-header-image.jpg' | url_asset }}" class="w-100" alt="">
+</div>
+{% endif %}
+
+<div id="service-page-wrapper" class="container body-bg p-3 p-sm-4 br-3 {% if theme.service_header_image_enabled %} service-page-with-image{% endif %}">
+  <h1 class="page-title">{{ textpage.title }}</h1>
+  
+  {% if theme.service_page_sub_title %}
+  <div class="opacity-70">{{ theme.service_page_sub_title | t }}</div>
+  {% endif %}
+  
+  <div class="row">
+    <div class="col-12 col-md-4 col-lg-3">
+      
+      <ul id="service-sidelinks" class="custom-scrollbar d-flex d-md-block mt-4">
+        {% if faq %}
+        <li class="service-sidelink-item">
+          <a href="#faq" data-scrollview-id="faq" class="service-sidelink service-sidelink-cta d-flex justify-content-between align-items-center">
+            <span class="flex-grow-1">{{ 'Frequently asked questions' | t }}</span>
+            <i class="icon-arrow-right ml-3"></i>
+          </a>
+        </li>
+        {% endif %}
+        {% if true %}
+        <li class="service-sidelink-item d-none d-md-block">
+          <a href="#contactdetails" data-scrollview-id="contactdetails" class="service-sidelink d-flex justify-content-between align-items-center {% if not faq %} service-sidelink-cta{% else %} body-bg gray-border{% endif %}">
+            <span class="flex-grow-1">{{ 'Contact details' | t }}</span>
+            <i class="icon-contacts ml-3 fz-110"></i>
+          </a>
+        </li>
+        {% endif %}
+        {% if store_locator_enabled %}
+        <li class="service-sidelink-item">
+          <a href="{{ 'service/stores' | url }}" class="service-sidelink body-bg gray-border d-flex justify-content-between align-items-center {% if not faq and false %} service-sidelink-cta{% endif %}">
+            <span class="flex-grow-1">{{ 'View our stores' | t }}</span>
+            <i class="icon-location ml-3 fz-110"></i>
+          </a>
+        </li>
+        {% endif %}
+        {% for link in shop.links.customer_service %}
+        <li class="{% if store_locator_enabled or faq %}mt-md-4{% endif %}"></li>
+        <li class="service-sidelink-item">
+          <a href="{{ link.url | url }}" class="service-sidelink">{{ link.title }}</a>
+        </li>
+        {% endfor %}
+        <li class="mt-md-4"></li>
+        
+        {% set excludeLinks = ['service', 'service/stores'] %}
+        {% for link in shop.links.service if link.url != 'sitemap' and link.url not in excludeLinks %}
+        <li class="service-sidelink-item">
+          <a href="{{ link.url | url }}" data-url="{{ link.url }}" class="service-sidelink{% if link.url is active %} service-sidelink-active bold{% endif %}"{% if link.new_window %} target="_blank"{% endif %}>{{ link.title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+      
+    </div>
+    <div class="col-12 col-md-8 col-lg-9">
+      
+      {% if cta_blocks_enabled %}
+      <div id="service-cta-bar" class="d-flex flex-column flex-lg-row mx-n2 mt-4 ">
+        
+        {% if theme.service_cta_1_title %}
+        <div class="col px-2">
+          <div class="service-cta h-100">
+          <i class="icon-{{ theme.service_cta_1_icon | t }} service-cta-icon"></i>
+          <div>
+            <div class="h4 fz-110">{{ theme.service_cta_1_title | t | raw }}</div>
+            <span>{{ theme.service_cta_1_sub | t | raw }}</span>
+          </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if theme.service_cta_2_title %}
+        <div class="col px-2">
+          <div class="service-cta h-100">
+          <i class="icon-{{ theme.service_cta_2_icon | t }} service-cta-icon"></i>
+          <div>
+            <div class="h4 fz-110">{{ theme.service_cta_2_title | t | raw }}</div>
+            <span>{{ theme.service_cta_2_sub | t | raw }}</span>
+          </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if theme.service_cta_3_title %}
+        <div class="col px-2">
+          <div class="service-cta h-100">
+          <i class="icon-{{ theme.service_cta_3_icon | t }} service-cta-icon"></i>
+          <div>
+            <div class="h4 fz-110">{{ theme.service_cta_3_title | t | raw }}</div>
+            <span>{{ theme.service_cta_3_sub | t | raw }}</span>
+          </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+      
+      <div class="mt-4">
+        {{ textpage.content | raw }}
+      </div>
+      
+      <form class="contact-form mt-4" action="{{ 'service/contactPost/' | url }}" method="POST">
+        <h2 class="heading-with-highlight">{{ 'Contact us' | t }}</h2>
+        <div class="row">
+          <div class="col-md-6 mt-3">
+            <label for="contact_name">{{ 'Name' | t }}:</label>
+            <input id="contact_name" type="text" name="name" value="{{ form.name }}" class="theme-input border-color-light">
+          </div>
+          <div class="col-md-6 mt-3">
+            <label for="contact_company">{{ 'Company' | t }}:</label>
+            <input id="contact_company" type="text" name="company" value="{{ form.company }}" class="theme-input border-color-light">
+          </div>
+          <div class="col-md-6 mt-3">
+            <label for="contact_email">{{ 'Email address' | t }}:</label>
+            <input id="contact_email" type="text" name="email" value="{{ form.email }}" class="theme-input border-color-light">
+          </div>
+          <div class="col-md-6 mt-3">
+            <label for="contact_phone">{{ 'Phone' | t }}:</label>
+            <input id="contact_phone" type="text" name="phone" value="{{ form.phone }}" class="theme-input border-color-light">
+          </div>
+          <div class="col-md-12 mt-3">
+            <label for="contact_subject">{{ 'Subject' | t }}:</label>
+            <input id="contact_subject" type="text" name="subject" value="{{ form.subject }}" class="theme-input border-color-light">
+          </div>
+          <div class="col-md-12 mt-3">
+            <label for="contact_message">{{ 'Message' | t }}:</label>
+            <textarea id="contact_message" name="message" class="theme-input border-color-light" style="height:160px;">{{ form.message }}</textarea>
+          </div>
+          <div class="col-md-12 margin-top-half text-right">
+            <button class="button with-icon" type="submit" value="1">{{ 'Submit' | t }} <i class="icon-arrow-right"></i></button>
+          </div>
+        </div>
+        
+        <input type="hidden" style="display:none;" name="key" value="{{ page.key }}">
+      </form>
+      
+      <div class="mt-4">
+        <h2 id="contactdetails" class="heading-with-highlight">{{ 'Contact details' | t }}</h2>
+        
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-5 col-xl-4 mt-3 order-1 order-md-0">
+
+            <div>
+              {% if theme.contact_phone %}
+              <div class="service-contact-item">
+                <i class="service-contact-icon icon-phone-lined"></i> <span>{{ theme.contact_phone | t }}</span>
+              </div>
+              {% endif %}
+
+              {% if theme.whatsapp %}
+              <div class="service-contact-item">
+                <i class="service-contact-icon icon-whatsapp"></i> <span>{{ theme.whatsapp | t }}</span>
+              </div>
+              {% endif %}
+
+              {% if theme.contact_email %}
+              <div class="service-contact-item">
+                <i class="service-contact-icon icon-envelope"></i> <span>{{ theme.contact_email | t }}</span>
+              </div>
+              {% endif %}
+
+              {% if theme.contact_coc %}
+              <div class="mb-1">
+                <strong>{{ 'CoC number' | t }}</strong>: {{ theme.contact_coc | t }}
+              </div>
+              {% endif %}
+
+              {% if theme.contact_vat %}
+              <div class="">
+                <strong>{{ 'VAT number' | t }}:</strong> {{ theme.contact_vat | t }}
+              </div>
+              {% endif %}
+            </div>
+
+          </div>
+          <div class="col-12 col-md-6 col-lg-7 col-xl-8 mt-3 order-0 order-md-1">
+            
+            <div class="d-flex align-items-center">
+              <i id="service-location-icon" class="icon-location c-highlight fz-250"></i>
+              <div class="ml-2">
+              <div>
+                <span class="heading fz-110 mb-1">{{ shop.name }}</span>
+                {{ theme.contact_address | t }}<br>
+                {{ theme.contact_zip | t }} {{ theme.contact_city | t }}<br>
+              {{ theme.contact_country }}</div>
+              </div>
+          	</div>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+  {% if faq %}
+<div class="gray-bg mt-3 mb-n6 container-bar">
+  <h1 id="faq" class="container">{{ 'Frequently asked questions' | t }}</h1>
+  <div class="container">
+  <div class="row faq mdt-n4">
+    
+    {% for q in faq %}
+    <div class="col-12 col-md-6 mt-4">
+      <div class="as-body p-4 box-shadow rounded">
+        <span class="heading heading-with-highlight fz-125">{{ q.title | t }}</span>
+        {% for item in q.items %}
+        <div class="faq-item gray-border-bottom">
+          <div class="question"><span class="title">{{ item.title }}</span> <i class="fas fa-angle-down"></i></div>
+          <div class="answer">
+            {{ item.content | raw }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    
+  </div>
+  </div>
+</div>
+  {% endif %}

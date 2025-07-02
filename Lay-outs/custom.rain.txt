@@ -1,0 +1,153 @@
+{% spaceless %}
+	{% set pageOverrides = {
+		'/service/orderlist': 'snippets/page-orderlist.rain',
+		'/service/stores': 'snippets/page-stores.rain'
+	} %}
+
+	{% set twkInstance = (shop.id in [340681]) ? 'ad9e05c0' : false %}
+  {% set isDemoShop = (shop.id in [303272, 310879, 342221, 341897, 342220, 310881, 310880]) %}
+	{% set isFixedLayout = false %}
+  {% set requestType = request.get.request_type %}
+  {% set requestAction = request.get.request_action %}
+
+	{% set devMode = request.get.dev == 1 %}
+  {% set clusterDomain = ('shoplightspeed.com' in shop.domains.assets) ? 'shoplightspeed' : 'webshopapp' %}
+	{% set baseDomain = shop.domains.secure ?: shop.domains.normal %}
+	{% set urlPath = '/' ~(request.url | replace({(baseDomain): ''}) | split('?'))[0] | trim('/') %}
+	{% set templateName = template | replace({'pages/': '', '.rain': ''}) %}
+
+  {% set logoUrl = theme.logo_url ?: ('logo.png' | url_asset) %}
+  {% set logoUrlMobile = theme.logo_url_mobile ?: ('logo-mobile.png' | url_asset) %}
+  {% set isCustomCheckout = checkout and ((theme.custom_checkout_enabled and not request.get.native == 1) or request.get.customcheckout == 'true') %}
+
+	{# Product details #}
+	{% set product_col_width = (not theme.collection_sidebar) ?  3 : (request.get.col_width ?: theme.products_per_row) %}
+	{% set productTitle = theme.show_fulltitle ? product.fulltitle : product.title %}
+
+  {% set imgCrop = (theme.product_image_fit ? 2 : 1) %}
+  {% set catImgCrop = (theme.category_image_fit ? 2 : 1) %}
+  {% set squareProductImages = (theme.product_image_ratio == 'square') %}
+
+  {% set shopLegalMode = shop.settings.legal.mode %}
+	{% set exclShipping = 'Excl. $1' | t('<a href="' ~ 'service/shipping-returns' | url ~ '" class="highlight-txt">' ~ 'Shipping costs' | t ~ '</a>') %}
+  {% set vatSwitcherEnabled = theme.b2b_enabled and theme.vat_switcher_enabled %}
+
+  {# Shop reviews #}
+  {% set shopReviewsScore = theme.shopreviews_score | replace({',': '.'}) | number_format(1) %}
+  {% set shopReviewsScore = shopReviewsScore > theme.shopreviews_score_max ? theme.shopreviews_score_max : shopReviewsScore %}
+  {% set shopReviewsRating = (shopReviewsScore / theme.shopreviews_score_max)  %}
+  {% set shopReviewsStars = (shopReviewsRating * 5) | round %}
+
+	{# Shop images #}
+  {% set imgRatio = squareProductImages ? '1:1' : '13:15' %}
+  {% set imageLargeSize = squareProductImages ? ('650x650x'~imgCrop) : ('650x750x'~imgCrop) %}
+  {% set imageSize = squareProductImages ? ('325x325x'~imgCrop) : ('325x375x'~imgCrop) %}
+  {% set imageThumbSize = squareProductImages ? ('65x65x'~imgCrop) : ('65x75x'~imgCrop) %}
+  {% set imgLargeHeight = squareProductImages ? '650' : '750' %}
+  {% set imgLargeWidth = squareProductImages ? '650' : '650' %}
+  {% set imgHeight = squareProductImages ? '325' : '375' %}
+  {% set imgWidth = squareProductImages ? '325' : '325' %}
+  {% set imgThumbHeight = squareProductImages ? '65' : '75' %}
+  {% set imgThumbWidth = squareProductImages ? '65' : '65' %}
+	{% set imagePlaceholderSquare = 'placeholder-square.svg' | url_asset %}
+	{% set imagePlaceholderPortrait = 'placeholder-portrait.svg' | url_asset %}
+  {% set imagePlaceholder = squareProductImages ? imagePlaceholderSquare : imagePlaceholderPortrait %}
+
+  {% set isAjaxRequest = request.get.request_type == 'ajax' %}
+  {% set data01Features = ['timer', 'bundle', 'advanced_variants', 'variants_type', 'colors'] %}
+
+  {% set slidesActive = 0 %}
+  {% set slidesActive = slidesActive + theme.slider_1_enabled %}
+  {% set slidesActive = slidesActive + theme.slider_2_enabled %}
+  {% set slidesActive = slidesActive + theme.slider_3_enabled %}
+
+  {% set cartqty = 0 %}
+  {% for product in page.cart.products %}
+    {% set cartqty = cartqty + product.quantity %}
+  {% endfor %}
+
+	{# Header USP's #}
+  {% set subheaderEnabled = (theme.navigation_mode == 'button') %}
+  {% set uspCarouselPosition = theme.usp_carousel_position %}
+  {% set uspsInSubheader = (uspCarouselPosition == 'hybrid' and theme.navigation_mode == 'button') %}
+  {% set amountOfSubheaderFeatures = 0 %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.navigation_mode == 'button') %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.navigation_custom_links_position == 'navbar' and shop.links.main and theme.navigation_show_custom_links) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.hallmark != 'disabled') %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (vatSwitcherEnabled) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.shopreviews_in_header) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + ((theme.show_navbar_blogs and shop.blogs) or theme.show_navbar_brands) %}
+  {% set amountOfSubheaderFeatures = amountOfSubheaderFeatures + (theme.navigation_custom_links_position == 'navbar' and (theme.show_navbar_stores_page or theme.show_navbar_service_page)) %}
+  {% set uspCarouselPosition = (uspCarouselPosition == 'hybrid' and (amountOfSubheaderFeatures > 3 or not subheaderEnabled)) ? 'bottom' : uspCarouselPosition %}
+{% endspaceless %}
+
+{% if requestType == 'ajax' %}
+  {% include 'snippets/ajax.rain' %}
+{% else %}
+<!DOCTYPE html>
+<html lang="{{ shop.language }}">
+  <head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-KFQNLMZ');</script>
+    <!-- End Google Tag Manager -->
+
+    {% include 'snippets/head.rain' %}
+
+    <!-- Reloadify trackingscript: meet gebruikersinteractie vanaf paginalaad -->
+    <script src="https://app.reloadify.com/assets/interaction.js?reloadify_account_id=7317c79f-6db7-449c-b3ce-ee6d04f6b0ee"></script>
+  </head>
+
+  <body class="layout-custom usp-carousel-pos-{{ theme.usp_carousel_position }}{% if shop.b2b or (theme.b2b_default_pricing == 'excl' and theme.b2b_enabled) %} b2b{% endif %}{% if theme.b2b_enabled %} vat-switcher-{{ theme.b2b_default_pricing }}{% endif %}">
+    
+    <div id="mobile-nav-holder" class="fancy-box from-left overflow-hidden p-0">
+    	<div id="mobile-nav-header" class="p-3 border-bottom-gray gray-border-bottom">
+        <div class="flex-grow-1 font-headings fz-160">{{ 'Menu' | t }}</div>
+        <div id="mobile-lang-switcher" class="d-flex align-items-center mr-3 lh-1">
+          <span class="flag-icon flag-icon-{{ shop.language2.code }} mr-1"></span> <span class="">{{ shop.currency2.code }}</span>
+        </div>
+        <i class="icon-x-l close-fancy"></i>
+      </div>
+      <div id="mobile-nav-content"></div>
+    </div>
+    
+    {% include 'snippets/header.rain' %}
+    <div id="subnav-dimmed"></div>
+    
+    {% if template != 'pages/index.rain' and 'service/stores' not in request.url %}
+    	{% include 'snippets/breadcrumbs.rain' %}
+    {% endif %}
+    
+    {% include 'snippets/messages.rain' %}
+    
+    {% if twkInstance and template != 'pages/collection.rain' %}
+      <div id="tweakwise-output"></div>
+    {% endif %}
+    
+    {% if pageOverrides[urlPath] %}
+    	{% include [pageOverrides[urlPath], template] %}
+    {% else %}
+    	{% include template %}
+    {% endif %}
+    
+    {% include 'snippets/footer.rain' %}
+    
+    <div id="dimmed" class="dimmed full"></div>
+    <div class="dimmed flyout"></div>
+    <div id="fancy-backdrop"></div>
+    
+    {% include 'snippets/footer-js.rain' %}
+    
+    <!-- Reloadify recommendations: laad na paginabouw voor aanraders -->
+    <script src="https://app.reloadify.com/assets/recommend.js?reloadify_account_id=7317c79f-6db7-449c-b3ce-ee6d04f6b0ee"></script>
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KFQNLMZ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  </body>
+</html>
+{% endif %} {# end request_type #}

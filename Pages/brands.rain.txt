@@ -1,0 +1,29 @@
+<div class="container brands">
+  
+  <div class="row rowmargin">
+    <div class="col-md-12">
+      <h1 class="category-title">{{ 'Brands' | t }}</h1>
+    </div>
+    <div class="col-md-12">
+      <!--{{ catalog.content | raw }} -->
+    </div>
+  </div>
+  
+  <div class="row">
+    
+    {% for brand in brands %}
+      <div class="col-lg-2 col-md-3 col-sm-4 col-6 mt-4">
+        <a href="{{ brand.url | url }}" title="{{ brand.title }}">
+          {% if brand.image %}
+          <img src="{{ brand.image | url_image('280x180x'~(theme.brand_image_fit ? '2' : '1'), brand.title) }}" alt="{{ brand.title }}" class="img-responsive brand-img br-2" />
+          {% else %}
+          <img src="{{ 'placeholder-brand.svg' | url_asset }}" alt="{{ brand.title }}" class="img-responsive brand-img br-2">
+          {% endif %}
+        </a>
+        <h3><a href="{{ brand.url | url }}" title="{{ brand.title }}">{{ brand.title }}</a></h3>
+      </div>
+    {% endfor %}
+    
+  </div>
+  
+</div>

@@ -1,0 +1,116 @@
+<div class="nav-main-holder">
+				<ul class="nav-main">
+          {% for category in shop.categories %}
+          <li class="nav-main-item" data-id="{{ category.id }}">
+            <a href="{{ category.url | url }}" class="nav-main-item-name{% if category.subs %} has-subs{% endif %}">
+              {% if theme.vertical_nav_images %}
+                <img src="{{ category.image ? (category.image | url_image('35x35x1')) : imagePlaceholderSquare }}" width="35" height="35" loading="lazy" fetchpriority="low">
+              {% endif %}
+              {{ category.title }}
+            </a>
+            {% if category.subs %}
+            	{% if theme.vertical_nav_type == 'small' %}
+						  <ul class="nav-main-sub fixed-width level-1">
+                <li class="nav-category-title">{{ category.title }}</li>
+                
+                {% for category in category.subs %}
+                <li class="nav-main-item">
+                  <a href="{{ category.url | url }}" class="nav-sub-item-name{% if category.subs %} has-subs{% endif %}">
+              			{{ category.title }}
+            			</a>
+                  
+                  {% if category.subs %}
+                  <ul class="nav-main-sub fixed-width level-2">
+										<li class="nav-category-title">{{ category.title }}</li>
+                    {% for category in category.subs %}
+                    <li class="nav-main-item">
+                      <a href="{{ category.url | url }}" class="nav-sub-item-name">
+                        {{ category.title }}
+                      </a>
+                      
+                      {% if category.subs %}
+                      <ul class="nav-main-sub fixed-width level-3">
+                        <li class="nav-category-title">{{ category.title }}</li>
+                        
+                        {% for category in category.subs %}
+                        <li class="nav-main-item">
+                          <a href="{{ category.url | url }}" class="nav-sub-item-name">
+                            {{ category.title }}
+                          </a>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                      {% endif %}
+                        
+                    </li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+                </li>
+                {% endfor %}
+              </ul>
+            	{% else %}
+              <ul class="nav-main-sub full-width mega level-1">
+                <li>
+                  <div class="nav-main-sub-mega nav-main-sub-item-holder">
+                    
+                    <div class="container">
+                      
+                      <h3 class="mb-3 mt-2 fz-180" style="opacity: 0.4;">{{ category.title }}</h3>
+                      
+                      <div class="row">
+                    
+                    {% for category in category.subs %}
+                    <div class="col-md-3 nav-main-sub-item">
+                      
+                      <a href="{{ category.url | url }}" class="nav-category-title">{{ category.title }}</a>
+                      
+                      {% if category.subs %}
+                      <ul class="nav-mega-sub level-2">
+                        {% for category in category.subs %}
+                        <li><a href="{{ category.url | url }}">{{ category.title }}</a></li>
+                        {% endfor %}
+                      </ul>
+                      {% endif %}
+                      
+                    </div>
+                        
+                    {% if loop.index is divisibleby(4) %}
+                  		<div class="cf"></div>
+                		{% endif %}    
+                  	{% endfor %}
+                    
+                    
+                      </div>
+                    </div>
+                        
+                  </div>
+                </li>
+              </ul>
+            	{% endif %}
+            {% endif %}
+          </li>
+          {% endfor %}
+          
+          {# if theme.show_navbar_blogs and shop.blogs %}
+          <li class="nav-main-item">
+            {% for blog in shop.blogs | limit(1) %}
+            <a href="{{ blog.url | url }}" class="nav-main-item-name">
+              	{% for article in blog.articles | limit(1) %}
+              		{% if theme.vertical_nav_images %}
+                  {% if article.image %}
+                    <img src="{{ article.image | url_image('35x35x1') }}">
+                  {% else %}
+                    <img src="{{ 'nav-cat-placeholder.png' | url_asset('35x35x1') }}">
+                  {% endif %}
+              		{% endif %}
+                {% endfor %}
+              
+              {{ 'Blog' | t }}
+            </a>
+            {% endfor %}
+          </li>
+          {% endif #}
+          
+        </ul>
+</div>

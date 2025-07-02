@@ -1,0 +1,13 @@
+<!-- <div class="{% if not gray_bg %}margin-top-double{% endif %}"> -->
+<div class="">
+  <div class="container">
+    
+		<div class="">
+      <h5 class="headline">{{ subtitle | t }}</h5>
+      <h3 class="headline" data-text="{{ title | t }}">{{ title | t }}</h3>
+    </div>
+    
+    {% include 'snippets/products.rain' with{ 'products': featured, 'mode': 'highlight', 'offset': offset, 'limit': (offset+1) } %}
+
+  </div>
+</div>

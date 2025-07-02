@@ -1,0 +1,34 @@
+<div id="footer-reviews-holder">
+  <h4 class="footer-title">{{ theme.footer_reviews_title | t }}</h4>
+  <a href="{{ theme.shopreviews_url | t }}" id="footer-reviews" class="d-flex flex-column gray-bg p-2 p-md-4 rounded mt-2" target="_blank">
+
+    {% if theme.footer_reviews_hallmark == 'custom' %}
+      <img src="{{ 'footer-reviews-logo.png' | url_asset }}" alt="" class="hallmark-img">
+    {% else %}
+      {% include 'snippets/hallmarks-minified.rain' with {'hallmark': theme.footer_reviews_hallmark} %}
+    {% endif %}
+
+    <div class="d-flex align-items-center mt-1 mt-md-4 flex-row flex-md-column flex-xl-row">
+      <div class="flex-grow-1 nowrap order-0 order-md-1 order-xl-0">
+        <div class="fz-120">
+        <!--
+        {% for i in 1..5 %}
+          --><i class="icon-star-s {{ i > (shopReviewsStars) ? 'empty' : 'star-fill' }}"></i><!--
+        {% endfor %}
+        -->
+        </div>
+        <div>{{ '$1 reviews' | t (theme.shopreviews_amount) }}</div>
+      </div>
+
+      <div class="review-rating order-1 order-md-0 order-xl-1 ml-2 ml-md-0 ml-xl-2 mb-0 mb-md-2 mb-xl-0" style="background-color:{{ theme.footer_reviews_rating_color }};">
+        <span class="review-rating-score bold">{{ shopReviewsScore }}</span><span class="review-rating-max fz-070">/{{ theme.shopreviews_score_max }}</span>
+      </div>
+    </div>
+  </a>
+
+  {% if theme.footer_reviews_button_text %}
+  <div class="mt-3 text-right">
+  <a href="{{ theme.shopreviews_url | t }}" target="_blank" id="footer-reviews-link" class="button button-small with-icon" style="background-color:{{ theme.footer_reviews_button_color }};">{{ theme.footer_reviews_button_text | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+  {% endif %}
+</div>

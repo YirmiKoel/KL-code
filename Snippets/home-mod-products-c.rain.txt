@@ -1,0 +1,50 @@
+{% set productsType = theme.home_products_c_type %}
+
+{% set offset = productsType == 'featured' ? featuredOffset : 0 %}
+{% set limit = productsType == 'featured' ? featuredLimit : 8 %}
+{% set button_url = productsType == 'custom' ? ((theme.products_c_category_url | t) | url ~'?sort='~theme.products_c_category_sort) : ('collection?sort='~productsType) %}
+
+<div id="home-products-c" class="home-main-products container">    
+	{% if theme.products_module_c_carousel %}
+  <div class="pos-relative">
+    <h3 class="headline mb-n2">{{ theme.home_products_c_title | t }}</h3>
+
+    <div class="title-swiper-arrows">
+    	<i class="swiper-home-main-prev title-swiper-arrow icon-angle-left"></i>
+    	<i class="swiper-home-main-next title-swiper-arrow icon-angle-right"></i>
+    </div>
+  </div>
+  
+  <div class="swiper-container homepage-product-slider margin-top home-slide-a">
+    <div class="swiper-wrapper homepage-product-slider-wrapper static-products-holder">
+    	{% include 'snippets/products.rain' with {'products': _context[productsType], 'mode': 'grid', 'in_slider': true, 'lazyOffset' : 0, 'offset': offset, 'limit': limit } %}
+    </div>
+  </div>
+
+  <div class="margin-top text-center">
+  	<a href="{{button_url }}" class="button with-icon lined">{{ theme.home_products_c_button | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+	{% else %}
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="headline mb-n2 with-link">{{ theme.home_products_c_title | t }}</h3>
+
+      <div class="row">
+        <div class="col-md-12">
+          {% if theme.home_products_c_type == 'custom' %}
+          <div class="row productsrow product-grid static-products-holder dynamic-products" data-products-url="{{ (theme.products_c_category_url | t) | url }}?request_type=ajax&amp;request_action=collection&amp;mode=grid&amp;limit=8&amp;sort={{ theme.products_c_category_sort }}&amp;col_width=3" data-event-complete="themeProductGridChanged">
+          </div>
+          {% else %}
+          <div class="row productsrow product-grid static-products-holder">                
+            {% include 'snippets/products.rain' with {'products': _context[productsType], 'mode': 'grid', 'lazyOffset' : 0, 'col_width':3, 'offset': offset, 'limit':limit } %}
+          </div>
+          {% endif %}
+        </div> 
+      </div>
+    </div>
+  </div>
+  <div class="margin-top text-center">
+  	<a href="{{ button_url }}" class="button with-icon lined">{{ theme.home_products_c_button | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+	{% endif %}
+</div>

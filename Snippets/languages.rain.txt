@@ -1,0 +1,60 @@
+{% set customLanguages = [] %}
+{% set curUrl = '' %}
+{% for language in shop.languages %}
+{% if template == 'pages/collection.rain' or template == 'pages/catalog.rain' %}
+  {% if page.breadcrumbs[0].url == 'collection' %}
+    {% set curUrl = ((language.url ~'collection') | url) %}
+  {% elseif page.breadcrumbs[0].url == 'catalog' %}
+    {% set curUrl = ((language.url ~'catalog') | url) %}
+  {% elseif page.breadcrumbs[0].url == 'brands' %}
+    {% set curUrl = ((language.url ~'go/brand/'~ collection.brand_id) | url) %}
+  {% elseif page.search %}
+    {% set curUrl = ((language.url ~'search/'~ page.search) | url) %}
+  {% else %}
+    {% if template == 'pages/collection.rain' %}
+      {% set curUrl = ((language.url ~'go/category/'~ collection.category_id) | url) %}
+    {% elseif template == 'pages/catalog.rain' %}
+      {% set curUrl = ((language.url ~'go/category/'~ catalog.category_id) | url) %}
+    {% endif %}
+  {% endif %}
+{% elseif template == 'pages/product.rain' %}
+  {% set curUrl = ((language.url ~'go/product/'~ product.id) | url) %}
+{% elseif template == 'pages/textpage.rain' %}
+  {% if textpage.category_id %}
+    {% set curUrl = ((language.url ~'go/category/'~ textpage.category_id) | url) %}
+  {% else %}
+    {% set lastPart = request.url | split('/') %}
+    {% set lastPartLength = (lastPart | length-2) %}
+    {% set serviceUrl = '' %}
+    {% set serviceUrl = lastPart[lastPartLength] %}
+    {% set curUrl = ((language.url ~'service/'~ serviceUrl) | url) %}
+  {% endif %}
+{% elseif template == 'pages/blog.rain' %}
+  {% set curUrl = ((language.url ~ blog.url) | url) %}
+{% else %}
+  {% if template != 'pages/index.rain' %}
+    {% if template != 'pages/account-dashboard.rain' %}
+      {% set lastPart = template | replace({'pages/': '', '.rain': '', '-': '/'}) %}
+    {% else %}
+      {% set lastPart = 'account' %}
+    {% endif %}
+  {% else %}
+    {% set lastPart = '' %}
+  {% endif %}
+  {% set curUrl = ((language.url ~ lastPart) | url) %}
+{% endif %}
+{% set customLanguages = customLanguages | merge({ (language.code) : {'url': curUrl, 'title': language.title, 'code': language.code, 'active': language.active} }) %}
+{% endfor %}
+
+{#<ul>
+  {% for language in customLanguages %}
+  <li>
+    <a lang="{{ language.code }}" title="{{ language.title }}" href="{{ language.url | url }}">
+      <span class="flags {{ language.code }}"></span> {{ language.title | t | upper }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>#}
+{% for language in customLanguages %}
+<option lang="{{ language.code }}" title="{{ language.title }}" data-url="{{ language.url | url }}"{% if language.code == shop.language2.code %} selected="selected"{% endif %}>{{ language.title | t }}</option>
+{% endfor %}

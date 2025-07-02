@@ -1,0 +1,152 @@
+<div class="d-flex align-items-center mt-2">
+  <div class="collection-view flex-grow-1 nowrap">
+    <a href="{{ 'grid' | collection_url('mode') | url }}" class="{% if collection.mode == 'grid' %}active{% endif %}">{{ 'Grid' | t }}</a>
+    <a href="{{ 'list' | collection_url('mode') | url }}" class="{% if collection.mode == 'list' %}active{% endif %}">{{ 'List' | t }}</a>
+  </div>
+  
+  <select name="sort" onchange="document.location=this.options[this.selectedIndex].getAttribute('data-url')" class="fancy-select d-inline-block w-auto">
+    {% for sort in collection.sorts %}
+    <option value="{{ sort.id }}" data-url="{{ sort.id  | collection_url('sort') | url }}"{% if collection.filters.sort == sort.id %} selected="selected"{% endif %}>{{ sort.title }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+{# if collection.filters.custom or collection.brands or true %}
+      <div class="row">
+        <div class="col-md-12 margin-top">
+          <div class="custom-filters-holder">
+          
+            <div class="">
+              {% if theme.filters_position != 'sidebar' %}<span class="filter-toggle hidden-xxs hidden-xs hidden-sm" data-fancy="fancy-filters-holder">
+                {{ 'Filters' | t }} <i class="fas fa-sliders-h"></i>
+              </span>{% endif %}
+              
+              <form id="sort_filters" class="filters-top{% if theme.filters_position == 'sidebar' %} standalone{% endif %}">
+              	<a href="{{ 'grid' | collection_url('mode') | url }}" class="{% if collection.mode == 'grid' %}active{% endif %}"><i class="fa fa-th"></i></a>
+                <a href="{{ 'list' | collection_url('mode') | url }}" class="{% if collection.mode == 'list' %}active{% endif %}"><i class="fa fa-th-list"></i></a>
+
+                <input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+                <input type="hidden" name="brand" value="{{ collection.filters.brand }}" />
+                <input type="hidden" name="mode" value="{{ collection.filters.mode }}" />
+                <input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+                <input type="hidden" name="max" value="{{ collection.filters.max }}" id="custom_filter_form_max" />
+                <input type="hidden" name="min" value="{{ collection.filters.min }}" id="custom_filter_form_min" />
+
+                <select name="limit" onchange="$('#sort_filters').submit();">
+                    <option value="{{ collection.filters.limit }}"{% if request.get.limit == collection.filters.limit %} selected{% endif %}>{{ collection.filters.limit }}</option>
+                    {% for i in [6,12,24,36,72] %}
+                    {% if i != collection.filters.limit %}
+                    <option value="{{ i }}"{% if request.get.limit == i %} selected{% endif %}>{{ i }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+
+              <select name="sort" onchange="$('#sort_filters').submit();" id="xxaa">
+                {% for sort in collection.sorts %}
+                <option value="{{ sort.id }}"{% if collection.filters.sort == sort.id %} selected="selected"{% endif %}>{{ sort.title }}</option>
+                {% endfor %}
+              </select>  
+              </form>
+            </div>
+            
+            {% if theme.filters_position != 'sidebar' or true %}
+            <div class="custom-filters-selected">
+            {% if 'filter' in request.url %}
+            
+              {% for customFilter in collection.filters.custom %}
+              	{% for value in customFilter.values %}
+              		
+              		{% if value.active %}
+              		<span>{{ value.title }}</span>
+              		{% endif %}
+              
+              	{% endfor  %}
+              {% endfor %}
+            {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if false %}
+          <form action="{{ collection.internal.url | url }}" method="get" id="custom_filter_form" class="{% if 'filter' in request.url %} active{% endif %}">
+          <input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+            <input type="hidden" name="brand" value="{{ collection.filters.brand }}" />
+          <input type="hidden" name="mode" value="{{ collection.filters.mode }}" />
+          <input type="hidden" name="limit" value="{{ collection.filters.limit }}" />
+          <input type="hidden" name="sort" value="{{ collection.filters.sort }}" />
+          <input type="hidden" name="max" value="{{ collection.filters.max }}" id="custom_filter_form_max" />
+          <input type="hidden" name="min" value="{{ collection.filters.min }}" id="custom_filter_form_min" />
+          <div class="filter-holder">
+            
+            <div class="row">
+              {% for filter in collection.filters.custom | sort %}
+              <div class="col-md-3 custom-filter-col">
+                <div class="custom-filter-block">
+                <h5>{{ filter.title }}</h5>
+                  
+                <ul class="filter-values">
+                  {% for value in filter.values %}
+                    <li class="{% if loop.index > 5 %}hidden-filter{% endif %}" data-filter-group="{{ filter.id }}">
+                      <input id="filter_{{ value.id }}" type="checkbox" name="filter[]" class="fancy-checkbox" value="{{ value.id }}" {% if value.active %} checked="checked"{% endif %} />
+                      <label for="filter_{{ value.id }}">{{ value.title }}{% if not value.active and value.has_count %} <span>({{ value.count }})</span>{% endif %}</label>
+                    </li>
+	                {% endfor %}
+                  
+                	{% if filter.values | length > 5 %}
+	                  <li class="more">
+                    	<a href="#" data-filter-group="{{ filter.id }}">{{ 'View more' | t }}</a>
+                  	</li>
+                	{% endif %}
+                </ul>
+                </div>
+              </div>
+							{% endfor %}
+              
+              <div class="col-md-3">                
+                <div class="custom-filter-block">
+                  <h5>{{ 'Brands'  | t }}</h5>
+                  <ul class="filter-values">
+                    {% for brand in collection.brands %}
+                      <li class="{% if loop.index > 5 %}hidden-filter{% endif %}" data-filter-group="brands">
+                        <input id="brand_{{ brand.id }}" type="radio" name="brand" value="{{ brand.id }}" {% if brand.id == collection.filters.brand %} checked="checked"{% endif %} /> <label for="brand_{{ brand.id }}">{{ brand.title }}</label>
+                      </li>
+                    {% endfor %}
+                    
+                    {% if collection.brands | length > 5 %}
+                      <li class="more">
+                        <a href="#" data-filter-group="brands"><i class="fas fa-angle-right"></i> {{ 'View more' | t }}</a>
+                      </li>
+                		{% endif %}
+                  </ul>
+                </div>
+                
+              </div>
+              
+              <div class="col-md-3">
+                <div class="price-filter-block">
+                <h5>{{ 'Price'  | t }}</h5>
+                <div class="sidebar-filter-slider">
+                  <div id="collection-filter-price"></div>
+                </div>
+                <div class="price-filter-range cf">
+                  <div class="min">{{ 'Min' | t }}: {{ shop.currency2.symbol }}<span>{{ collection.filters.min }}</span></div>
+                  <div class="max">{{ 'Max' | t }}: {{ shop.currency2.symbol }}<span>{{ collection.filters.max }}</span></div>
+                </div>
+                </div>
+              </div>
+              
+            </div>
+            
+            <script>
+              $(function() {
+                if(issetGetParam('filter')) {
+                  $('#remove-filter').html('<a href="" onclick="document.location=\''+location.protocol + '//' + location.host + location.pathname+'\'; return false;"><i class="fa fa-times"></i> {{ "Remove filters" | t }}</a>');
+                }
+              });
+            </script>
+          </div>
+          </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif #}

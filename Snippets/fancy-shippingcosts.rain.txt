@@ -1,0 +1,51 @@
+<div class="fancy-box fancy-box-side" id="fancy-shippingcosts" data-fancy-backdrop="always">
+      <div class="fancy-shippingcosts">
+        <div class="container">
+          <div class="row">
+            
+            <h4>{{ 'Calculate shipping costs' | t }}</h4>
+            <form id="gui-form-shipment" action="{{ 'cart/setShipmentLocation' | url }}" method="post">
+              <select id="gui-form-country" name="country" >
+                {% for country in cart.shipping.countries %}
+                  <option value="{{ country.id }}" {% if country.id == cart.shipping.country %}selected="selected"{% endif %}>{{ country.title }}</option>
+                {% endfor %}
+              </select>
+            
+              <div class="flex-container seamless input-group">
+            		<input class="flex-grow-1" type="text" id="gui-form-zipcode" name="zipcode" value="{{ cart.shipping.zipcode }}" placeholder="{{ 'ZIP/Postal Code' | t }}" />
+              	<button type="submit" class="button">{{ 'View' | t }}</button>
+              </div>
+            </form>
+            
+          	<form id="gui-form-shipping" class="margin-top" action="{{ 'cart/setShipmentMethod' | url }}" method="post">
+              <div class="methods-block{% if not cart.shipping.methods %} hidden{% endif %}">
+              	<div class="methods-title title-font">{{ 'Shipping methods' | t }}</div>
+                {% for method in cart.shipping.methods %}
+                  <div class="">
+                    <input id="gui-form-shipping-{{ method.id }}" type="radio" name="method" value="{{ method.id }}" {% if method.id == cart.shipment.id %}checked="checked"{% endif %} onclick="$('#gui-form-shipping').submit();" />
+                    <label for="gui-form-shipping-{{ method.id }}">
+                      <span class="margin-right-10">{{ method.title }}</span>
+                      {% if shop.b2b %}
+                      	({{ method.price_excl | money_without_currency }})
+                    	{% else %}
+                      	({{ method.price_incl | money_without_currency }})
+                      {% endif %}
+                    </label>
+                  </div>
+                  {% endfor %}
+              </div>
+              
+              <div class="text-center no-shipments{% if cart.shipping.methods or ( cart.shipping.countries[cart.shipping.country].has_region_based_shipping and not cart.shipping.zipcode ) %} d-none{% endif %}">
+                {{ 'No shipping methods found for this country.' | t }}
+              </div>
+              
+              <div class="text-center no-zipcode{% if not cart.shipping.countries[cart.shipping.country].has_region_based_shipping or cart.shipping.zipcode %} d-none{% endif %}">
+                {{ 'Please type in your ZIP/Postal Code.' | t }}
+              </div>
+            </form>
+            
+          </div>
+          
+        </div>
+      </div>
+</div>

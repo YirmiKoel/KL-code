@@ -1,0 +1,103 @@
+{% include 'snippets/breadcrumbs.rain' %}
+<div class="article-custom container blogs">
+  
+  <div class="row">
+    <div class="col-md-9 mt-3">
+
+      <article class="">
+        <header class="">
+<!--           <div class="h1 d-block d-sm-none">{{ article.title }}</div> -->
+          
+          <div class="pos-relative">
+            <picture id="article-picture" class="gray-bg gray-overlay">
+              {% if article.image %}
+              <img id="article-image" src="{{ article.image | url_image('', article.title) }}" alt="{{ article.title }}">
+              {% endif %}
+            </picture>
+            
+        <div class="article-date ">
+            <span class="article-date-day">{{ article.date | date('d') }}</span>
+            <span class="article-date-month">{{ article.date | date('M') | t }}</span>
+          	<span class="article-date-year">{{ article.date | date('Y') }}</span>
+          </div>
+            
+            <div class="article-image-header justify-content-end">
+<!--               <div class="article-title mx-3 block-acrylic-dark d-none d-sm-block">
+                <h1 id="article-main-title">{{ article.title }}</h1>
+              </div> -->
+              <a href="#" class="share-button article-share-button mr-3" data-title="{{ article.title }}" data-url="{{ article.url | url }}">{{ 'Share' | t }} <i class="icon-share-s ml-2"></i></a>
+            </div>
+          </div>
+          
+          <h1 class="mt-3 heading-with-highlight">{{ article.title }}</h1>
+          
+          {% if article.author or true %}
+          <div class="">
+            
+            {% if article.author %}
+            <div class="flex-grow-1 mr-3 mt-2 opacity-80 fz-090">
+            	<span class="author mr-3"><strong>{{ 'By' | t }}</strong>: {{ article.author }}</span> <span class="comments"><strong>{{ 'Comments' | t }}</strong>: {{ article.comments_count }}</span>
+            </div>
+            {% endif %}
+            
+          </div>
+          {% endif %}
+        </header>
+        
+        <section id="blog-content" class="content static-products-holder mt-3{% if true %} fz-110{% endif %}">
+          {{ article.content | raw }}
+        </section>
+        
+        {% if article.tags %}
+          <div class="tagcloud mt-4 text-left">
+            {% for tag in article.tags %}
+            <a href="{{ tag.url | url }}" class="tagcloud-tag">{{ tag.title }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </article>
+      
+      {% if blog.comments %}
+      
+      <hr class="my-4">
+
+      <div class="d-block d-sm-flex align-items-center">
+        <h2 class="flex-grow-1">{{ 'Comments' | t }} ({{ article.comments_count }})</h2>
+        <button class="button button-medium mt-2 mt-md-0" data-trigger-fancy="fancy-blogreply">{{ 'Leave a comment' | t }}</button>
+      </div>
+
+          {% if not article.comments %}
+          <div class="comment margin-top text-center">
+            {{ 'There are no comments yet, be the first one to comment' | t }}
+          </div>
+          {% else %}
+          	{% for comment in article.comments %}
+          	<div class="gray-border p-3 p-md-4 product-mini-list d-block mt-3">
+              <div class="d-flex align-items-center">
+              {% if theme.blog_gravatar_enabled %}
+                <div class="mr-3">
+              	{% include 'snippets/blog-gravatar-icon.rain' %}
+                </div>
+              {% endif %}
+              	<div>
+                  <span class="font-headings bold fz-110">{{ comment.name }}</span>
+                  <div class="fz-090 opacity-70">{{ 'Posted on $1' | t(comment.date) }}</div>
+                </div>
+              </div>
+              <div class="mt-2">
+                {{ comment.content | striptags('<br>') | raw }}
+              </div>
+          	</div>
+          	{% endfor %}
+          {% endif %}
+
+      {% endif %}
+    </div>
+    
+    <div class="col-md-3 mt-3">
+      {% include 'snippets/sidebar.rain' with{'type': 'blog'} %}
+    </div>
+  </div>
+</div>
+
+{# include 'snippets/fancy-blogreply.rain' #}

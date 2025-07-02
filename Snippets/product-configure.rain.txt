@@ -1,0 +1,201 @@
+{% set optionsSource = 'options' %}
+{% set optionsName = 'option' %}
+{% if product.matrix %}
+{% set optionsSource = 'matrix' %}
+{% set optionsName = 'matrix' %}
+{% endif %}
+
+{% set skus = [] %}
+{% if product.variants %}
+    {% for variant in product.variants %}
+        {% set skus = skus | merge([variant.sku]) %}
+    {% endfor %}
+{% else %}
+    {% set skus = skus | merge([product.sku]) %}
+{% endif %}
+
+<div class="product-configure">
+	<div class="product-configure-inner">
+    
+    {# START PRODUCT VARIANTS/OPTIONS #}
+    {% if product.variants and not product.options and not product.matrix %}
+    
+    <div class="option-wrap product-variants" data-sku="{{ skus | join(',') }}">
+      <label class="label-title title-font color-label hidden">{{ 'Color' | t }} - <span class="cur-var light">{{ product.variant }}</span></label>
+      <label class="label-title title-font variant-label">{{ 'Selecteer een variant' | t }}:</label>
+      <select name="variant" id="product_configure_variants" onchange="document.getElementById('product_configure_form').action = '{{ ('product/variants/'~product.id) | url }}'; document.getElementById('product_configure_form').submit();">
+        {% for variant in product.variants %}
+        <option value="{{ variant.id }}"{% if variant.active %} selected="selected"{% endif %}>{{ variant.title }} - {{ variant.price | money_without_currency }}</option>
+        {% endfor%}
+      </select>
+      <div class="circle-wrap hidden" data-max="14" data-max-mobile="10" data-state="hidden">
+      <ul class="circles ul-reset">
+        {% set variantCount = product.variants | length %}
+        {% if request.device.mobile %}
+          {% set visibleVariants = 10 %}
+        {% else %}
+          {% set visibleVariants = 14 %}
+        {% endif %}
+        {% for variant in product.variants %}
+        	{% set colorTitle = variant.title | replace({' ': '-', '(': '', ')': '', 'è': 'e'}) | striptags | trim | lower %}
+        <li {% if loop.index > visibleVariants %}class="hidden"{% endif %}><a class="circle" href="{{ product.url | url }}?id={{ variant.id }}" title="{{ variant.title }}" data-sku="{{ variant.sku }}">
+          <div class="dot color-{{ colorTitle }}{{ variant.active ? ' active relative': '' }}">{#{% if variant.active %}<i class="icon-check-b"></i>{% endif %}#}</div>
+          <div class="color-title">{{ variant.title }}</div>
+          </a></li>
+        {% endfor %}
+      </ul>
+      {% if variantCount > visibleVariants %}
+        <a href="javascript:;" class="show-more" data-show-more="{{ (product.variants | length > 14) ? ('Toon alle $1 kleuren' | t(product.variants | length)) : 'Toon alle opties' }}" data-show-less="{{ 'Toon minder' | t }}">
+          {{ (product.variants | length > 14) ? ('Toon alle $1 kleuren' | t(product.variants | length) | raw) : 'Toon alle opties' }}
+          <i class="icon-arrow-down"></i>
+        </a>
+      {% endif %}
+    </div>
+    
+    {% else %}
+    
+    {% for option in product[optionsSource] %}
+    <div class="option-wrap product-options">
+      <label class="label-title title-font">{{ option.title | t }}</label>
+      <select name="{{ optionsName }}[{{ option.id }}]" id="product_configure_option_{{ option.id }}" onchange="document.getElementById('product_configure_form').action = '{{ ('product/'~optionsSource~'/'~product.id) | url }}'; document.getElementById('product_configure_form').submit();">
+        {% for value in option.values %}
+        <option value="{{ value.id }}"{% if value.active %} selected="selected"{% endif %}>{{ value.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endfor %}
+    
+    {% endif %}
+    {# END PRODUCT VARIANTS/OPTIONS #}
+    
+    {# START PRODUCT CUSTOM #}
+    {% if product.custom %}
+    {% for custom in product.custom %}
+    
+    {% if custom.type == 'checkbox' %}
+    <div class="option-wrap product-custom-checkbox">
+    	<label class="label-title title-font">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <div class="custom-options">
+      	{% for option in custom.values %}
+        <div class="custom-option ui checkbox">
+          <input name="custom[{{ custom.id }}][]" id="product_configure_custom_{{ custom.id }}_{{ option.id }}" {% if option.value %}checked="checked"{% endif %} value="{{ option.id }}" type="checkbox">
+          <label for="product_configure_custom_{{ custom.id }}_{{ option.id }}">{{ option.title }}{% if option.price %} (+{{ option.price | money_without_currency }}){% endif %}</label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'radio' %}
+    <div class="option-wrap product-custom-radio">
+    	<label class="label-title title-font">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <div class="custom-options">
+      	{% for option in custom.values %}
+        <div class="custom-option ui checkbox radio">
+          <input name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}_{{ option.id }}" {% if option.value %}checked="checked"{% endif %} value="{{ option.id }}" type="radio">
+          <label for="product_configure_custom_{{ custom.id }}_{{ option.id }}">{{ option.title }}{% if option.price %} (+{{ option.price | money_without_currency }}){% endif %}</label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'select' %}
+    <div class="option-wrap product-custom-select">
+      <label class="label-title title-font" for="product_configure_custom_{{ custom.id }}">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <select name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}">
+      	<option value="" disabled selected>Maak een keuze</option>
+        {% for option in custom.values %}
+        <option value="{{ option.id }}" {% if option.value %}selected="selected"{% endif %}>{{ option.title }}{% if option.price %} (+{{ option.price | money_without_currency }}){% endif %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'multipleselect' %}
+    <div class="option-wrap product-custom-multipleselect">
+      <label class="label-title title-font" for="product_configure_custom_{{ custom.id }}">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <select name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}" multiple>
+        <option value="" disabled selected>Maak een keuze</option>
+        {% for option in custom.values %}
+        <option value="{{ option.id }}" {% if option.value %}selected="selected"{% endif %} data-price="{{ option.price }}">{{ option.title }}{% if option.price %} (+{{ option.price | money_without_currency }}){% endif %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'text' %}
+    <div class="option-wrap product-custom-text">
+      <label class="label-title title-font" for="product_configure_custom_{{ custom.id }}">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <input class="standard-input" type="text" name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}" {% if custom.value %}value="{{ custom.value }}"{% else %}value=""{% endif %}{% if custom.max_chars %} maxlength="{{ custom.max_chars }}"{% endif %}>
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'textarea' %}
+    <div class="option-wrap product-custom-textarea">
+      <label class="label-title title-font" for="product_configure_custom_{{ custom.id }}">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <textarea class="standard-input" type="text" name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}" value=""{% if custom.max_chars %} maxlength="{{ custom.max_chars }}"{% endif %}>{% if custom.value %}{{ custom.value }}{% endif %}</textarea>
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'date' %}
+    <div class="option-wrap product-custom-date">
+      <label class="label-title title-font" for="product_configure_custom_{{ custom.id }}">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <input class="standard-input" type="date" name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}" {% if custom.value %}value="{{ custom.value }}"{% else %}value=""{% endif %} min="{{ 'now' | date('Y/m/d') }}" max="">
+    </div>
+    {% endif %}
+    
+    {% if custom.type == 'datetime' %}
+    <div class="option-wrap product-custom-datetime">
+      <label class="label-title title-font" for="product_configure_custom_{{ custom.id }}">{{ custom.title | t }}{% if custom.required %} <em>*</em>{% endif %}</label>
+      <input class="standard-input" type="datetime-local" name="custom[{{ custom.id }}]" id="product_configure_custom_{{ custom.id }}" {% if custom.value %}value="{{ custom.value }}"{% else %}value=""{% endif %}>
+    </div>
+    {% endif %}
+    
+    {% endfor %}
+    {% endif %}
+  	{# END PRODUCT CUSTOM #}
+  </div>
+</div>
+<input type="hidden" name="bundle_id" id="product_configure_bundle_id" value="">
+  
+<script>
+  const deviceMobile = {{ request.device.mobile }}
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    // Color dots toggle
+    $('.productpage .product-configure .product-variants .show-more').on('click', function() {
+      var circleWrap = $(this).closest('.circle-wrap');
+      var showMoreText = $(this).data('show-more');
+      var showLessText = $(this).data('show-less');
+      
+      
+      if (deviceMobile) {
+        var maxShow = parseInt(circleWrap.attr('data-max-mobile'));
+      } else {
+        var maxShow = parseInt(circleWrap.attr('data-max'));
+      }
+      
+      var state = circleWrap.attr('data-state');
+      $(this).toggleClass('active');
+    	if ($(this).hasClass('active')) {
+        $(this).html(showLessText, '<i class="icon-arrow-up"></i>');
+      } else {
+        $(this).html(showMoreText, '<i class="icon-arrow-down"></i>');
+      }
+
+      if (state == 'hidden') {
+        circleWrap.find('li').removeClass('hidden', 150);
+        circleWrap.attr('data-state', 'shown');
+      } else {
+        circleWrap.attr('data-state', 'hidden');
+        $('.productpage .product-configure ul.circles li').each(function(index){
+          if(index+1 > maxShow){
+            $(this).addClass('hidden', 150);
+          }
+      	});
+      }
+    })
+  });
+  // End color dots toggle
+</script>

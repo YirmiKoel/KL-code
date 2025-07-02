@@ -1,0 +1,196 @@
+{#
+		Copyright Dyvelopment Group BV
+		------
+		This code is intellectual property of Dyvelopment Group BV.
+		The unauthorized copying, modification, sharing or distribution of this code prohibited.
+#}
+
+{% if type == 'head' %}
+
+	{% if theme.ga4_type == 'gtm' %}
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,z){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+z+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','{{ theme.ga4_id }}');</script>
+    <!-- End Google Tag Manager -->
+
+		<script>
+      window.dataLayer = window.dataLayer || [];
+      if( typeof gtag != 'function' )
+      {
+        function gtag() {dataLayer.push(arguments);}
+      }
+		</script>
+
+	{% elseif theme.ga4_type == 'gtag' %}
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ theme.ga4_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ theme.ga4_id }}');
+
+      {% if theme.google_ads_conversions_enabled %}
+      gtag('config', '{{ theme.google_ads_conversion_id }}', { ' allow_enhanced_conversions': {{ theme.google_ads_enhanced_conversions ? 'true' : 'false' }} } ) ;
+      {% endif %}
+    </script>
+
+	{% endif %}
+
+{% else %}
+
+	{% set itemIdKey = theme.ga4_product_item_id ?: 'id' %}
+
+	{# Product view #}
+	{% if template == 'pages/product.rain' %}
+	<script>
+    {% set price = 'bundle:' in product.data_01 | lower and product.bundles ? product.bundles[0].price.price : product.price.price %}
+    {% if theme.ga4_type == 'gtm' %}
+      dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+      dataLayer.push({
+        event: "view_item",
+        ecommerce: {
+          items: [
+          {
+            item_id: "{{ product[itemIdKey] }}",
+            item_name: "{{ product.title }}",
+            currency: "{{ shop.currency | upper }}",
+            {% if product.brand %}item_brand: "{{ product.brand.title }}",{% endif %}
+            item_variant: "{{ product.variant }}",
+            price: {{ price }}
+          }
+          ]
+        }
+      });
+    {% else %}
+      gtag("event", "view_item", {
+        currency: "{{ shop.currency | upper }}",
+        value: {{ price }},
+        items: [
+          {
+            item_id: "{{ product[itemIdKey] }}",
+            item_name: "{{ product.title }}",
+           	{% if product.brand %}item_brand: "{{ product.brand.title }}",{% endif %}
+            item_variant: "{{ product.variant }}",
+            price: {{ price }}
+          }
+        ]
+      });
+    {% endif %}
+	</script>
+	{% endif %}
+
+	{# Collection view #}
+	{% if template == 'pages/collection.rain' %}
+	<script>
+    {% if theme.ga4_type == 'gtm' %}
+      {% if page.search %}
+      dataLayer.push({
+        event: "search",
+        search_term: "{{ page.search }}"
+      });
+      {% else %}
+      dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+      dataLayer.push({
+        event: "view_item_list",
+        ecommerce: {
+          items: [
+          {% for product in collection.products %}
+          {
+            item_id: "{{ product[itemIdKey] }}",
+            item_name: "{{ product.title }}",
+            {% if product.brand %}item_brand: "{{ product.brand.title }}",{% endif %}
+            index: {{ loop.index0 }},
+            price: {{ product.price.price }}
+          }{% if not loop.last %},{% endif %}
+          {% endfor %}
+          ]
+        }
+      });
+      {% endif %}
+    {% else %}
+      {% if page.search %}
+      gtag("event", "search", {
+        search_term: "{{ page.search }}"
+      });
+      {% else %}
+      gtag("event", "view_item_list", {
+        item_list_id: "{{ collection.category_id }}",
+        item_list_name: "{{ collection.title }}",
+        items: [
+          {% for product in collection.products %}
+          {
+            item_id: "{{ product[itemIdKey] }}",
+            item_name: "{{ product.title }}",
+            {% if product.brand %}item_brand: "{{ product.brand.title }}",{% endif %}
+            index: {{ loop.index0 }},
+            price: {{ product.price.price }}
+          }{% if not loop.last %},{% endif %}
+         {% endfor %}
+        ]
+      });
+      {% endif %}
+    {% endif %}
+	</script>
+	{% endif %}
+
+	{# Conversions #}
+	{% if template == 'pages/thankyou.rain' %}
+	<script>
+    {% if theme.ga4_type == 'gtm' %}
+      dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
+      dataLayer.push({
+        {% if theme.google_ads_enhanced_conversions %}customerEmail: "{{ order.customer.email }}",{% endif %}
+        event: "purchase",
+        ecommerce: {
+            transaction_id: "{{ order.information.number }}",
+            value: {{ order.information.price_incl }},
+            currency: "{{ order.information.currency | upper }}",
+            {% if order.information.code %}coupon: "{{ order.information.code }}",{% endif %}
+            items: [
+						{% for product in order.products %}
+						{
+              item_id: "{{ product.product_id }}",
+              item_name: "{{ product.title }}",
+              index: {{ loop.index0 }},
+              {% if product.brand %}item_brand: "{{ product.brand }}",{% endif %}
+              item_variant: "{{ product.variant }}",
+              price: {{ product.base_price_incl }},
+              quantity: {{ product.quantity }}
+						}{% if not loop.last %},{% endif %}{% endfor %}]
+        }
+      });
+    {% else %}
+      {% if theme.google_ads_enhanced_conversions %}
+      gtag("set", "user_data", {
+        "email": "{{ order.customer.email }}",
+      });
+      {% endif %}
+
+      gtag("event", "purchase", {
+        transaction_id: "{{ order.information.number }}",
+        value: {{ order.information.price_incl }},
+        currency: "{{ order.information.currency | upper }}",
+        {% if order.information.code %}coupon: "{{ order.information.code }}",{% endif %}
+        items: [
+        {% for product in order.products %}
+         {
+          item_id: "{{ product.product_id }}",
+          item_name: "{{ product.title }}",
+          index: {{ loop.index0 }},
+          {% if product.brand %}item_brand: "{{ product.brand }}",{% endif %}
+          item_variant: "{{ product.variant }}",
+          price: {{ product.base_price_incl }},
+          quantity: {{ product.quantity }}
+        }{% if not loop.last %},{% endif %}{% endfor %}]
+      });
+    {% endif %}
+	</script>
+	{% endif %}
+
+{% endif %}

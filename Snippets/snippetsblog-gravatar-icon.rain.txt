@@ -1,0 +1,1 @@
+<img src="https://www.gravatar.com/avatar/{{ comment.email | md5 }}?s=48&amp;d=mp" alt="gravatar" loading="lazy" width="48" height="48">

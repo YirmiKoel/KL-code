@@ -1,0 +1,176 @@
+{% if lazyOffset is same as (0) %}
+	{% set lazyClass = ' lazy' %}
+{% elseif not lazyOffset %}
+	{% set lazyOffset = 999 %}
+{% endif %}
+
+{% if type == 'default' %}
+  <div id="homepage-categories-default" class="horizontal-scroller custom-scrollbar d-flex">
+    <div class="xx d-flex">
+      {% for category in categories %}
+        <a href="{{ category.url | url }}" class="home-category-block mr-3 align-items-center gray-border">
+          {% if theme.home_categories_images or true %}
+            {% if category.image %}
+            <img {% if loop.index > lazyOffset %}data-{% endif %}src="{{ category.image | url_image('48x48x1', category.title) }}" width="48" height="48" class="{% if loop.index > lazyOffset %}lazy{% endif %} home-category-img" alt="{{ category.title }}" data-idx="{{ loop.index }}">
+            
+            {% else %}
+            <img {% if loop.index > lazyOffset %}data-{% endif %}src="{{ 'placeholder-square.svg' | url_asset }}" width="48" height="48" class="{% if loop.index > lazyOffset %}lazy {% endif %}home-category-img" alt="">
+            {% endif %}
+          {% endif %}
+          <h5 class="home-category-title">
+            {{ category.title }}
+          </h5>
+          <i class="icon-arrow-right ml-2 button-icon-circle"></i>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% elseif type == 'circles' %}
+
+<div class="d-flex align-items-center">
+<i id="home-cat-prev" class="mr-2 icon-arrow-left swiper-arrow swiper-arrow-large mb-2"></i>
+
+  <div id="home-categories-circles" class="flex-grow-1 px-0 px-md-3 swiper-container homepage-categories type-circles{% if theme.title_categories %} mt-3{% endif %}">
+    <div class="swiper-wrapper">
+      {% for category in categories %}
+      <div class="swiper-slide">
+        <a class="home-category px-1px-sm-2" href="{{ category.url | url }}">
+            {% if category.image %}          
+        <img
+             {% if loop.index > lazyOffset %}data-{% endif %}src="{{ category.image | url_image((150~'x'~150~'x'~1), category.title) }}"
+             alt="{{ category.title }}"
+             title="{{ category.title }}"
+             width="150"
+             height="150"
+             class="home-category-img img-max-width{% if loop.index > lazyOffset %} lazy{% endif %}" />
+          
+            {% else %}
+              <img data-src="{{ 'placeholder-square.svg' | url_asset }}" alt="{{ category.title }}" class="home-category-img img-max-width{% if loop.index > lazyOffset %} lazy{% endif %}">
+            {% endif %}
+        <div class="home-category-title">{{ category.title }}</div>
+          
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+	<i id="home-cat-next" class="ml-2 icon-arrow-right swiper-arrow swiper-arrow-large mb-2"></i>
+</div>
+{% elseif type == 'grid' %}
+
+<!-- <div id="homepage-categories-grid"> -->
+      {% for category in categories %}
+				{% set categoryImage = category.image ? (category.image | url_image('48x48x1', category.title)) : imagePlaceholderSquare %}
+
+        <div class="col-9 col-sm-6 col-md-4 col-lg-3 mt-3 home-categories{% if loop.first %} pl-0 pl-md-3{% endif %}">
+          <a href="{{ category.url | url }}" class="home-category-block gray-border">
+            {% if theme.home_categories_images or true %}
+              <img data-src="{{ categoryImage }}" width="48" height="48" class="lazy home-category-img" alt="{{ category.title }}">
+            {% endif %}
+            <h5 class="home-category-title">
+              {{ category.title }}
+            </h5>
+            <i class="icon-arrow-right ml-2 button-icon-circle"></i>
+          </a>
+        </div>
+      {% endfor %}
+<!-- </div> -->
+
+{% elseif type == 'collection' %}
+
+  <div id="collection-category-carousel" class="horizontal-scroller custom-scrollbar d-flex">
+      {% for category in categories %}
+        <a href="{{ category.url | url }}" class="home-category-block cat-block-small-mobile mr-3 gray-border">
+          {% if theme.collection_subcategory_images_enabled %} {# and theme.category_block_images != 'disabled' %}#}
+            {% if category.image %}
+            <img src="{{ category.image | url_image('48x48x1', category.title) }}" width="48" height="48" class="home-category-img{% if theme.category_block_images == 'rounded' %} br-100{% endif %}" alt="{{ category.title }}" loading="lazy">
+            
+            {% else %}
+            <img src="{{ 'placeholder-square.svg' | url_asset }}" width="48" height="48" class="home-category-img{% if theme.category_block_images == 'rounded' %} br-100{% endif %}" alt="" loading="lazy">
+            {% endif %}
+          {% endif %}
+          <h5 class="home-category-title">
+            {{ category.title }}
+          </h5>
+          <i class="icon-arrow-right ml-2 button-icon-circle"></i>
+        </a>
+      {% endfor %}
+  </div>
+
+{% elseif type == 'collection_topbar' %}
+<div class="pos-relative{% if theme.collection_subcats_carousel == 'mobile' %} d-block d-md-none{% endif %}">
+  <div id="collection-category-carousel" class="horizontal-scroller horizontal-scroller-with-nav d-flex">
+  {% for category in categories %}
+    <a href="{{ category.url | url }}" class="collection-category-carousel-block cat-block-small-mobile {% if not loop.last %} mr-3{% endif %}{% if theme.collection_subcategory_images_enabled %} with-images{% else %} text-center{% endif %}">
+      {% if theme.collection_subcategory_images_enabled %} {# and theme.category_block_images != 'disabled' %}#}
+        {% if category.image %}
+        <img src="{{ category.image | url_image('48x48x1', category.title) }}" width="36" height="36" class="home-category-img{% if theme.category_block_images == 'rounded' %} br-100{% endif %}" alt="{{ category.title }}">
+        {% else %}
+        <img src="{{ 'placeholder-square.svg' | url_asset }}" width="36" height="36" class="home-category-img{% if theme.category_block_images == 'rounded' %} br-100{% endif %}" alt="">
+        {% endif %}
+      {% endif %}
+      <h5 class="home-category-title category-carousel-block-title{% if theme.collection_subcategory_images_enabled %} {% else %} fw-normal{% endif %}">
+      {{ category.title }}
+      </h5>
+      {#<i class="icon-arrow-right ml-2 button-icon-circle"></i>#}
+    </a>
+  {% endfor %}
+  </div>
+</div>
+{% elseif type == 'catalog' %}
+	{% for category in categories %}
+    
+<a href="{{ category.url | url }}" class="home-highlight flex-grow-1{% if not loop.last %} mr-3{% endif %} home-category-catalog-item" data-zstyle="flex: 0 0 20%; max-width:20%;">
+  <picture class="overflow-hidden">
+    <img src="{{ category.image | url_image('350x350x'~(theme.category_image_fit ? '2' : '1')) }}" class="home-highlight-img banner-img{% if theme.category_img_hover_effect %} image-hover-scale{% endif %}" alt="{{ category.title }}" width="350" height="350" loading="lazy">
+  </picture>
+<div class="banner-footer-textblock p-3">
+  <span>{{ category.title }}</span>
+  <i class="button button-icon-circle ml-1 icon-arrow-right d-none d-sm-block"></i>
+</div>
+</a>
+	{% endfor %}
+{% else %}
+  <div class="category col-sm-6 col-md-3 col-xs-6 margin-top">
+
+    <div class="img-holder rounded overflow-hidden">
+      <div class="scale-holder">
+
+        {% if loop.index > lazyOffset %}
+          {% if category.image %}
+            {% if theme.category_image_fit %}
+            <img data-src="{{ category.image | url_image('400x400x1', category.title) }}" class="img-responsive lazy" alt="{{ category.title }}" title="{{ category.title }}" />
+            {% else %}
+            <img data-src="{{ category.image | url_image('400x400x2', category.title) }}" class="img-responsive lazy" alt="{{ category.title }}" title="{{ category.title }}" />
+            {% endif %}
+          {% else %}
+            <img data-src="{{ 'placeholder-square.svg' | url_asset }}" class="img-responsive lazy" alt="{{ category.title }}" title="{{ category.title }}"/>
+          {% endif %}
+        {% else %}
+          {% if category.image %}
+            {% if theme.category_image_fit %}
+            <img src="{{ category.image | url_image('400x400x1', category.title) }}" class="img-responsive" alt="{{ category.title }}" title="{{ category.title }}" />
+            {% else %}
+            <img src="{{ category.image | url_image('400x400x2', category.title) }}" class="img-responsive" alt="{{ category.title }}" title="{{ category.title }}" />
+            {% endif %}
+          {% else %}
+            <img src="{{ 'placeholder-square.svg' | url_asset }}" class="img-responsive" alt="{{ category.title }}" title="{{ category.title }}"/>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <div class="hidden-xs hidden-xxs flex-container seamless middle text-center">
+        <h4>{{ category.title }}</h4>
+      </div>
+      <a href="{{ category.url | url }}">{{ category.title }}</a>
+    </div>
+
+    <a href="{{ category.url | url }}" class="title hidden-lg hidden-md hidden-sm text-center">
+      <h5>{{ category.title }}</h5>
+    </a>
+  </div>
+
+  {% if loop.index is divisibleby(2) %}
+    <div class="cf hidden-lg hidden-md hidden-sm visible-xs visible-xxs"></div>
+  {% endif %}
+{% endif %}

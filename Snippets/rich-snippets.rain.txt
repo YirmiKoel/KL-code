@@ -1,0 +1,132 @@
+<script type="application/ld+json">
+[
+	{# BREADCRUMBS #}
+	{% if template != 'pages/index.rain' %}
+	{
+    "@context": "http://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement":
+    [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+        	"@id": "{{ '' | url }}",
+        	"name": "Home"
+        }
+      }{% if page.breadcrumbs %},{% endif %}
+    	{% for crumb in page.breadcrumbs %}
+    	{
+    		"@type": "ListItem",
+     		"position": {{ loop.index + 1 }},
+     		"item":	{
+      		"@id": "{{ crumb.url | url }}",
+      		"name": "{{ crumb.title }}"
+    		}
+    	}{% if not loop.last %},{% endif %}
+    	{% endfor %}
+    ]
+  },
+  {% endif %}
+  {# BREADCRUMBS #}
+  
+  {# PRODUCT PAGE #}
+  {% if template == 'pages/product.rain' %}
+  {% set price = 'bundle:' in product.data_01 | lower and product.bundles ? product.bundles[0].price.price : product.price.price %}
+  {
+    "@context": "http://schema.org",
+    "@type": "Product", 
+    "name": "{{ product.fulltitle }}",
+    "url": "{{ product.url | url }}",
+    {% if product.brand.title %}"brand": "{{ product.brand.title }}",{% endif %}
+    {% if product.description %}"description": "{{ shop.description }}",{% endif %}
+    {% if product.image %}"image": "{{ product.image | url_image(imageSize, product.fulltitle) }}",{% endif %}
+    {% if product.ean %}"gtin13": "{{ product.ean }}",{% endif %}
+    {% if product.code %}"mpn": "{{ product.code }}",{% endif %}
+    {% if product.sku %}"sku": "{{ product.sku }}",{% endif %}
+    "offers": {
+      "@type": "Offer",
+      "price": "{{ price | number_format(2, '.', '') }}",
+      "url": "{{ product.url | url }}",
+      "priceValidUntil": "{{ 'NOW' | date_modify("+1 year") | date("Y-m-d") }}",
+      "priceCurrency": "{{ shop.currency | upper }}" {% if product.stock.level > 0 and product.stock.available %},{% endif %}
+      {% if product.stock.level > 0 and product.stock.available %}
+        "availability": "https://schema.org/InStock",
+        "inventoryLevel": "{{ product.stock.level }}"
+      {% endif %}
+    }
+    {% if product.reviews %},
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": "5",
+      "worstRating": "1",
+      "ratingValue": "{{ product.score * 5 | number_format(1, ',', '.') }}",
+      "reviewCount": "{{ product.reviews | length }}"
+    },
+    "review": [
+    	{% for review in product.reviews %}
+      {
+        "@type": "Review",
+        "datePublished": "{{ review.date | date('Y-m-d') }}",
+        "description": "{{ review.content }}",
+        "name": "",
+        "reviewRating": {
+          "@type": "Rating",
+          "bestRating": "5",
+          "ratingValue": "{{ review.score * 5 }}",
+          "worstRating": "1"
+        },
+        "author": {
+        	"@type": "Person",
+          "name": "{{ review.name }}"
+        }
+      }{% if not loop.last %},{% endif %}{% endfor %}
+    ]
+    {% endif %}
+  },
+  {% endif %}
+  {# PRODUCT PAGE #}
+  
+  {# COMPANY #}
+  {
+    "@context": "http://schema.org",
+    "@id": "{{ '' | url}}#Organization",
+    "@type": "Organization",
+    "url": "{{ shop.domain }}", 
+    "name": "{{ shop.name }}",
+    "logo": "{{ 'logo.png' | url_asset }}",
+    "telephone": "{{ theme.contact_phone }}",
+    "email": "{{ theme.contact_email }}"
+    {% if theme.shopreviews_enable_rich_snippet and theme.shopreviews_score and theme.shopreviews_amount and theme.shopreviews_url %},
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "bestRating": "{{ theme.shopreviews_score_max }}",
+      "worstRating": "1",
+      "ratingValue": "{{ theme.shopreviews_score }}",
+      "reviewCount": "{{ theme.shopreviews_amount }}",
+      "url":"{{ theme.shopreviews_url }}"
+    }
+    {% endif %}
+    {% if theme.rich_snippet_enable_company %},
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "{{ theme.contact_address | t }}",
+      "addressLocality": "{{ theme.contact_city | t }}",
+      "postalCode": "{{ theme.contact_zip | t }}",
+      {% if theme.contact_region %}"addressRegion": "{{ theme.contact_zip | t }}",{% endif %}
+      "addressCountry": {
+        "@type": "Country",
+        "name": "{{ theme.contact_country_code | t }}"
+      }
+    },
+    "contactPoint" : {
+      "@type": "ContactPoint",
+      "telephone": "{{ theme.contact_phone | t }}",
+      "email": "{{ theme.contact_email | t }}",
+      "contactType": "customer service"
+    }
+  {% endif %}
+  }
+  {# COMPANY #}
+]
+</script>

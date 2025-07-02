@@ -1,0 +1,408 @@
+{% if theme.home_vid_enabled %}
+{% if not theme.home_vid_fullwidth %}
+<div class="container">
+  <div class="row rowmargin">
+    <div class="col-md-12">
+{% endif %}
+<div class="home-vid{% if not theme.dark_overlay_enabled %} no-overlay{% endif %}">
+  <div class="vid-holder">
+	<video width="100%" loop="true" muted="true" autoplay="true" playsinline="true">
+		<source src="{{ theme.home_vid_url }}" type="video/mp4">
+	</video> 
+  </div>
+   <div class="home-vid-overlay">
+     <div class="home-vid-content-holder">
+       <div class="home-vid-content">
+          <div class="banner-text-block">
+          <h3 class="title">{{ theme.home_vid_title | t }}</h3>
+          <div class="sub">{{ theme.home_vid_sub | t }}</div>
+          <a href="{{ theme.home_vid_button_url | t }}" class="button">{{ theme.home_vid_button_text | t }}</a>
+          </div>
+       </div>
+     </div>
+   </div>
+</div>
+{% if not theme.home_vid_fullwidth %}
+</div>
+  </div>
+  	</div>
+{% endif %}
+{% endif %}
+
+{% if (theme.slider_1_enabled or theme.slider_2_enabled or theme.slider_3_enabled) and not theme.slider_in_highlights %}
+
+  {% if not theme.slider_fullwidth or theme.slider_side_block != 'disabled' %}
+		<div class="container rowmargin">
+      <div class="row">
+    		<div class="col-md-{% if theme.slider_side_block == 'disabled' %}12{% else %}8{% endif %}">
+  {% endif %}
+          
+    {% include 'snippets/homepage-slider.rain' with{ slider_type: theme.slider_type } %}
+	
+	{% if not theme.slider_fullwidth or theme.slider_side_block != 'disabled' %}
+    </div>
+	{% endif %}
+        
+	{% if theme.slider_side_block != 'disabled' %}
+  	{% if theme.slider_side_block == 'deal' %}
+      <div class="col-md-4 d-flex">
+        <div class="deal-holder gray-border product-block">
+        {% for product in featured | limit(1) %}
+          {% include 'snippets/products.rain' with {'mode': 'homedeal_new', 'product' : product} %}
+        {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="col-md-4 d-flex flex-column static-products-holder home-side-list">
+        <h3 class="headline">Populaire producten</h3>
+          {% for product in popular | limit(4) %} 
+            {% include 'snippets/products.rain' with {'mode': 'mini_list' } %}
+          {% endfor %}
+
+          <div class="text-center margin-top-s">
+            <a href="" class="button lined with-icon">{{ 'View all' | t }} <i class="icon-arrow-right"></i></a>
+          </div>
+      </div>
+    {% endif %}
+	{% endif %}
+      
+  {% if not theme.slider_fullwidth or theme.slider_side_block != 'disabled' %}
+        
+      </div>
+    </div>
+	{% endif %}
+
+{% endif %}
+
+{% if theme.slider_in_highlights %}
+	{% include 'snippets/homepage-highlights.rain' with{ 'with_slider':true } %}
+{% else %}
+	{% include 'snippets/homepage-highlights.rain' with{ 'with_slider':false } %}
+{% endif %}
+
+{% if categories %}
+<div class="container margin-top">
+  {% if theme.title_categories %}
+    <h3 class="headline with-link">
+      {{ theme.title_categories | t }}
+      <a href="" class="button-txt with-icon">Bekijk catalogus <i class="icon-arrow-right"></i></a>
+  	</h3>
+  {% endif %}
+  
+  {% include 'snippets/categories.rain' with {'lazyOffset':0, 'type': 'homepage'} %}
+</div>
+{% endif %}
+
+{% set featuredOffset = 0 %}
+{% set featuredLimit = 8 %}
+
+{% if theme.promo_product_1_enabled %}
+  {% set featuredOffset = featuredOffset + 1 %}
+  {% set featuredLimit = featuredLimit + 1 %}
+{% endif %}
+
+{% if theme.promo_product_2_enabled %}
+  {% set featuredOffset = featuredOffset + 1 %}
+  {% set featuredLimit = featuredLimit + 1 %}
+{% endif %}
+
+{% if theme.promo_product_1_enabled and featured %}
+    {% include 'snippets/home-promo-product.rain' with { 'offset': 1, 'position': 'left', 'title': theme.homelook_title, 'subtitle': theme.homelook_subtitle, 'button': theme.homelook_button }%}
+{% endif %}
+
+{# if theme.home_module_1 != 'disabled ' %}
+	{% include 'snippets/home-mod-' ~ theme.home_module_1 ~ '.rain' with {'gray_bg': theme.module_1_gray} %}
+{% endif %}
+
+{% if theme.home_module_2 != 'disabled ' %}
+	{% include 'snippets/home-mod-' ~ theme.home_module_2 ~ '.rain' with {'gray_bg': theme.module_2_gray} %}
+{% endif %}
+
+{% if theme.home_module_3 != 'disabled ' %}
+	{% include 'snippets/home-mod-' ~ theme.home_module_3 ~ '.rain' with {'gray_bg': theme.module_3_gray} %}
+{% endif %}
+
+{% if theme.home_module_4 != 'disabled ' %}
+	{% include 'snippets/home-mod-' ~ theme.home_module_4 ~ '.rain' with {'gray_bg': theme.module_4_gray} %}
+{% endif %}
+
+{% if theme.home_module_5 != 'disabled ' %}
+	{% include 'snippets/home-mod-' ~ theme.home_module_5 ~ '.rain' with {'gray_bg': theme.module_5_gray} %}
+{% endif %}
+
+{% if theme.home_module_6 != 'disabled ' %}
+	{% include 'snippets/home-mod-' ~ theme.home_module_6 ~ '.rain' with {'gray_bg': theme.module_6_gray} %}
+{% endif #}
+
+{% if (theme.home_products_type_a == 'featured' and featured) or (theme.home_products_type_a == 'new' and newest) or (theme.home_products_type_a == 'popular' and popular) %}
+<div class="gray-bg container-bar margin-top-double home-main-products">    
+    {% if theme.products_module_a_carousel %}
+    <div class="container pos-relative">
+        <h3 class="headline" data-text="{{ theme.main_grid_title | t }}">{{ theme.main_grid_title | t }}</h3>
+      
+            <div class="title-swiper-arrows">
+              <div class="swiper-home-main-prev">
+                <i class="fas fa-chevron-left"></i>
+              </div>
+              <div class="swiper-home-main-next">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+      </div>
+          <div class="container swiper-container homepage-product-slider margin-top home-slide-a">
+            <div class="swiper-wrapper static-products-holder">
+              {% for product in featured | limit(featuredLimit) %}
+              	{% if loop.index > featuredOffset %}
+                	{% include 'snippets/products.rain' with {'mode': 'grid', 'in_slider': true, 'lazyOffset' : 0 } %}
+								{% endif %}
+              {% endfor %}
+            </div>
+<!--             <div class="swiper-scrollbar"></div> -->
+            
+            <div class="dy-swiper-preload">
+              <div class="lds-dual-ring"></div>
+            </div>
+          </div>
+  <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}" class="button buttolarge with-icon lined">{{ theme.main_grid_title | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+    {% else %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h3 class="headline with-link" data-text="{{ theme.main_grid_title | t }}">{{ theme.main_grid_title | t }}</h3>
+        
+        <div class="row">
+          <div class="col-md-12">
+            <div class="row productsrow product-grid static-products-holder">
+              {% spaceless %}
+              
+              {% if theme.home_products_type_a == 'featured' %}
+                {% for product in featured | limit(featuredLimit) %}
+                {% if (loop.index > featuredOffset) %}
+                  {% include 'snippets/products.rain' with {'mode': 'grid', 'type': 'featured', 'loopindex': 1, 'col_width':3, 'lazyOffset':0} %}
+                {% endif %}
+                {% endfor %}
+              {% endif %}
+              
+              {% if theme.home_products_type_a == 'new' %}
+                {% for product in newest | limit(8) %}
+                  {% include 'snippets/products.rain' with {'mode': 'grid', 'type': 'featured', 'loopindex': 1, 'col_width':3, 'lazyOffset':0} %}
+                {% endfor %}
+              {% endif %}
+              
+              {% if theme.home_products_type_a == 'popular' %}
+                {% for product in popular | limit(8) %}
+                  {% include 'snippets/products.rain' with {'mode': 'grid', 'type': 'featured', 'loopindex': 1, 'col_width':3, 'lazyOffset':0} %}
+                {% endfor %}
+              {% endif %}
+              
+							{% endspaceless %}
+            </div>
+          </div> 
+        </div>
+          
+      </div>
+    </div>
+    </div>
+    <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}" class="button buttolarge with-icon lined">{{ 'View collection' | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+    {% endif %}
+    
+</div>
+{% endif %}
+
+{% if (theme.slider_sub_1_enabled or theme.slider_sub_2_enabled) and theme.subbanner_position == 'highlights' %}
+  <div class="container margin-top subheadlines{% if not theme.dark_overlay_enabled %} no-overlay{% endif %}">
+    <div class="row">
+      {% include 'snippets/homepage-subbanners.rain' with {'type': 'standalone'} %}
+    </div>
+  </div>
+{% endif %}
+
+{% if theme.promo_product_2_enabled and featured %}
+    {% include 'snippets/home-promo-product.rain' with { 'offset': 2, 'position': 'right', 'title': theme.promo_product_2_title, 'subtitle': theme.promo_product_2_subtitle, 'button': theme.promo_product_2_button }%}
+{% endif %}
+
+{% if newest %}
+<div class="gray-bg container-bar margin-top-double home-main-products">    
+    <div class="container pos-relative">
+        <h3 class="headline" data-text="{{ theme.bottom_grid_title | t }}">{{ theme.bottom_grid_title | t }}</h3>
+      
+            <div class="title-swiper-arrows">
+              <div class="swiper-home-main-prev">
+                <i class="fas fa-chevron-left"></i>
+              </div>
+              <div class="swiper-home-main-next">
+                <i class="fas fa-chevron-right"></i>
+              </div>
+            </div>
+      </div>
+          <div class="container swiper-container homepage-product-slider margin-top home-slider-b">
+            <div class="swiper-wrapper">
+              {% for product in newest | limit(8) %} 
+                {% include 'snippets/products.rain' with {'mode': 'grid', 'in_slider': true } %}
+              {% endfor %}
+            </div>
+            <div class="dy-swiper-preload">
+              <div class="lds-dual-ring"></div>
+            </div>
+          </div>
+  <div class="margin-top text-center">
+    <a href="{{ 'collection' | t }}" class="button with-icon">{{ 'View collection' | t }} <i class="icon-arrow-right"></i></a>
+  </div>
+</div>
+{% endif %}
+
+{% if theme.home_banner_enabled %}
+  
+  {% if theme.homebanner_full_width %}
+  <div class="home-banner margin-top-double lazy-bg{% if not theme.dark_overlay_enabled %} no-overlay{% endif %}" data-src="{{ 'homebanner-image.jpg' | url_asset }}">
+    <div class="container">
+  {% else %}
+  <div class="container margin-top-double">
+    <div class="home-banner rounded lazy-bg{% if not theme.dark_overlay_enabled %} no-overlay{% endif %}" data-src="{{ 'homebanner-image.jpg' | url_asset }}">
+  {% endif %}
+
+      <div class="col-md-12 text-{{ theme.homebanner_text_align }}">
+        <div class="banner-text-block">
+          <h3 class="title">{{ theme.homebanner_title | t }}</h3>
+          <span class="sub">{{ theme.homebanner_sub | t }}</span>
+          {% if theme.homebanner_button_text %}
+          <a href="{{ theme.homebanner_button_url | t }}" class="button">{{ theme.homebanner_button_text | t }}</a>
+          {% endif %}
+        </div>
+      </div>
+    
+    </div>
+  </div>
+{% endif %}
+
+{% if theme.homepage_product_type_bottom != 'disabled' and false %}
+
+      {% set bottomSort = '' %}
+      
+      {% if theme.homepage_product_type_bottom == 'new' %}
+      	{% set bottomSort = 'newest' %}
+      {% elseif theme.homepage_product_type_bottom == 'popular' %}
+      	{% set bottomSort = 'popular' %}
+      {% endif %}
+      
+<div class="container">
+	<div class="row product-grid static-products-holder">
+    <div class="col-md-12 margin-top-double">
+      <h3 class="headline with-link" data-text="{{ theme.bottom_grid_title | t }}">{{ theme.bottom_grid_title | t }}<span class="spacer"></span> <a href="{{ 'collection' | t }}?sort={{ bottomSort }}" class="button-txt">{{ 'View collection' | t }} <i class="fas fa-angle-right"></i></a></h3>
+    </div>
+        
+    {% if theme.homepage_product_type_bottom == 'featured' %}
+      {% for product in featured | limit(4) %}
+        {% include 'snippets/products.rain' with {'mode': 'grid', 'col_width':3, 'lazyOffset':0} %}
+      {% endfor %}
+    {% elseif theme.homepage_product_type_bottom == 'popular' %}
+      {% for product in popular | limit(4) %}
+        {% include 'snippets/products.rain' with {'mode': 'grid', 'col_width':3, 'lazyOffset':0} %}
+      {% endfor %}
+    {% else %}
+      {% for product in newest | limit(4) %}
+        {% include 'snippets/products.rain' with {'mode': 'grid', 'col_width':3, 'lazyOffset':0} %}
+      {% endfor %}
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+      
+{% if shop.brands and theme.show_homepage_brands %}
+<div class="container homepage-brands">
+  <div class="row rowmargin80">
+    <div class="col-md-12">
+      <h3 class="headline"data-text="{{ 'Our brands' | t }}">{{ 'Our brands' | t }}</h3>
+    </div>
+  </div>
+  
+
+  <div class="home-brands-holder rowmargin">
+
+    <div class="swiper-container home-brands">
+      <div class="swiper-wrapper">
+        {% for brand in shop.brands %}
+        <div class="swiper-slide home-brands-slide">
+            <a href="{{ brand.url | url }}">
+            {% if brand.image %}
+            <img src="{{ brand.image | url_image('280x180x2') }}" class="img-responsive" alt="{{ brand.title }}" width="280" height="180">
+            {% else %}
+            <img src="{{ 'brand-icon.png' | url_asset }}" class="img-responsive" alt="{{ brand.title }}" width="280" height="180">
+            {% endif %}
+            </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+  
+{% endif %}
+  
+
+{% if theme.show_homepage_blogs and shop.blogs %}
+  <div class="container blogs">
+    <div class="row rowmargin80">
+      <div class="col-md-12">
+        {% if theme.pretitle_blogs %}<h4 class="headline">{{ theme.pretitle_blogs | t }}</h4>{% endif %}
+            {% if theme.title_blogs %}
+            <h3 class="headline">{{ theme.title_blogs | t }}</h3>
+            {% endif %}
+        <p class="headline">{{ theme.desc_blogs | t }}</p>
+      </div>
+    </div>
+    
+      {#<div class="blog-slider-holder rowmargin">
+        <div class="swiper-container blog-slider">
+      		<div class="swiper-wrapper">
+    				{% include 'snippets/blogs.rain' with{'type' : 'homepage'} %}
+          </div>
+        </div>
+        
+        <div class="arrow blog-arrow-left"><i class="fa fa-caret-left"></i></div>
+        <div class="arrow blog-arrow-right"><i class="fa fa-caret-right"></i></div>
+        
+        <div class="swiper-pagination swiper-pagination-blogs"></div>
+      </div>#}
+    
+    <div class="row">
+      {% for blog in shop.blogs | limit(1) %}
+      	{% include 'snippets/blogs.rain' with {'type': 'home'} %}
+      {% endfor %}
+    </div>
+    
+  </div>
+{% endif %}
+  
+{% if content %}
+<div class="container margin-top-double">
+  <div class="row">
+    <div class="col-md-12 content">
+      {{ content | raw }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if shop.tags and theme.setting_homepagetags %}
+<div class="container blogs">
+  <div class="row rowmargin80">
+    <h3 class="headline">{{ 'Tags' | t }}</h3>
+    
+    <div class="col-md-12">
+      <ul class="tagcloud">
+        {% for tag in shop.tags %}
+        <li><a href="{{ tag.url | url }}" title="{{ tag.title }}">
+          {{ tag.title }} <span>({{ tag.count }})</span></a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endif %}

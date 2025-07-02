@@ -1,0 +1,37 @@
+{% if 'service/preset' not in request.url %}
+<div class="container textpage{% if textpage.category_id %} textpage-category{% endif %}">
+  {% if theme.sidebar_on_textpages %}
+    <div class="row">
+    <div class="col-lg-3 col-md-4 mt-3 mt-md-4">
+      {% include 'snippets/sidebar.rain' with {type:'service-links'} %}
+      {% include 'snippets/usps.rain' with {'type': 'list', 'classList': 'mt-3 d-none d-md-block' } %}
+    </div>
+    <div class="col-lg-9 col-md-8 mt-4">
+      <h1>{{ textpage.title }}</h1>
+      <div class="{% if 'service/preset' not in request.url %}content{% endif %}">
+        {{ textpage.content | raw }}
+      </div>
+    </div>
+    </div>
+  {% else %}
+    <div class="row">
+      <div class="col-md-12">
+        <h1>{{ textpage.title }}</h1>
+
+        <div class="{% if 'service/preset' not in request.url %}content{% endif %}">
+          {{ textpage.content | raw }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% else %}
+    <div class="row ml-auto mr-auto" style="max-width:991px;">
+    <div class="col mt-4">
+      <h1 class="text-center">{{ textpage.title }}</h1>
+      <div class="">
+        {{ textpage.content | raw }}
+      </div>
+    </div>
+    </div>
+{% endif %}

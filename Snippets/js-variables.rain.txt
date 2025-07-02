@@ -1,0 +1,257 @@
+<script>
+  var colorTranslation = '{{ 'Color' | t }}';
+{% if type == 'head' %}
+  window.theme = {
+    isDemoShop: {{ isDemoShop ? 'true' : 'false' }},
+    language: '{{ shop.language2.code }}',
+    template: '{{ template }}',
+    pageData: {},
+    dyApps: {
+      version: 20220101
+    }
+  };
+{% endif %}
+
+{% if type == 'body' %}
+
+  	theme.pageData.product = {{ template == 'pages/product.rain' ? (product | json_encode | raw) : 'false' }};
+  	theme.pageData.collection = {{ template == 'pages/collection.rain' ? (collection | json_encode | raw) : 'false' }};
+  	theme.pageData.index = {% if template != 'pages/index.rain' %}false{% else %}{
+			featuredCategoriesCount: {{ categories | length }},
+			featuredProductsCount: {{ products | length }}
+    };{% endif %}
+  
+	{% if checkout %}
+  theme.checkout = {
+    step: '{{ step }}',
+    theme: '{{ checkout.theme }}',
+    data: Checkout.data
+  };
+	{% else %}
+ 	theme.checkout = false;
+	{% endif %}
+  
+  theme.settings = {
+    reviewsEnabled: {% if theme.setting_reviews %}true{% else %}false{% endif %},
+    live_search_enabled: true,
+    notification_enabled: {{ theme.notification_enabled ? 'true' : 'false' }},
+    notification_name: '{{ theme.notification_name }}',
+    freeShippingEnabled: {% if theme.enable_free_shipping_notice %}true{% else %}false{% endif %},
+    quickShopEnabled: true,
+    quickorder_enabled: {{ theme.quickorder_enabled ? 'true' : 'false' }},
+    product_block_white: {{ theme.product_block_white ? 'true' : 'false' }},
+    sliderTimeout: {{ theme.slider_timeout }},
+    slidesActive: {{ slidesActive }},
+    variantBlocksEnabled: {% if theme.show_variant_blocks %}true{% else %}false{% endif %},
+    hoverSecondImageEnabled: true,
+    navbarDimBg: {% if theme.navbar_dimbg %}true{% else %}false{% endif %},
+    navigation_mode: '{{ theme.navigation_mode }}',
+    navbar_sticky: {{ theme.navbar_sticky ? 'true' : 'false' }},
+    navbar_sub_brands: {{ theme.navbar_sub_brands ? 'true' : 'false' }},
+    vertical_nav_type: '{{ theme.vertical_nav_type }}',
+    home_categories_type: '{{ theme.home_categories_type }}',
+    boxed_product_grid_blocks_with_border: {{ theme.boxed_product_grid_blocks_with_border ? 'true' : 'false' }},
+    show_product_brands: {% if theme.show_product_brands %}true{% else %}false{% endif %},
+    show_product_description: {{ theme.show_product_description ? 'true' : 'false' }},
+    enable_auto_related_products: {{ theme.enable_auto_related_products ? 'true' : 'false' }},
+    showProductBrandInGrid: {{ theme.productgrid_show_brand  and theme.show_product_brands ? 'true' : 'false' }},
+    showProductReviewsInGrid: {{ theme.productgrid_enable_reviews ? 'true' : 'false' }},
+    showProductFullTitle: {{ theme.show_fulltitle ? 'true' : 'false' }},
+    productGridTextAlign: '{{ theme.productgrid_text_align }}',
+    shadowOnHover: {% if theme.shadow_on_hover %}true{% else %}false{% endif %},
+    product_mouseover_zoom: {{ theme.product_mouseover_zoom ? 'true' : 'false' }},
+    collection_pagination_mode: '{{ theme.collection_pagination_mode }}',
+    collection_subcats_carousel_navigation: true,
+    logo: '{{ 'logo.png' | url_asset }}',
+		logoMobile: {% if theme.enable_logo_mobile %}'{{ 'logo-mobile.png' | url_asset }}'{% else %}false{% endif %},
+    mobile_nav_main_images_enabled: {{ theme.mobile_nav_main_images_enabled ? 'true' : 'false' }},
+    mobile_nav_sub_header_enabled: {{ theme.mobile_nav_sub_header_enabled ? 'true' : 'false' }},
+    mobile_nav_click_toggle_sub_enabled: {{ theme.mobile_nav_click_toggle_sub_enabled ? 'true' : 'false' }},
+    subheader_usp_default_amount: {{ theme.subheader_usp_default_amount }},
+    dealDisableExpiredSale: {{ theme.deal_disable_expired_sale ? 'true' : 'false' }},
+    keep_stock: {{ theme.keep_stock ? 'true' : 'false' }},
+    product_grid_stock_type: '{{ theme.product_grid_stock_type }}',
+  	filters_position: '{{ theme.filters_position }}',
+    yotpo_id: '{{ theme.yotpo_id }}',
+    cart_icon: '{{ theme.cart_icon }}',
+    live_add_to_cart: {{ theme.live_add_to_cart ? 'true' : 'false' }},
+    enable_cart_flyout: {{ theme.enable_cart_flyout ? 'true' : 'false' }},
+    enable_cart_quick_checkout: {{ theme.enable_cart_quick_checkout ? 'true' : 'false' }},
+    productgrid_enable_reviews: {{ theme.productgrid_enable_reviews ? 'true' : 'false' }},
+    //productgrid_enable_colors: true,
+    grid_second_image_hover: true,
+    dyapps_collection_swatches_enabled: {{ theme.dyapps_collection_swatches_enabled ? 'true' : 'false' }},
+    show_amount_of_products_on_productpage: {{ theme.show_amount_of_products_on_productpage ? 'true' : 'false' }},
+    show_delivery_time: '{{ theme.show_delivery_time }}',
+    delivery_time_text: '{{ theme.delivery_time_text | t }}',
+    promo_product_a_image_size: '{{ theme.promo_product_a_image_size }}',
+    promo_product_b_image_size: '{{ theme.promo_product_b_image_size }}',
+    b2b_enabled: {{ theme.b2b_enabled? 'true' : 'false' }},
+    b2b_default_pricing: '{{ theme.b2b_default_pricing }}',
+    vat_switcher_enabled: {{ vatSwitcherEnabled ? 'true' : 'false' }},
+    dyapps_addons_enabled: {{ theme.dyapps_addons_enabled ? 'true' : 'false' }},
+    dyapps_advanced_variants: {{ theme.dyapps_advanced_variants ? 'true' : 'false' }},
+    blog_tag_carousel_enabled: {{ theme.blog_tag_carousel_enabled ? 'true' : 'false' }},
+    product_hide_delivery_outofstock: {{ theme.product_hide_delivery_outofstock ? 'true' : 'false' }}
+  };
+
+  theme.images = {
+    ratio: '{{ theme.product_image_ratio }}',
+    imageSize: '{{ imageSize }}',
+    thumbSize: '{{ imageThumbSize }}',
+    imgHeight: '{{ imgHeight }}',
+    imgWidth: '{{ imgWidth }}',
+    placeholder: '{{ imagePlaceholder }}',
+    placeholderSquare: '{{ imagePlaceholderSquare }}'
+  }
+
+  theme.shop = {
+    id: {{ shop.id }},
+    domain: '{{ shop.domain }}',
+    currentLang: '{{ shop.language2.title }}',
+    currency: {
+      symbol: '{{ shop.currency2.symbol }}',
+      title: '{{ shop.currency2.title }}',
+      code: '{{ shop.currency2.code }}',
+      ratio: {{ ((10000 | money_without_currency | replace({',':'', '.':''})) / 10000 / 100) | number_format(6) }}
+    },
+    b2b: {{ shop.b2b ? 'true' : 'false' }},
+    show_demobar: {{ shop.show_demobar ? 'true' : 'false' }},
+    pageKey: '{{ page.key }}',
+    serverTime: '{{ date | date('M j, Y H:i:s O') }}',
+    getServerTime: function getServerTime()
+    {
+      return new Date(theme.shop.serverTime);
+    },
+    template: '{{ template }}',
+    legalMode: '{{ shop.settings.legal.mode }}',
+    pricePerUnit: {{ shop.settings.price_per_unit ? 'true' : 'false' }},
+    checkout: {
+      stayOnPage: {{ shop.cart_redirect_back ? 'false' : 'true' }},
+    },
+    breadcrumb:
+		{
+      title: '{{ breadcrumb.title }}',
+    },
+    ssl: {{ request.ssl ? 'true': 'false' }},
+    cart_redirect_back: {{ shop.settings.checkout.cart_redirect_back ? 'true' : 'false' }},
+    wish_list: {{ shop.settings.wish_list ? 'true' : 'false' }}
+  };
+                                              
+	theme.page = {
+    compare_amount: {{ page.compare | length }},
+    account: {% if page.account %}{
+    
+    }{% else %}false{% endif %},
+  };
+
+  theme.url = {
+    shop: '{{ '' | url }}',
+    domain: '{{ shop.domain }}',
+    static: '{{ shop.domains.static | replace({'http://':'https://'}) }}',
+    search: '{{ 'search' | url }}',
+    cart: '{{ 'cart' | url }}',
+    checkout: '{{ 'checkout' | url }}',
+    compare: '{{ 'compare/add/' | url }}',
+    //addToCart: '{{ '/cart/add/' | url | replace({'http:': 'https://'}) }}',
+    addToCart: '{{ '/cart/add/' | url }}',
+    gotoProduct: '{{ 'go/product' | url }}',
+  };
+                               
+	{% if template == 'pages/collection.rain' %}
+  theme.collection = {
+    productCount: {{ collection.count }},
+    pages: {{ collection.pages }},
+    page: {{ collection.page }},
+    itemsFrom: {{ collection.items_from }},
+    itemsTo: {{ collection.items_to }},
+  };
+	{% else %}
+  theme.collection = false;
+  {% endif %}
+
+  theme.text = {
+    viewAll: '{{ 'View all' | t }}',
+    continueShopping: '{{ 'Continue shopping' | t }}',
+    proceedToCheckout: '{{ 'Proceed to checkout' | t }}',
+    viewProduct: '{{ 'View product' | t }}',
+    addToCart: '{{ 'Add to cart' | t }}',
+    noInformationFound: '{{ 'No information found' | t }}',
+    view: '{{ 'View' | t }}',
+    moreInfo: '{{ 'More info' | t }}',
+    checkout: '{{ 'Checkout' | t }}',
+    close: '{{ 'Close' | t }}',
+    navigation: '{{ 'Navigation' | t }}',
+    inStock: '{{ 'In stock' | t }}',
+    outOfStock: '{{ 'Out of stock' | t }}',
+    soldOut: '{{ 'Sold out' | t }}',
+    freeShipping: '{{ theme.free_shipping_notice | t }}',
+    amountToFreeShipping: '{{ theme.amount_to_free_shipping_text | t }}',
+    amountToFreeShippingValue: parseFloat({{ (theme.amount_to_free_shipping | number_format(2) | replace({',':'', '.': ''})) / 100 }}),
+    backorder: '{{ 'Backorder' | t }}',
+    search: '{{ 'Search' | t }}',
+    tax: '{{ (shop.b2b ? 'Excl. VAT' : 'Incl. VAT') | t }}',
+    exclShipping: '{{ 'Excl. $1' | t('<a href="' ~ 'service/shipping-returns' | url ~ '" target="_blank">' ~ 'Shipping costs' | t ~ '</a>') | replace({'\'':'\\\''})  | raw }}',
+    customizeProduct: '{{ 'Customize product' | t }}',
+    expired: '{{ 'Expired' | t }}',
+    dealExpired: '{{ 'Deal expired' | t }}',
+    compare: '{{ 'Compare' | t }}',
+    wishlist: '{{ 'Wishlist' | t }}',
+    cart: '{{ 'Cart' | t }}',
+    wasAddedToCart: '{{"'$1' was added to your shopping cart." | t('_PLACEHOLDER_') }}',
+    thisProductHasBeenAddedToYourCart: '{{ 'This product has been added to your cart!' | t }}',
+    remaining: '{{ 'Remaining' | t }}',
+    SRP: '{{ 'SRP' | t }}',
+    inclVAT: '{{ 'Incl. VAT' | t }}',
+    exclVAT: '{{ 'Excl. VAT' | t }}',
+    unitPrice: '{{ 'Unit price' | t }}',
+    lastUpdated: '{{ 'Last updated' | t }}',
+    onlinePricesMayDiffer: '{{ 'Online and in-store prices may differ' | t }}',
+    countdown: {
+      labels: ['{{ 'Years' | t }}', '{{ 'Months' | t }} ', '{{ 'Weeks' | t }}', '{{ 'Days' | t }}', '{{ 'Hours' | t }}', '{{ 'Minutes' | t }}', '{{ 'Seconds' | t }}'],
+      labels1: ['{{ 'Year' | t }}', '{{ 'Month' | t }} ', '{{ 'Week' | t }}', '{{ 'Day' | t }}', '{{ 'Hour' | t }}', '{{ 'Minute' | t }}', '{{ 'Second' | t }}'],
+    },
+    chooseLanguage: '{{ 'Choose your language' | t }}',
+    chooseCurrency: '{{ 'Choose your currency' | t }}',
+    loginOrMyAccount: '{{ page.account ? ('My account' | t) : ('Login' | t) }}',
+    validFor: '{{ 'Valid for' | t }}',
+    apply: '{{ 'Apply' | t }}',
+    pts: '{{ 'pts' | t }}',
+  }
+  
+  {% macro json_cats(categories) %}
+    {% for category in categories %}
+    	{ "id": "{{ category.id }}", "active": {{ category.url is active ? 'true' : 'false' }}, "type": "category", "title" : "{{ category.title }}", "url": "{{ category.url | url }}", "thumb": "{{ category.image ? (category.image | url_image('30x30x1')) : '' }}", "image": "{{ category.image ? (category.image | url_image('340x200x1')) : '' }}", "subs": [{{_self.json_cats(category.subs) }}] },
+    {% endfor %}
+  {% endmacro %}
+  
+  theme.navigation = [
+      { "title": "{{ 'Home' | t }}", "type": "home", "url": "{{ '' | url }}", "subs": [] },
+      
+      {{ _self.json_cats(shop.categories) }}
+      
+			{% if theme.show_navbar_blogs %}
+        {% for blog in shop.blogs | limit (2) %}
+        { "title": "{{ blog.title }}", "type": "blog", "url": "{{ blog.url | url }}", "subs": [] },
+        {% endfor %}
+      {% endif %}
+      
+      {% if theme.show_navbar_brands %}
+      	{ "title": "{{ 'Brands' | t }}", "type": "brands", "url": "{{ 'brands' | url }}", "subs": [] },
+      {% endif %}
+      {% if theme.show_navbar_service_page %}
+      	{ "title": "{{ 'Customer service' | t }}", "type": "service", "url": "{{ 'service' | url }}", "subs": [] },
+      {% endif %}
+      
+      {% if shop.links.main and (theme.navigation_show_custom_links) %}
+        {% for link in shop.links.main %}
+        { "title": "{{ link.title }}", "type": "link", "url": "{{ link.url | url }}", "subs": [] },
+        {% endfor %}
+      {% endif %}
+      
+        {% if theme.nav_sale_enabled %}
+       { "title": "{{ theme.nav_sale_label | t }}", "type": "link", "url": "{{ (theme.nav_sale_url | t | url) }}", "subs": [] },
+        {% endif %}
+    ];
+{% endif %}
+</script>

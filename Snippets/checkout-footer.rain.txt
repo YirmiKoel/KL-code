@@ -1,0 +1,52 @@
+{# snippets/checkout-footer.rain #}
+{% if type == 'default' %}
+<div class="footer-checkout mt-5">
+  
+  <div class="footer-checkout-service-links text-center">
+    <a href="{{ 'service' | url }}" class="underlined mr-2">{{ 'Customer service' | t }}</a>
+    <a href="{{ 'service/general-terms-conditions' | url }}" class="underlined mr-2">{{ 'Terms and conditions' | t }}</a>
+    <a href="{{ 'service/privacy-policy' | url }}" class="underlined mr-2">{{ 'Privacy policy' | t }}</a>
+  </div>
+  
+
+  <div class="copyright mt-2 opacity-70">
+  © {{ 'Copyright' | t }} {{ 'now' | date('Y') }} {{ shop.name }}{% if shop.links and shop.links.powered_by %} - Powered by {% for link in shop.links.powered_by | limit(1) %}
+  <a href="{{ link.url | url }}" title="{{ link.title }}"{% if link.new_window %} target="_blank"{% endif %}>{{ link.title }}</a> {% if not loop.last %} - {% endif %} 
+  {% if not loop.last %} - {% endif %}
+  {% if shop.language == 'nl' %}
+    -  <a href="https://www.dyvelopment.com/nl/lightspeed/design/" title="dyvelopment" target="_blank">Lightspeed design</a> by <a href="https://www.dyvelopment.com/nl/" title="dyvelopment" target="_blank" class="underlined">Dyvelopment</a>
+  {% else %}
+    -  Theme by <a href="https://www.dyvelopment.com/en/" title="dyvelopment" target="_blank" class="">Dyvelopment</a>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+</div>
+
+  
+</div>
+{% else %}
+<div class="footer-checkout gray-bg p-4 mt-4">
+  
+  <div class="footer-checkout-service-links text-center">
+    <a href="{{ 'service' | url }}" class="underlined mr-2">{{ 'Customer service' | t }}</a>
+    <a href="{{ 'service/general-terms-conditions' | url }}" class="underlined mr-2">{{ 'Terms and conditions' | t }}</a>
+    <a href="{{ 'service/privacy-policy' | url }}" class="underlined mr-2">{{ 'Privacy policy' | t }}</a>
+  </div>
+  
+
+  <div class="copyright">
+  © {{ 'Copyright' | t }} {{ 'now' | date('Y') }} {{ shop.name }}{% if shop.links and shop.links.powered_by %} - Powered by {% for link in shop.links.powered_by | limit(1) %}
+  <a href="{{ link.url | url }}" title="{{ link.title }}"{% if link.new_window %} target="_blank"{% endif %}>{{ link.title }}</a> {% if not loop.last %} - {% endif %} 
+  {% if not loop.last %} - {% endif %}
+  {% if shop.language == 'nl' %}
+    -  <a href="https://www.dyvelopment.com/nl/lightspeed/design/" title="dyvelopment" target="_blank">Lightspeed design</a> by <a href="https://www.dyvelopment.com/nl/" title="dyvelopment" target="_blank" class="underlined">Dyvelopment</a>
+  {% else %}
+    -  Theme by <a href="https://www.dyvelopment.com/en/" title="dyvelopment" target="_blank" class="">Dyvelopment</a>
+  {% endif %}
+  {% endfor %}
+  {% endif %}
+
+</div>
+  
+</div>
+{% endif %}

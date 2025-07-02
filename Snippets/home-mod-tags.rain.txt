@@ -1,0 +1,11 @@
+<div id="homepage-tags" class="container">
+    <h3 class="headline">{{ 'Tags' | t }}</h3>
+  
+      <div class="tagcloud text-left mt-2">
+        {% for tag in shop.tags %}
+        <a href="{{ tag.url | url }}" title="{{ tag.title }}" class="tagcloud-tag">
+          {{ tag.title }} <span>({{ tag.count }})</span></a>
+        {% endfor %}
+      </div>
+
+</div>

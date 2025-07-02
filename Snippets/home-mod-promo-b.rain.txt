@@ -1,0 +1,3 @@
+{% if featured %}
+    {% include 'snippets/home-promo-product.rain' with { 'offset': 1, 'position': 'right', 'title': theme.promo_product_2_title, 'subtitle': theme.promo_product_2_subtitle, 'button': theme.promo_product_2_button, 'promo_type': 'b' }%}
+{% endif %}

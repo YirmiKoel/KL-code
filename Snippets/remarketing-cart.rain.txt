@@ -1,0 +1,16 @@
+<script type="text/javascript">
+
+  var google_tag_params = {
+  
+    ecomm_prodid: [{% for product in page.cart.products %}"{{ product.id }}"{% if not loop.last %},{% endif %}{% endfor %}],
+    ecomm_pagetype: 'cart',
+    ecomm_totalvalue: {{ page.cart.total.price | number_format(2, '.', ',') }},
+  };
+
+
+  dataLayer = [{
+  
+    google_tag_params: window.google_tag_params
+
+  }];
+</script>

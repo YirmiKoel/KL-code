@@ -1,0 +1,65 @@
+{% if twkInstance and not isAjaxRequest and request.get.twk != 'false' %}
+{% set mainCategory = false %}
+{% set currentCategory = false %}
+{% set lastCategory = false %}
+{% set lastCategoryWithSubs = shop.categories %}
+
+{% for category in shop.categories if not mainCategory %}
+  {% if category.url is active %}
+		{% set mainCategory = category %}
+		{% set currentCategory = category %}
+		{% set lastCategory = category %}
+
+		{% set isEnd = false %}
+	
+		{% for i in range(1, 3) if not isEnd %}
+			{% set isActive = false %}
+			{% set lastCategory = currentCategory %}
+
+			{% if currentCategory.subs %}
+				{% set lastCategoryWithSubs = currentCategory %}
+			{% endif %}
+		
+      {% for category in currentCategory.subs if not isActive %}
+        {% if category.url is active %}
+					{% set currentCategory = category %}
+					{% set isActive = true %}
+        {% endif %}
+      {% endfor %}
+
+			{# if there are no subcats, or if we're already in the current category, quit #}
+			{% if not currentCategory.subs or currentCategory.id == collection.category_id %}
+				{% set isEnd = true %}
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+{% endfor %}
+
+{% set content = collection.content %}
+
+<div class="container">
+<h1 class="page-title">{{ collection.title }}</h1>
+  {% if collection.description %}
+  <p>{{ collection.description }}</p>
+  {% endif %}
+  
+{% if ((currentCategory and currentCategory.subs) or collection.internal.url == 'collection') and theme.collection_subcats_carousel != 'disabled' %}
+	{% include 'snippets/categories.rain' with {'type': 'collection_topbar', 'categories': (collection.internal.url == 'collection' ? shop.categories : currentCategory.subs)} %}
+{% endif %}
+</div>
+
+    	<div id="tweakwise-output" style="min-height:50vh;"></div>
+
+<div class="container mt-4">
+          <div class="content">
+          {{ content | raw }}
+        </div>
+</div>
+
+{% else %}
+<div id="collection" class="static-products-holder">
+
+      {% include 'snippets/collection-content.rain' %}
+  
+</div>
+{% endif %}

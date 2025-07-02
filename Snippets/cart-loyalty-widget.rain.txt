@@ -1,0 +1,82 @@
+<div class="loyalty-block margin-top gray-border" style="padding:15px;">
+
+  {% if not page.account %}
+    <h5>{{ 'Want to earn points on every order?' | t }}</h5>
+    <div class="d-flex" style="align-items:center;     justify-content: space-between;">
+      <a href="{{ 'account' | url }}" class="button inverted small-button text-center margin-top-half"  style="width:auto;">
+        {{ 'Login or create an account' | t }}
+      </a>
+      <div class="text-center margin-top-half" style="padding-left:5px;">
+      <a href="{{ 'loyalty' | url }}" class="" style="font-size:0.9em; opacity:0.7;">
+        {{ 'Learn more' | t }}
+      </a>
+      </div>
+    </div>
+  {% else %}
+    {% if customer_loyalty %}
+  
+      {% if cart.discount.code or cart.discount.discount_rules %}
+        <h5>{{ 'Rewards' | t }}</h5>
+        <div class="margin-top-half">
+          {{ 'A discount is already applied to this cart.' | t }}
+        </div>
+      {% else %}
+        <h5>{{ 'Rewards' | t }}</h5>
+  
+        {% if not cart.loyalty_reward %}
+          <div class="loyalty-rewards"></div>
+          <div class="text-center loyalty-loader" style="font-size:1.2em;">
+<!--             <i class="fa fa-spin fa-spinner"></i> -->
+          </div>
+        {% else %}
+  				<div class="reward-redeemed button-color"><i class="icon-check"></i> {{ 'Reward redeemed' |  t }}</div>
+        {% endif %}
+      {% endif %}
+  
+    {% else %}
+      <h5>{{ 'Want to earn points on every order?' | t }}</h5>
+  
+      <div class="margin-top-half">
+        {{ 'Verify your phone number at checkout to start earning points.' | t }}
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+
+<script>
+  $(function()
+  {
+  	if( $('.loyalty-rewards').length > 0 )
+    {
+      $.get(theme.url.shop + 'services/getEvaluateCartRewards/', function(data)
+			{
+        console.log('LOYATLY REWARDS:');
+        console.log(data);
+        
+        if( data.rewards )
+        {
+          var loyaltyFormItems = [];
+          data.rewards.forEach(function (reward, index)
+					{
+            
+            var formItem = $('<form id="cart-loyalty-item-' + (index + 1) + '" class="cart-loyalty-item d-flex" action="'+theme.url.shop+'cart/applyReward/" method="post" style="align-items: center; margin-top:8px; padding-top:8px; border-top:1px solid rgba(155,155,155,.17);">'+
+                             	'<div class="item title" style="flex-grow:1;">' +
+                                '<div class="name"><strong>' + reward.reward_name + '</strong></div>' +
+                                '<div class="info">'+theme.text.validFor+': ' + reward.product_name + '</div>' +
+                             	'</div>' +
+															'<div class="item points" style="padding-left:10px; padding-right:10px;">' + reward.reward_points + ' '+theme.text.pts+'</div>' +
+                              '<div class="gui-cart-rewards-content gui-cart-rewards-list-apply">' +
+                              	'<button type="submit" class="button small-button">'+theme.text.apply+'</button>' +
+                             		'<input type="hidden" name="reward_id" value="' + reward.reward_id + '"/>' +
+                              '</div>' +
+														'</form>');
+            loyaltyFormItems.push(formItem);
+        	});
+        }
+        
+        $('.loyalty-rewards').append(loyaltyFormItems);
+        $('.loyalty-loader').hide();
+      });
+    }
+  });
+</script>

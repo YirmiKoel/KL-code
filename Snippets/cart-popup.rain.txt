@@ -1,0 +1,110 @@
+<div class="cart-popup-holder">
+  <div class="cart-popup rounded body-bg">
+    <div class="x body-bg" onclick="clearModals();"></div>
+    {#<h3>{{ 'Cart' | t }}</h3>#}
+    <div class="message-bar success margin-top hidden-xs hidden-xxs">
+      <div class="icon"><i class="fas fa-check"></i></div>
+      <span class="message"></span>
+    </div>
+    <div class="message-bar-mobile-success visible-xs visible-xxs"></div>
+    
+    <div class="flex-container seamless middle margin-top">
+      <div class="flex-item col-50 text-center current-product-holder">
+        <div class="current-product">
+            <div class="image"></div>
+            <div class="content margin-top-half">
+            	<div class="title"></div>
+              <div class="variant-title"></div>
+            	<div class="price margin-top-half"></div>
+            </div>
+          </div>
+          
+          <div class="proceed-holder">
+          {% if theme.cart_popup_show_related or true %}
+            {% if product.related or cart.related or cart.upsells or true %}
+            <div class="proceed margin-top">
+              <a href="{{ product.url | url }}" class="button lined margin-right-10" onclick="clearModals(); return false;">{{ 'Continue shopping' | t }}</a>
+              <a href="{{ 'cart' | url }}" class="button">{{ 'View cart' | t }}</a>
+            </div>
+            {% endif%}
+          {% endif %}
+          </div>
+        </div>
+      <div class="flex-item right col-50 hidden-sm hidden-xs hidden-xxs">
+        {% if (not product.related and not cart.related and not cart.upsells and (page.recent | length) < 2) or not theme.cart_popup_show_related %}         
+        	<div class="cart-popup-recent">  
+          <h4>{{ 'Recently added' | t }}</h4>
+          
+          {% for product in page.cart.products | reverse | limit(3) %}
+          	<div class="cart-item-holder {{ product.vid }}">
+              <div class="cart-item-image">
+                <img src="{{ product.image | url_image('100x100x2',product.fulltitle) }}" width="40" height="40" alt="{{ product.fulltitle }}"> 
+              </div>
+              
+              <div class="cart-item-title">
+                <h5><a href="{{ product.url | url }}">{{ product.title }}</a></h5>
+                
+                {% if product.bundled | length %}
+                  <div class="bundled">
+                    {% for bundledProduct in product.bundled %}
+                      + {{ bundledProduct.title }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
+                
+                <div class="price">
+                  <span class="quantity">{{ product.quantity }} x</span> {{ product.price | money_without_currency }}
+                </div>
+              </div>
+              
+              <div class="cf"></div>
+            </div>
+          {% endfor %}
+
+          <div class="sum text-right">
+            <span>{% if shop.b2b %}{{ 'Total excl. VAT' | t }}{% else %}{{ 'Total incl. VAT' | t }}{% endif %}:</span> <span class="total"><strong>{{ page.cart.total.price | money_without_currency }}</strong></span>
+          </div>  
+          </div>
+
+          {#<div class="proceed text-center margin-top">
+            <a href="#" class="button lined">{{ 'Continue shopping' | t }}</a>
+            <a href="{{ 'cart' | t }}" class="button">{{ 'View cart' | t }}</a>
+          </div>#}
+
+          <div class="margin-top text-center">
+            {% for payment in shop.payments | sort %}
+              <a target="_blank" href="{{ 'service/payment-methods' | url }}" title="{{ payment.title | t }}" class="payment-icons dark {{ payment.icon | trim('.png') }}">
+              </a>
+            {% endfor %} 
+            </div>
+        {% else %}
+          <div class="cart-popup-related">
+            {% if product.related %}
+            	<h4 data-type="product.related">{{ 'Recommendations' | t }}</h4>
+            	<div class="product-related">
+                {% for product in product.related | limit(4) %}
+                  {% include 'snippets/products.rain' with {'mode': 'mini_list' } %}
+                {% endfor %}
+              </div>
+            {% elseif cart.upsells %}
+            	<h4 data-type="cart.upsells">{{ 'Recommendations' | t }}</h4>
+              {% for product in cart.upsells.products | limit(4) %}
+                {% include 'snippets/products.rain' with {'mode': 'mini_list' } %}
+              {% endfor %}
+            {% elseif cart.related %}
+            	<h4 data-type="cart.related">{{ 'Recommendations' | t }}</h4>
+              {% for product in cart.related | limit(4) %}
+                {% include 'snippets/products.rain' with {'mode': 'mini_list' } %}
+              {% endfor %}
+            {% elseif page.recent | length > 1 %}
+            	<h4 data-type="page.recent">{{ 'Recently viewed' | t }}</h4>
+            	{% for product in page.recent | limit(4) %}
+                {% include 'snippets/products.rain' with {'mode': 'mini_list' } %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

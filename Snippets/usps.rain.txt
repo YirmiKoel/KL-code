@@ -1,0 +1,410 @@
+{#{% include 'snippets/fancy-boxes.rain' %} #}
+
+{% if 'class=' in theme.usp1_icon %}
+	{% set usp1icon = theme.usp1_icon %}
+{% else %}
+	{% set usp1icon = '<i class="fas fa-'~theme.usp1_icon | trim('fa-')~'"></i>' %}
+{% endif %}
+
+{% if 'class=' in theme.usp2_icon %}
+	{% set usp2icon = theme.usp2_icon %}
+{% else %}
+	{% set usp2icon = '<i class="fas fa-'~theme.usp2_icon | trim('fa-')~'"></i>' %}
+{% endif %}
+
+{% if 'class=' in theme.usp3_icon %}
+	{% set usp3icon = theme.usp3_icon %}
+{% else %}
+	{% set usp3icon = '<i class="fas fa-'~theme.usp3_icon | trim('fa-')~'"></i>' %}
+{% endif %}
+
+{% if 'class=' in theme.usp4_icon %}
+	{% set usp4icon = theme.usp4_icon %}
+{% else %}
+	{% set usp4icon = '<i class="fas fa-'~theme.usp4_icon | trim('fa-')~'"></i>' %}
+{% endif %}
+
+{% if type == 'header' %}
+
+<!-- <div class="usps-slider-holder" style="width:100%;"> -->
+  <div class="swiper-container usps-header{% if class %} {{ class }}{% endif %} usp-def-amount-{{ theme.subheader_usp_default_amount }}">
+    <div class="swiper-wrapper">
+      
+        {% if theme.product_usp_1 %}
+        <div class="swiper-slide usp-carousel-item d-flex align-items-center">
+<!--           <div> -->
+          <i class="icon-check-b usp-carousel-icon"></i> <div>{{ theme.product_usp_1 | t | raw }}</div>
+<!--           </div> -->
+        </div>
+        {% endif %}
+      
+        {% if theme.product_usp_2 %}
+        <div class="swiper-slide usp-carousel-item d-flex align-items-center">
+<!--           <div> -->
+          <i class="icon-check-b usp-carousel-icon"></i> <div>{{ theme.product_usp_2 | t | raw }}</div>
+<!--           </div> -->
+        </div>
+        {% endif %}
+        
+        {% if theme.product_usp_3 %}
+        <div class="swiper-slide usp-carousel-item d-flex align-items-center">
+<!--           <div> -->
+          <i class="icon-check-b usp-carousel-icon"></i> <div>{{ theme.product_usp_3 | t | raw }}</div>
+<!--           </div> -->
+        </div>
+        {% endif %}
+      
+        {% if theme.product_usp_4 %}
+        <div class="swiper-slide usp-carousel-item d-flex align-items-center">
+<!--           <div> -->
+          <i class="icon-check-b usp-carousel-icon"></i> <div>{{ theme.product_usp_4 | t | raw }}</div>
+<!--           </div> -->
+        </div>
+        {% endif %}
+      
+		</div>
+	</div>
+<!-- </div> -->
+
+{% elseif type == 'quickshop' %}
+
+<div class="usps-slider-holder" style="width:100%;">
+  <div class="swiper-container usps-quickshop">
+    <div class="swiper-wrapper">
+      
+        {% if theme.product_usp_1 %}
+        <div class="swiper-slide usp-block">
+          <i class="fa fa-{{ theme.usp1_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_1 | t | raw }}
+        </div>
+        {% endif %}
+      
+        {% if theme.product_usp_2 %}
+        <div class="swiper-slide usp-block">
+          <i class="fa fa-{{ theme.usp2_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_2 | t | raw }}
+        </div>
+        {% endif %}
+        
+        {% if theme.product_usp_3 %}
+        <div class="swiper-slide usp-block">
+          <i class="fa fa-{{ theme.usp3_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_3 | t | raw }}
+        </div>
+        {% endif %}
+      
+        {% if theme.product_usp_4 %}
+        <div class="swiper-slide usp-block">
+          <i class="fa fa-{{ theme.usp4_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_4 | t | raw }}
+        </div>
+        {% endif %}
+      
+		</div>
+	</div>
+</div>
+
+{% elseif type == 'product_bar' %}
+
+<div class="product-usp-bar" style="width:100%;">
+  <div class="swiper-container usps-header">
+    <div class="swiper-wrapper">
+      
+        {% if theme.product_usp_1 %}
+        <div class="swiper-slide usp-block">
+          {{ usp1icon | raw }} {{ theme.product_usp_1 | t | raw }}
+        </div>
+        {% endif %}
+      
+        {% if theme.product_usp_2 %}
+        <div class="swiper-slide usp-block">
+          {{ usp2icon | raw }} {{ theme.product_usp_2 | t | raw }}
+        </div>
+        {% endif %}
+        
+        {% if theme.product_usp_3 %}
+        <div class="swiper-slide usp-block">
+          {{ usp3icon | raw }} {{ theme.product_usp_3 | t | raw }}
+        </div>
+        {% endif %}
+      
+        {% if theme.product_usp_4 %}
+        <div class="swiper-slide usp-block">
+          {{ usp4icon | raw }} {{ theme.product_usp_4 | t | raw }}
+        </div>
+        {% endif %}
+      
+		</div>
+	</div>
+</div>
+
+{% elseif type == 'productpage' %}
+
+	<div class="productpage-usps">
+      <ul>
+      {% if theme.usp1 %}
+      <li>{{ usp1icon | raw }} <h4>{{ theme.usp1 | t }}</h4> {{ theme.usp1_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp2 %}
+      <li>{{ usp2icon | raw }} <h4>{{ theme.usp2 | t }}</h4> {{ theme.usp2_sub | t }}</li>
+      {% endif %}
+        <li class="seperator"></li>
+      {% if theme.usp3 %}
+      <li>{{ usp3icon | raw }} <h4>{{ theme.usp3 | t }}</h4> {{ theme.usp3_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp4 %}
+      <li>{{ usp4icon | raw }} <h4>{{ theme.usp4 | t }}</h4> {{ theme.usp4_sub | t }}</li>
+      {% endif %}
+      </ul>
+	</div>
+
+{% elseif type == 'cartpage' %}
+
+	<div class="productpage-usps cart">
+      <ul>
+      {% if theme.usp1 %}
+      <li>{{ usp1icon | raw }} <h4>{{ theme.usp1 | t }}</h4> {{ theme.usp1_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp2 %}
+      <li>{{ usp2icon | raw }} <h4>{{ theme.usp2 | t }}</h4> {{ theme.usp2_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp3 %}
+      <li>{{ usp3icon | raw }} <h4>{{ theme.usp3 | t }}</h4> {{ theme.usp3_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp4 %}
+      <li>{{ usp4icon | raw }} <h4>{{ theme.usp4 | t }}</h4> {{ theme.usp4_sub | t }}</li>
+      {% endif %}
+      </ul>
+	</div>
+
+{% elseif type == 'list' %}
+
+  <ul class="usp-list {{ classList }}">
+    {% if theme.product_usp_1 %}
+    {#<li><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_1 | t | raw }}</span></li> #}
+    <li><a data-trigger-fancy="fancy-modal-usp-1" data-fancy-id="fancy-modal-usp-2"><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_1 | t | raw }}</span></a></li>
+    {% endif %}
+    {% if theme.product_usp_2 %}
+    {#<li><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_2 | t | raw }}</span></li> #}
+    <li><a data-trigger-fancy="fancy-modal-usp-2" data-fancy-id="fancy-modal-usp-2"><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_2 | t | raw }}</span></a></li>
+    {% endif %}
+    {% if theme.product_usp_3 %}
+    {#<li><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_3 | t | raw }}</span></li> #}
+    <li><a data-trigger-fancy="fancy-modal-usp-3" data-fancy-id="fancy-modal-usp-3"><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_3 | t | raw }}</span></a></li> 
+    {% endif %}
+    {% if theme.product_usp_4 %}
+    {#<li><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_4 | t | raw }}</span></li> #}
+    <li><a data-trigger-fancy="fancy-modal-usp-4" data-fancy-id="fancy-modal-usp-4"><i class="icon-check-b mr-2"></i> <span class="">{{ theme.product_usp_4 | t | raw }}</span></a></li>
+    {% endif %}
+  </ul>
+
+{% elseif type == 'sidebar' %}
+
+  <div class="sidebar-usps rowmargin hidden-sm hidden-xs hidden-xxs">
+    {#<div class="title">{{ theme.sidebar_usps_title | t }}</div>#}
+    {#<ul>
+    {% if theme.product_usp_1 %}
+    <li><i class="fa fa-{{ theme.product_usp_1_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_1 | t }}</li>
+    {% endif %}
+    {% if theme.product_usp_2 %}
+    <li><i class="fa fa-{{ theme.product_usp_2_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_2 | t }}</li>
+    {% endif %}
+    {% if theme.product_usp_3 %}
+    <li><i class="fa fa-{{ theme.product_usp_3_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_3 | t }}</li>
+    {% endif %}
+    {% if theme.product_usp_4 %}
+    <li><i class="fa fa-{{ theme.product_usp_4_icon | trim('fa-') }}" aria-hidden="true"></i> {{ theme.product_usp_4 | t }}</li>
+    {% endif %}
+    </ul>#}
+      <ul>
+      {% if theme.usp1 %}
+      <li>{{ usp1icon | raw }} <h4>{{ theme.usp1 | t }}</h4> {{ theme.usp1_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp2 %}
+      <li>{{ usp2icon | raw }} <h4>{{ theme.usp2 | t }}</h4> {{ theme.usp2_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp3 %}
+      <li>{{ usp3icon | raw }} <h4>{{ theme.usp3 | t }}</h4> {{ theme.usp3_sub | t }}</li>
+      {% endif %}
+      {% if theme.usp4 %}
+      <li>{{ usp4icon | raw }} <h4>{{ theme.usp4 | t }}</h4> {{ theme.usp4_sub | t }}</li>
+      {% endif %}
+      </ul>
+  </div>
+
+{% elseif type == 'large_bar' %}
+
+  {% set amountUSPs = 0 %}
+  
+  {% if theme.usp1 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  {% if theme.usp2 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  {% if theme.usp3 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  {% if theme.usp4 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  
+  {% if amountUSPs == 4 %}
+    {% set usp_col_width = 3 %}
+  {% elseif amountUSPs == 3 %}
+    {% set usp_col_width = 4 %}
+  {% elseif amountUSPs == 2 %}
+    {% set usp_col_width = 6 %}
+  {% elseif amountUSPs == 1 %}
+    {% set usp_col_width= 12 %}
+  {% endif %}
+  
+  {% if amountUSPs > 0 %}
+  <div class="container usp-bar">
+    <div class="equal">
+    <div class="row table-row">
+      
+      {% if theme.usp1 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp1icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp1 | t }}</h4>
+          <span>{{ theme.usp1_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if theme.usp2 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp2icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp2 | t }}</h4>
+          <span>{{ theme.usp2_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if theme.usp3 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp3icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp3 | t }}</h4>
+          <span>{{ theme.usp3_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if theme.usp4 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp4icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp4 | t }}</h4>
+          <span>{{ theme.usp4_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+    </div>
+    </div>
+  </div>
+  {% endif %}
+
+{% else %}
+
+  {% set amountUSPs = 0 %}
+  
+  {% if theme.usp1 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  {% if theme.usp2 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  {% if theme.usp3 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  {% if theme.usp4 %}
+    {% set amountUSPs = amountUSPs+1 %}
+  {% endif %}
+  
+  {% if amountUSPs == 4 %}
+    {% set usp_col_width = 3 %}
+  {% elseif amountUSPs == 3 %}
+    {% set usp_col_width = 4 %}
+  {% elseif amountUSPs == 2 %}
+    {% set usp_col_width = 6 %}
+  {% elseif amountUSPs == 1 %}
+    {% set usp_col_width= 12 %}
+  {% endif %}
+  
+  {% if amountUSPs > 0 %}
+  <!-- <div class="{% if theme.show_slider and not theme.slider_fullwidth %}container{% else %}container-fluid{% endif %} usps {{ theme.usp_style }}">-->
+  <div class="container usps">
+    <div class="equal">
+    <div class="row table-row">
+      
+      {% if theme.usp1 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp1icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp1 | t }}</h4>
+          <span>{{ theme.usp1_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if theme.usp2 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp2icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp2 | t }}</h4>
+          <span>{{ theme.usp2_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if theme.usp3 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp3icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp3 | t }}</h4>
+          <span>{{ theme.usp3_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if theme.usp4 %}
+      <div class="col-sm-{{ usp_col_width }} usp-block">
+        <div class="icon highlight-txt">
+            {{ usp4icon | raw }}
+        </div>
+        
+        <div class="usp-content">
+          <h4>{{ theme.usp4 | t }}</h4>
+          <span>{{ theme.usp4_sub | t }}</span>
+        </div>
+      </div>
+      {% endif %}
+      
+    </div>
+    </div>
+  </div>
+  {% endif %}
+
+{% endif %}

@@ -1,0 +1,57 @@
+{% if product.discount_rules %}
+  {% for discount_rule in product.discount_rules %}
+    <div class="alert mt-1">
+      <strong>{{ discount_rule }}</strong>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if product.discounts %}
+<div class="product-discounts-holder mt-3">
+  <h5 class="">{{ 'Bulk discount' | t }}</h5>
+
+  <div class="dycarousel-container pos-relative">
+  <div class="product-discounts mt-1 gray-bg">
+    <div id="discount_{{ discount.quantity }}" class="product-discount{% if true %} active{% endif %}" data-quantity="1">
+      <span class="fz-085">{{ 'No discount' | t }}</span>
+      <div class="product-discount-block">
+        <i class="icon-check-b product-discount-radio"></i>
+        <div class="">
+        <strong>{{ '$1 Piece' | t(1) | raw }}</strong>
+        <div class="fz-090">
+          {% if vatSwitcherEnabled %}
+          <span class="price-incl"><span class="fd-piece-price">{{ productPriceIncl | money_without_currency }}</span></span>
+          <span class="price-excl"><span class="fd-piece-price">{{ productPriceExcl | money_without_currency }}</span></span>
+          {% else %}
+          <span class=""><span class="fd-piece-price">{{ productPrice | money_without_currency }}</span></span>
+          {% endif %}
+        </div>
+        </div>
+      </div>
+    </div>
+
+    {% for discount in product.discounts %}
+    <div id="discount_{{ discount.quantity }}" class="product-discount" data-quantity="{{ discount.quantity }}">
+      <span class="product-discount-percentage"><strong>{{ discount.percentage | percentage }}</strong> {{ 'Discount' | t }}</span>
+      <div class="product-discount-block">
+        <i class="icon-check-b product-discount-radio"></i>
+        <div class="">
+          <strong>{{ '$1 Pieces' | t(discount.quantity) | raw }}</strong>
+          <div class="fz-090">
+            {% if vatSwitcherEnabled %}
+            <span class="price-incl fd-piece-price">{{ discount.price.price_incl | money_without_currency }}</span>
+            <span class="price-excl fd-piece-price">{{ discount.price.price_excl | money_without_currency }}</span>
+            {% else %}
+            <span class="fd-piece-price">{{ discount.price | money_without_currency }}</span>
+            {% endif %}
+            
+            <span class="opacity-70">/ {{ 'Piece' | t }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  </div>
+</div>
+{% endif %}

@@ -1,0 +1,877 @@
+{% set metadata = {
+	id: product.id,
+	vid: product.vid,
+	variant: ((product.variant | lower) == "default" ? '' : product.variant),
+	title: (product.title),
+	price: (product.price),
+	image: ( product.image ? (product.image | url_image(imageSize)) : '')
+} | json_encode( constant('JSON_HEX_APOS') ) %}
+{# variant: ((product.variant | lower) == "default" ? '' : (product.variant | replace({"'": "#039;"}))),
+title: (product.title | replace({"'": "#039;"})), #}
+
+{% set productFeatures = {} %}
+{% set productAsABundle = 'bundle:' in product.data_01 | lower %}
+{% set productAsABundleType = ('shoplightspeed' in shop.domains.static) ? 'related' : theme.bundles_type %}
+
+{# Determine product title #}
+{% set productTitle = theme.show_fulltitle ? product.fulltitle : product.title %}
+
+{# determine specific stock status #}
+{% set stockText = 'In stock' %}
+{% set stockType = 'in-stock' %}
+
+{% if product.stock.track %}
+	{% if not product.stock.available and not product.stock.on_stock %}
+		{% set stockText = 'Out of stock' %}
+		{% set stockType = 'out-of-stock' %}
+	{% elseif product.stock.available and not product.stock.on_stock %}
+    {% set stockText = 'Backorder' %}
+		{% set stockType = 'backorder' %}
+	{% endif %}
+{% endif %}
+
+{# Product price determination #}
+{% set productPrice = (productAsABundle and product.bundles) ? product.bundles[0].price.price : product.price.price %}
+{% set productPriceIncl = (productAsABundle and product.bundles) ? product.bundles[0].price.price_incl : product.price.price_incl %}
+{% set productPriceExcl = (productAsABundle and product.bundles) ? product.bundles[0].price.price_excl : product.price.price_excl %}
+{% set priceOld = product.price.price_old %}
+{% set priceOldExcl = product.price.price_old_excl %}
+{% set priceOldIncl = product.price.price_old_incl %}
+
+{# Parse Data 01 parameters #}
+{% set labelText = false %}
+{% set timerVal = false %}
+{% set pricePromoText = false %}
+
+{% if product.data_01 != '' %}
+	{% set params = product.data_01 | split('|') %}
+	
+  {% for paramGroup in params %}
+		{% set param = paramGroup | split(':') %}
+		{% set option = param[0] | trim | lower %}
+		{% set value = (param[1] ?: param[0]) | trim %}
+
+		{% set productFeatures = productFeatures | merge({(option): value}) %}
+	{% endfor %}
+{% endif %}
+
+{% set bulk_variants = ((theme.b2b_product_bulk_variants or request.get.bulk_variants == 1) or productFeatures['bulk_variants']) and productFeatures['bulk_variants'] != 'false' and not request.get.native == 1 %}
+{% set first_spec = product.specs | first %} {# first product spec for procons #}
+
+
+{% set isPriceFrom = false %}
+{% set lowestPriceOld = product.price.price_old %}
+{% set lowestPriceOldExcl = product.price.price_old_excl %}
+{% set lowestPriceOldIncl = product.price.price_old_incl %}
+{% set lowestPrice = product.price.price %}
+{% set lowestPriceExcl = product.price.price_excl %}
+{% set lowestPriceIncl = product.price.price_incl %}
+{% set highestPrice = product.price.price %}
+{% set highestPriceExcl = product.price.price_excl %}
+{% set highestPriceIncl = product.price.price_incl %}
+
+{% if bulk_variants %}      
+  {% for variant in product.variants |sort((a, b) => a.price.price <=> b.price.price) %}
+    {% if loop.first %}
+      {% set lowestPrice = variant.price.price %}
+      {% set lowestPriceExcl = variant.price.price_excl %}
+      {% set lowestPriceIncl = variant.price.price_incl %}
+      {% set lowestPriceOld = variant.price.price_old %}
+      {% set lowestPriceOldExcl = variant.price.price_old_excl %}
+      {% set lowestPriceOldIncl = variant.price.price_old_incl %}
+    {% endif %}
+
+    {% if loop.last %}
+      {% set highestPrice = variant.price.price %}
+    {% endif %}
+  {% endfor %}
+
+  {% set isPriceFrom = highestPrice != lowestPrice %}
+{% endif %}
+
+{# --- calculator data --- #}
+{% set capacity = product.description | split('[capacity]')[1] %}
+
+{% set calculator = false %}
+{% if capacity %}
+	{% set calculator = true %}
+	{% set product = product | merge({ 'description': product.description | split('[description]')[1] }) %}
+{% endif %}
+
+{% if calculator %}
+{% include 'snippets/product-calculator.rain' with {'value': capacity} %}
+{% endif %}
+
+{% if not productAsABundle and theme.enable_sticky_addtocart and product.stock.available %}
+<div class="addtocart-sticky">
+  <div class="container d-flex align-items-center">
+      
+      <img src="{{ product.image | url_image(imageThumbSize) }}" alt="" height="{{ squareProductImages ? '42' : '48' }}" width="42" class="margin-right-15"> 
+      <h5 class="title d-none d-sm-block">{{ productTitle }}</h5>
+      
+      <div class="sticky-price flex-grow-1 text-right margin-right-15 nowrap">
+        {% if priceOld %}
+          {% if vatSwitcherEnabled %}
+            <span class="price-old price-incl">{{ (isPriceFrom ? lowestPriceOldIncl : priceOldIncl) | money_without_currency }}</span>
+            <span class="price-old price-excl">{{ (isPriceFrom ? lowestPriceOldExcl : priceOldExcl) | money_without_currency }}</span>
+          {% else %}
+            {{ (isPriceFrom ? lowestPriceOld : priceOld) | money_without_currency }}
+          {% endif %}        
+        	{% if shopLegalMode == 'strict' %}{{ 'SRP' | t }}{% endif %}
+        {% endif %}
+        
+        {% if vatSwitcherEnabled %}
+          <span class="price price-incl ml-1 bold fz-120">{{ (isPriceFrom ? lowestPriceIncl : productPriceIncl) | money_without_currency }}</span>
+          <span class="price price-excl ml-1 bold fz-120">{{ (isPriceFrom ? lowestPriceExcl : productPriceExcl) | money_without_currency }}</span>
+        {% else %}
+          <span class="price bold fz-120">{{ (isPriceFrom ? lowestPrice : productPrice) | money_without_currency }}</span> <span class="fz-080 vat-text">{{ (shop.b2b ? 'Excl. VAT' : 'Incl. VAT') | t }}</span>
+        {% endif %}
+      </div>
+      
+      <a data-metadata='{{ metadata | raw }}' href="{{ ('cart/add/' ~ product.vid) | url }}" class="button button-cta button-medium trigger-add-to-cart nowrap" data-title="{{ product.title }}" data-price="{{ product.price.price | money_without_currency }}" data-variant="{{ product.variant }}" data-image="{{ product.image | url_image(imageSize) }}">{#<i class="fa fa-{{ theme.cart_icon }}"></i> #}<span class="d-none d-sm-block">{{ 'Add to cart' | t }}</span><i class="icon-{{ theme.cart_icon }} d-block d-sm-none fz-180"></i></a>
+    
+  </div>
+</div>
+{% endif %}
+
+<div class="container productpage">
+  
+  <div class="fz-150 font-headings d-md-none">{{ productTitle }}</div>
+  <div class="title-appendix d-flex d-md-none mb-3 align-items-center">
+    {% if product.brand and theme.show_product_brands %}
+    <a href="{{ product.brand.url | url }}" class="brand-label">{{ product.brand.title }}</a>
+    <div class="v-sep"></div>
+    {% endif %}
+    {% if theme.yotpo_id %}
+      <div data-scrollview-id="reviews" data-scrollview-offset="-150" class="yotpo bottomLine html_content" data-appkey="{{ theme.yotpo_id }}" data-domain="{{ shop.domain }}" data-product-id="{{ product[theme.yotpo_product_identifier] }}" data-product-models="{{ product.id }}" data-name="{{ product.title }}" data-url="{{ product.url | url }}" data-image-url="{{ product.image | url_image }}" data-description="{{ product.description }}" data-bread-crumbs="{{ breadcrumb.title }}"></div>
+    {% elseif theme.setting_reviews %}
+        <div class="stars mr-1">
+          <!--
+          {% for i in 1..5 %}
+            --><i class="icon-star-s {{ i > ((product.score * 5) | round) ? 'star-empty' : 'star-fill' }}"></i><!--
+          {% endfor %}
+          -->
+        </div>
+        <a href="#reviews" data-scrollview-id="reviews" data-scrollview-offset="-150" class="highlight-txt fz-090"> ({{ product.reviews | length }})</a>
+    {% endif %}            
+  </div>
+  
+  <div class="content-box">
+  
+  <div class="row">    
+    <div class="col-12 col-md-{% if productFeatures['bundle'] %}5{% else %}6{% endif %} productpage-left">
+      <div class="{% if theme.product_image_gray_overlay %}gray-overlay gray-overlay-lighter{% endif %}" id="product-image-holder">
+        <div id="swiper-productimage" class="swiper-container product-image">
+          <div class="swiper-wrapper">
+            {% for image in product.images %}
+              <div class="swiper-slide zoom" data-src="{{ image | url_image('', productTitle) }}" data-fancybox="product-images">
+                
+                <img {% if not loop.first %}data-{% endif %}src="{{ image | url_image(imageLargeSize, productTitle) }}" width="{{ imgLargeWidth }}" height="{{ imgLargeHeight }}" class="{% if not loop.first %}swiper-lazy {% endif %}img-responsive" data-src-zoom="{{ image | url_image('', productTitle) }}" alt="{{ productTitle }}"> 
+                
+              </div>
+            {% else %}
+              <div class="swiper-slide zoom">
+                <img src="{{ imagePlaceholder }}" width="{{ imgLargeWidth }}" height="{{ imgLargeHeight }}" class="img-responsive" alt="{{ productTitle }}"> 
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% if product.images | length> 1 %}
+        <div class="swiper-pagination d-md-none"></div>
+        {% endif %}
+        
+      {% if productFeatures['tag_label'] %}
+        <div id="pp-tag-label" class="price-promo-text">
+          {{ productFeatures['tag_label'] | t }}
+        </div>
+      {% elseif productFeatures['label'] and false %}
+        <div id="pp-tag-label" class="product-label highlight-bg">
+          {{ productFeatures['label'] | t }}
+        </div>
+      {% endif %}
+      {% if shop.settings.wish_list %}
+        <a href="{{ ('account/wishlistAdd/' ~ product.id ~ '?variant_id=' ~ product.vid) | url }}" class="product-block-wishlist d-sm-none d-md-block d-lg-none">
+        	<i class="">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" xml:space="preserve" width="24" height="24"><path d="M16.387 10.282H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 4.06H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 3.827H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467z"/><path d="M19.14 4.029H15.967v-0.513c0 -0.206 -0.167 -0.373 -0.373 -0.373h-1.569C13.771 2.666 13.156 1.818 12 1.818s-1.771 0.848 -2.025 1.324h-1.569c-0.206 0 -0.373 0.167 -0.373 0.373v0.513H4.86c-0.206 0 -0.373 0.167 -0.373 0.373v17.407c0 0.206 0.167 0.373 0.373 0.373h14.28c0.206 0 0.373 -0.167 0.373 -0.373V4.402c0 -0.206 -0.167 -0.373 -0.373 -0.373zm-10.173 0.047h1.373c0.158 0 0.3 -0.1 0.352 -0.249l0.022 -0.062c0.004 -0.01 0.367 -1.013 1.286 -1.013 0.903 0 1.269 0.964 1.287 1.014l0.021 0.061a0.373 0.373 0 0 0 0.352 0.249h1.373v1.26H8.967v-1.26zm9.613 17.173H5.42V4.962h2.613v0.933c0 0.206 0.167 0.373 0.373 0.373h7.187c0.206 0 0.373 -0.167 0.373 -0.373v-0.933h2.613v16.287z"/></svg>
+          </i>
+        </a>
+      {% endif %}
+      </div>
+        
+        {% if product.images | length> 1 %}
+        <div class="d-none d-md-flex product-thumbs justify-content-center">
+          <i class="icon-arrow-left swiper-arrow thumb-arrow-left"></i>
+          <div id="swiper-product-thumbs" class="swiper-container zflex-grow-1 mx-3">
+            <div class="swiper-wrapper" style="padding-top:1px; padding-bottom:1px;">
+              {% for image in product.images %}
+              <div class="swiper-slide product-thumb grsay-overlay{% if loop.index == 1 %} active{% endif %}">
+                {#<img src="{{ image | url_image( (squareProductImages ? '85x85x2' : '85x95x2'), productTitle) }}" alt="{{ productTitle }}" height="{{ squareProductImages ? '85' : '95' }}" width="85" class="product-thumb-img"{% if loop.index > 1 %} loading="lazy"{% endif %}>#}
+                <img src="{{ image | url_image(imageThumbSize, productTitle) }}" alt="{{ productTitle }}" height="{{ imgThumbHeight }}" width="{{ imgThumbWidth }}" class="product-thumb-img"{% if loop.index > 1 %} loading="lazy"{% endif %}>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <i class="swiper-arrow thumb-arrow-right icon-arrow-right"></i>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-12 col-md-{{ productFeatures['bundle'] ? '7' : '6' }} zzproductpage-right {% if not productFeatures['bundle'] %} productpage-summary-right{% endif %} mt-3 mt-md-0">
+
+      <!-- start offer wrapper -->
+      <div class="offer-holder {% if theme.navigation_mode == 'menubar' and theme.compact_navbar %}offer-holder-stcky-navbar-compact{% elseif theme.navigation_mode == 'menubar' %}offer-holder-stcky-navbar{% endif %}">
+          
+        	<div class="title-appendix d-none d-md-flex align-items-center">
+            {% if product.brand and theme.show_product_brands %}
+            <a href="{{ product.brand.url | url }}" class="brand-label">{{ product.brand.title }}</a>
+            <div class="v-sep"></div>
+            {% endif %}
+            {% if theme.yotpo_id %}
+              <div data-scrollview-id="reviews" data-scrollview-offset="-150" class="yotpo bottomLine html_content" data-appkey="{{ theme.yotpo_id }}" data-domain="{{ shop.domain }}" data-product-id="{{ product[theme.yotpo_product_identifier] }}" data-product-models="{{ product.id }}" data-name="{{ product.title }}" data-url="{{ product.url | url }}" data-image-url="{{ product.image | url_image }}" data-description="{{ product.description }}" data-bread-crumbs="{{ breadcrumb.title }}"></div>
+            {% elseif theme.setting_reviews %}
+<!--             <div class="reviewscore lh-1">               -->
+                <div class="stars mr-1">
+                  <!--
+                  {% for i in 1..5 %}
+                    --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : 'star-fill' }}"></i><!--
+                  {% endfor %}
+                  -->
+                </div>
+                <a href="#reviews" data-scrollview-id="reviews" data-scrollview-offset="-150" class="highlight-txt d-none d-md-inline fz-090">
+                  {{ product.reviews | length == 1 ? ('1 review' | t) : '$1 reviews' | t(product.reviews | length) }}
+              	</a>
+<!--             </div> -->
+            {% endif %}            
+          </div>
+          
+          <h1 class="d-none d-md-block">{{ productTitle }}</h1>
+
+  <div class="product-price" {% if 'bundle:' in product.data_01 | lower %} style="display:none;"{% endif %}>
+
+    <div class="inner mt-1">
+      <div class="d-flex align-items-center flex-grow-1 flex-wrap lh-110">        
+        {% if isPriceFrom %}
+      		<span class="mr-2">{{ 'From $1' | t('999') | replace({' 999': ''}) }}</span>
+        {% endif %}
+        
+    {% if product.price.price_old %}
+    	<div class="price-old fz-110 opacity-90 mr-2">
+        {% if vatSwitcherEnabled %}
+        	<span class="price-incl">{{ (isPriceFrom ? lowestPriceOldIncl : priceOldIncl) | money_without_currency }}</span>
+          <span class="price-excl">{{ (isPriceFrom ? lowestPriceOldExcl : priceOldExcl) | money_without_currency }}</span>
+        {% else %}
+          {{ (isPriceFrom ? lowestPriceOld : priceOld) | money_without_currency }}
+        {% endif %}
+  		</div>
+      {% if shopLegalMode == 'strict' %}<span class="opacity-70 fz-090 mr-2 ml-n1">{{ 'SRP' | t }}</span>{% endif %}
+    {% endif %}
+    
+    <div class="">
+      {% if vatSwitcherEnabled %}
+        <span class="price price-incl">{{ (isPriceFrom ? lowestPriceIncl : productPriceIncl) | money_without_currency }}</span>
+        <span class="price price-excl">{{ (isPriceFrom ? lowestPriceExcl : productPriceExcl) | money_without_currency }}</span>
+      	<span class="fz-080 price-incl vat-text">{{ 'Incl. VAT' | t }}</span>
+      	<span class="fz-080 price-excl vat-text">{{ 'Excl. VAT' | t }}</span>
+      {% else %}
+      	<span class="price">{{ (isPriceFrom ? lowestPrice : productPrice) | money_without_currency }}</span> <span class="fz-080 pd vat-text">{{ (shop.b2b ? 'Excl. VAT' : 'Incl. VAT') | t }}</span>
+      {% endif %}
+    </div>
+        
+        {% if shopLegalMode == 'strict' %}
+        <div class="price-strict flex-basis-100 fz-080">* {{ exclShipping | raw }}</div>
+        {% endif %}
+
+        {% if product.unit and shop.settings.price_per_unit and product.unit.unit %}
+          <div class="unit-price flex-basis-100">
+            {{ 'Unit price' | t }}: {{ product.unit.price | money_without_currency }} {% if vatSwitcherEnabled %}<span class="unit-vat-text">{{ (shop.b2b ? 'Excl. VAT' : 'Incl. VAT') | t }}</span>{% endif %} / {{ product.unit.unit }}
+          </div>
+        {% endif %}
+      </div>
+      {% if theme.keep_stock %}
+      <div class="c-{{ stockType }} bold nowrap">{% if stockType == 'in-stock' %}<i class="icon-check-b"></i> {% endif %}{{ stockText | t }}{% if theme.show_stock_levels and product.stock.level > 0 %} ({{ product.stock.level }}){% endif %}</div>
+      {% endif %}
+    </div>
+
+{% if theme.inventory_per_location or request.get.inventory_location == 'true' %}
+    <div class="d-flex justify-content-end">
+<a href="{{ ('product-inventory/?id=' ~ product.vid) | url }}" class="store-stock trigger-live-modal d-inline-block" data-modal="fancy-stock-location" data-json-url="{{  ('product-inventory/?id=' ~ product.vid) | url }}&format=json" data-hook-onload="productStoreInventoryLoaded"><span class="underlined">{{ 'Available in store' | t }}</span> <i class="icon-question-l"></i></a>
+    </div>
+{% endif %}
+    
+  </div>
+        
+    {% if productFeatures['timer'] and theme.countdowns_enabled %}
+    <div class="product-deal-timer">
+      <h3 class="headline-fancy flex-grow-1">{{ theme.product_countdown_title | t }}</h3>
+      <div class="countdown-holder flex-grow-1 justify-self-start">
+        <div class="countdown-main-{{ product.id }} countdown-block tiny countdown-right" data-countdown="{{ productFeatures['timer'] }}"></div>
+      </div>
+    </div>
+    {% endif %}
+          
+    {% if product.description %}
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="product-description">
+          <p>
+            {{ product.description }}
+            {% if product.content %}
+            <a href="#information" data-scrollview-id="information" data-scrollview-offset="-190"><span class="underlined">{{ 'Read more' | t }}</span>.</a>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+        
+    {# Product discounts modules #}
+    {% include 'snippets/product-discounts.rain' %}
+
+  {# product form #}
+  {% if bulk_variants %}
+      {% include 'snippets/product-bulk-form.rain' %}
+  {% else %}
+        
+    {% if productFeatures['bundle'] %}
+      {% include 'snippets/product-as-bundle.rain' %}
+    {% endif %}
+      
+    {% if not request.get.dev %}
+        
+        <form action="{{ ('cart/add/' ~ product.vid) | url }}" id="product_configure_form" method="post" class="actions d-flex{% if page.account %} justify-between{% endif %} {% if ('horizontal' in theme.show_variations_horizontally) or (theme.show_variations_horizontally == 'blocks') %} hide-variant-dropdown{% endif %}">
+          {# Set showInput variable true and change if html_product_configure if added - added by Emma 06-04-2021 #}
+          {% set showInput = true %}
+          {% if product.options or product.variants or product.custom %}
+            <div class="variations">
+              {#{% if product.variants %}<div class="heading">{{ 'Selecteer een variant' | t }} -<span class="light">{{ product.variant }}</span></div>{% endif %}#}
+              {% if (theme.show_variations_horizontally == 'horizontal' or theme.show_variations_horizontally == 'horizontal-no-scroll' ) %}
+                {% if product.options and not product.variants %} {# 'and not product.variants' added by connie 24-02-2021 #}
+              		{% set showInput = false %}
+                  <div class="variationswrap blocks pos-r{% if theme.show_variations_horizontally == 'horizontal-no-scroll' %} no-scroll{% endif %}">
+                    {{ product | html_product_configure | raw }}
+                  </div>
+                {% elseif ( (product.variants | length) > 1 ) %}
+                  <div class="variationswrap pos-r{% if theme.show_variations_horizontally == 'horizontal-no-scroll' %} no-scroll{% endif %}">
+                    <ul class="buttons">
+                      {% for variant in product.variants %}
+                        <li class="{% if not variant.stock.available %}unavailable{% elseif variant.id == product.vid %}selected{% elseif variant.id != product.vid%}not-selected{% endif %}">
+                          <a href="{{ ( product.url ~ '?id=' ~ variant.id) | url }}" title="{{ variant.title }}">
+                            {# only shorten the variantion if product has mutliple variables #}
+                            {% set count = variant.title | split(':') | length - 1 %}
+                            {% if count < 2 %}
+                              {{ variant.title | split(':') | last }}
+                            {% else %}
+                              {{ variant.title }}
+                            {% endif %}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              	{# {% if product.custom and not product.options %} #}
+                {% if product.custom %} {# if statement added by connie 24-02-2021 #}
+              		{% set showInput = false %}
+              		<div class="custom-only">
+                  	{{ product | html_product_configure | raw }}
+              		</div>
+                {% endif %}
+              {% elseif theme.show_variations_horizontally == 'blocks' %}
+              	<div class="image-variants pos-r">
+              		<div class="variant-blocks owl-carousel">
+                    {% for variant in product.variants %}
+                      <div class="item {% if not variant.stock.available %}unavailable{% elseif variant.id == product.vid %}selected{% elseif variant.id != product.vid%}not-selected{% endif %}">
+                        <a href="{{ ( product.url ~ '?id=' ~ variant.id) | url }}" {% if not variant.image %}class="text-variant"{% endif %}>
+                          {% if variant.image %}
+                            <div class="image-outer"><img class="lazy" height="320" src="{{ 'lazy-preload.jpg' | url_asset }}" data-src="{{ variant.image | url_image(('500x500x2'), variant.title) }}" alt="{{ variant.title }}">{% if not variant.stock.available %}<div class="line"></div>{% endif %}</div>
+                          {% else %}
+                            {% if variant.title | length > 6 %}
+                              <div class="image-outer"><span>{{ variant.title | limit(6) }}...</span>{% if not variant.stock.available %}<div class="line"></div>{% endif %}</div>
+                            {% else %}
+                              <div class="image-outer"><span>{{ variant.title }}</span>{% if not variant.stock.available %}<div class="line"></div>{% endif %}</div>
+                            {% endif %}
+                          {% endif %}
+                          <p>{{ variant.title }}</p>
+                        </a>
+                      </div>
+                    {% endfor %}
+                  </div>
+              	</div>
+              	{% if product.custom or product.options %}
+              		{% set showInput = false %}
+                  {{ product | html_product_configure | raw }}
+                {% endif %}
+              {% else %} {# dropdown #}
+              	{% if product.options or product.variants or product.custom %}
+              		{% set showInput = false %}
+              		{#{% if request.get.dev %}#}
+                    {% include 'snippets/product-configure.rain' %}
+                  {#{% else %}
+                    {{ product | html_product_configure | raw }}
+                  {% endif %}#}
+                {% endif %}
+              {% endif %}
+            </div>
+          {% endif %}
+          
+          {# Show input if the html_product_configure is not present #}
+          {% if showInput %}
+            <input type="hidden" name="bundle_id" id="product_configure_bundle_id" value="">
+          {% endif %}
+          
+          {% if theme.bulk_discount_above_addtocart == 'above' %}
+           {% if product.discounts or product.discount_rules %}
+              <div class="staffel">
+                <div class="heading">{{ 'Bulk discount' | t }} {#<span>{{ 'Enjoy these awesome discount deals' | t }}</span>#}</div>
+                <ul class="group{% if product.discounts|length < 2 %} single {% endif %}">
+                  {% for discount in product.discounts %}
+                  	{% set quantity = '<b>' ~ discount.quantity ~ '</b>' %}
+                  	{% set price = '<b>' %}
+                      {% if theme.show_currencies %}{% set price = price ~ shop.currency2.symbol %}{% endif %}
+                      {% set price = price ~ discount.price.price | money_without_currency | replace({',00':',-'}) %}
+                  	{% set price = price ~ '</b>' %}
+                    <li><span>{% if discount.percentage > 0 %}-{% endif %}{{ discount.percentage * 100 }}%</span> {{ 'Bestel' | t }} {{ quantity | raw }} {{ 'Voor' | t | lower }} <b>{{ price | raw }}</b> {{ 'p/st' | t | lower }}</li>
+                  {#<li><span>{% if discount.percentage > 0 %}-{% endif %}{{ discount.percentage * 100 }}%</span> {{ 'Order' | t }} {{ quantity | raw }} {{ 'For only' | t | lower }} <b>{{ price | raw }}</b> {{ 'Per piece' | t | lower }}</li>#}
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+          {% endif %}
+
+          <div class="row">
+        <div id="add-to-cart-holder" class="col-md-12 mt-4 d-flex align-items-center addtocart-holder">
+          <div class="qty qty-large" data-type="global" data-id="mainproduct">
+            <input id="product-quantity" type="number" inputmode="numeric" name="quantity" class="qty-input qty-fast" value="{{ product.stock.minimum ?: 1 }}" data-min="{{ product.stock.minimum ?: 1 }}">
+            <i class="icon-angle-up qty-button qty-button-up" data-type="up"></i>
+            <i class="icon-angle-down qty-button qty-button-down" data-type="down"></i>
+          </div>
+
+          <button data-metadata='{{ metadata | raw }}' id="add-to-cart-button" type="submit" name="addtocart" class="ml-3 fz-110 p-0 w-100 trigger-add-to-cart button button-cta add-to-cart-button" data-vid="{{ product.vid }}" data-title="{{ product.title }}" data-variant="{{ product.variant }}" data-price="{{ product.price.price | money_without_currency }}" data-price-incl="{{ product.price.price_incl | money_without_currency }}" data-price-excl="{{ product.price.price_excl | money_without_currency }}" data-image="{{ product.image | url_image(imageThumbSize) }}"{% if product.related %} data-has-related="true"{% endif %}>
+            <span class="button-content">
+              <span class="flex-grow-1 align-self-center px-3">{{ 'Add to cart' | t }}</span>
+              <span class="button-icon">
+                <i class="px-3 icon-{{ theme.cart_icon }}"></i>
+              </span>
+            </span>
+          </button>
+          {% if shop.settings.wish_list %}
+          <a href="{{ ('account/wishlistAdd/' ~ product.id ~ '?variant_id=' ~ product.vid) | url }}" class="d-none d-sm-flex d-md-none d-lg-flex ml-3 align-self-stretch align-items-center">
+            {#<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" width="24" height="24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+            </svg>#}
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" xml:space="preserve" width="24" height="24"><path d="M16.387 10.282H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 4.06H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467zm0 3.827H7.613c-0.258 0 -0.467 -0.209 -0.467 -0.467 0 -0.258 0.209 -0.467 0.467 -0.467h8.773c0.258 0 0.467 0.209 0.467 0.467 0 0.258 -0.209 0.467 -0.466 0.467z"/><path d="M19.14 4.029H15.967v-0.513c0 -0.206 -0.167 -0.373 -0.373 -0.373h-1.569C13.771 2.666 13.156 1.818 12 1.818s-1.771 0.848 -2.025 1.324h-1.569c-0.206 0 -0.373 0.167 -0.373 0.373v0.513H4.86c-0.206 0 -0.373 0.167 -0.373 0.373v17.407c0 0.206 0.167 0.373 0.373 0.373h14.28c0.206 0 0.373 -0.167 0.373 -0.373V4.402c0 -0.206 -0.167 -0.373 -0.373 -0.373zm-10.173 0.047h1.373c0.158 0 0.3 -0.1 0.352 -0.249l0.022 -0.062c0.004 -0.01 0.367 -1.013 1.286 -1.013 0.903 0 1.269 0.964 1.287 1.014l0.021 0.061a0.373 0.373 0 0 0 0.352 0.249h1.373v1.26H8.967v-1.26zm9.613 17.173H5.42V4.962h2.613v0.933c0 0.206 0.167 0.373 0.373 0.373h7.187c0.206 0 0.373 -0.167 0.373 -0.373v-0.933h2.613v16.287z"/></svg>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+          
+      {% if calculator %}
+        <a 
+       		href="javascript:;" 
+         	onclick="$('.product-calculator').toggleClass('active')"
+         	class="button_light w-100 mt-2"
+       	>
+        	{{ 'Bereken aantal stuks' | t }}
+          <svg 
+         		xmlns="http://www.w3.org/2000/svg" 
+           	fill="none" 
+           	viewBox="0 0 24 24" 
+           	stroke-width="1.5" 
+           	stroke="currentColor" 
+           	class="w-6 h-6"
+         	>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </a>
+      {% endif %}
+  	</form>
+      
+      {% set delivery_timer_time = theme['delivery_timer_day_'~('now' | date('N'))] %}
+      {% set delivery_timer_datetime = delivery_timer_time ? ('now' | date('M'))~' '~('now' | date('d'))~', '~('now' | date('Y'))~' '~delivery_timer_time : null %}
+      
+      {% set use_custom_delivery_text = false %}
+      
+      {# if theme.product_show_custom_delivery == 'always' #}
+      {% if theme.show_delivery_time == 'custom' %}
+      	{% set use_custom_delivery_text = true %}
+      {# elseif theme.product_show_custom_delivery == 'instock' and product.stock.available #}
+      {% elseif theme.show_delivery_time == 'custom_if_stock' and product.stock.available %}
+      	{% set use_custom_delivery_text = true %}
+      {# elseif theme.product_show_custom_delivery == 'instock_condition' and product.stock.available and product.stock.delivery.title #}
+      {% elseif theme.show_delivery_time == 'custom_if_stock_condition' and product.stock.available and product.stock.delivery.title %}
+      	{% set use_custom_delivery_text = true %}
+      {% endif %}
+      
+      {% set delivery_time_text = use_custom_delivery_text ? (theme.delivery_time_text | t) : product.stock.delivery.title %}
+      {% set show_delivery_time = ((theme.delivery_countdown_timer_enabled and not bulk_variants) or product.stock.delivery.title or use_custom_delivery_text) %}
+      
+      {% if not product.stock.available and theme.product_hide_delivery_outofstock %}
+      	{% set show_delivery_time = false %}
+      {% endif %}
+      
+      {% if productAsABundle and not product.stock.available %}
+      	{% set show_delivery_time = false %}
+      {% endif %}
+      
+     {# {% if show_delivery_time %}
+      <div class="product-deliverytime d-flex align-items-center mt-3 w-100 delivery-{{ stockType }}" data-delivery-timer-time="{{ delivery_timer_time }}">
+        <i class="icon-truck fz-200 mr-2"></i>
+        <div class="deliverytime-content lh-110">
+          
+          <div class="delivery-time-text" data-original-delivery-title="{{ delivery_time_text }}" data-hide-expired="{{ theme.delivery_countdown_hide_expired ? 'true' : 'false' }}">
+            {% if theme.delivery_countdown_timer_enabled and not bulk_variants and product.stock.available and theme.dyapps_addons_enabled and delivery_timer_time %}
+              {{ theme.delivery_countdown_text | t('<span id="delivery-timer-'~product.id~'" data-product="'~product.id~'" class="product-delivery-timer highlight-bg" data-time-end="'~delivery_timer_time~'" data-datetime-end="'~delivery_timer_datetime~'">00:00:00</span>') | raw }}
+            {% else %}
+            	{% set deliveryTime = delivery_time_text | split('[SPLIT]') %}
+            	{#{{ delivery_time_text }} #}
+        {#    	{{deliveryTime[0] | raw }}#}
+            {#{% endif %}
+          </div>
+          
+        </div>
+      </div>#}
+      {#{% endif %} #} {# end delivery time #}
+        
+    {% if show_delivery_time %}
+    	<div class="product-deliverytime d-flex align-items-center mt-3 w-100 delivery-{{ stockType }}" data-delivery-timer-time="{{ delivery_timer_time }}">
+        <i class="icon-truck fz-200 mr-2"></i>
+        <div class="deliverytime-content lh-110">
+            <div class="delivery-time-text" data-original-delivery-title="{{ delivery_time_text }}" data-hide-expired="{{ theme.delivery_countdown_hide_expired ? 'true' : 'false' }}">
+              <a data-trigger-fancy="fancy-modal-usp-1" data-fancy-id="fancy-modal-usp-2">
+                {% if theme.delivery_countdown_timer_enabled and not bulk_variants and product.stock.available and theme.dyapps_addons_enabled and delivery_timer_time %}
+                    {{ theme.delivery_countdown_text | t('<span id="delivery-timer-'~product.id~'" data-product="'~product.id~'" class="product-delivery-timer highlight-bg" data-time-end="'~delivery_timer_time~'" data-datetime-end="'~delivery_timer_datetime~'">00:00:00</span>') | raw }}
+                {% else %}
+                    {% set now = "now"|date("l H:i") %}
+                    {% set currentDay = now|date("l") %}
+                    {% set currentTime = now|date("H:i") %}
+                    {% set fridayStart = "Friday 16:00" %}
+                    {% set mondayEnd = "Monday 00:00" %}
+                    {% if currentDay == "Friday" and currentTime >= "16:00" or currentDay == "Saturday" or currentDay == "Sunday" or currentDay == "Monday" and currentTime < "00:00" %}
+                        {{ "Vandaag besteld, dinsdag in huis" | t }}
+                    {% else %}
+                        {% set deliveryTime = delivery_time_text | split('[SPLIT]') %}
+                        {{ deliveryTime[0] | raw }}
+                    {% endif %}
+                {% endif %}
+                </a>
+            </div> 
+        	</div>
+    		</div>
+				{% endif %}
+
+        
+        
+      
+      {% if theme.product_custom_detail_position == 'below_delivery_bottom' %}
+      	{% include 'snippets/product-custom-details.rain' %}
+      {% endif %}
+      
+      <div class="d-flex align-items-center mt-2 product-sub-links">
+      	{% if true %}<a href="{{ ('compare/add/' ~ product.vid) | url }}" class="product-sub-link">{{ 'Add to compare' | t }}</a>{% endif %}
+        <div class="v-sep"></div>
+        {% if theme.show_social_share %}
+        <a href="#" class="product-sub-link share-button" data-title="{{ productTitle }}" data-url="{{ product.url | url }}">{{ 'Share this product' | t }} <i class="icon-share"></i></a>
+        {% endif %}
+      </div>
+      
+    </form>
+		
+    {% endif %}
+  
+	{% endif %} {# end variant as bulk #}
+        
+        {% if theme.usps_on_product_page %}
+          {% include 'snippets/usps.rain' with {'type': 'list', 'classList': 'mt-4' } %}
+        {% endif %}
+      </div>
+      <!-- end offer wrapper -->      
+    </div>
+    
+  </div>
+
+	{% if request.get.usps == 'bar' %}
+	<div class="row rowmargin">
+      <div class="col-md-12">
+				{% include 'snippets/usps.rain' with {'type': 'large_bar' } %}
+    </div>
+	</div>
+	{% endif %}
+    
+  {% set hasProCons = false %}
+
+	<div class="{# row #}col-12 {% if hasProCons %}mt-1 {% else %}mt-4 mt-md-5{% endif %} product-details">
+    <div class="row">
+      <div class="col-md-7 info-left">
+
+        <div class="mt-2 mt-md-4 active" id="information">
+          <h3 class="pp-section-title toggle-title toggle-title-md gray-border-bottom-lte-md py-2 mb-2 py-md-0 mb-md-2">
+            {{ 'Product description' | t }}
+          </h3>
+
+          <div class="toggle-content toggle-content-md content">
+
+    {% for spec in product.specs if spec.title in ['pros', 'cons'] and spec.value %}
+      {% if loop.first %}
+        {% set hasProCons = true %}
+        <div class="p-2 gray-bg mb-3 pos-relative"><div class="horizontal-scroller d-flex procon-carousel">
+      {% endif %}
+
+      {% set specValues = spec.value | split(';') %}
+
+      {% for specValue in specValues %}
+        <div class="product-procon d-flex align-items-center">
+          <i class="procon-icon white mr-2 {{ (spec.title | lower) == 'pros' ? 'icon-check-b bg-success' : 'icon-x bg-non-success'}}"></i> {{ specValue }}
+        </div>
+      {% endfor %}
+    {% endfor %}
+    {% if hasProCons %}</div></div>{% endif %}
+
+            {% if not product.content %}
+              <p>{{ 'No information found' | t }}<p>
+            {% else %}
+              {{ product.content | raw }}
+            {% endif %}
+          </div>
+        </div>
+
+
+        {% include 'snippets/product-specifications.rain' with {'type': 'embed'} %}
+
+        {# if product.specs or (product.code and theme.product_show_articlecode and productFeatures['group_by'] != 'code') or (product.ean and theme.product_show_ean and productFeatures['group_by'] != 'ean') or (product.sku and theme.product_show_sku and productFeatures['group_by'] != 'sku') %}
+          <div class="mt-0 mt-md-4" id="specifications">
+            <h3 class="pp-section-title toggle-title toggle-title-md gray-border-bottom-lte-md py-2 mb-2 py-md-0 mb-md-2">{{ 'Specifications' | t }}</h3>
+            <div id="product-specs-holder" class="toggle-content toggle-content-md content">
+              <div class="content-fold-overflow">
+                {% include 'snippets/product-specifications.rain' with {'limit': 60} %}
+              </div>
+            </div>
+          </div>
+        {% endif #}
+
+        {% if theme.setting_reviews or theme.yotpo_id %}
+        <div class="product-reviews mt-0 mt-md-4" id="reviews">        
+          <h3 class="pp-section-title toggle-title toggle-title-md gray-border-bottom-lte-md py-2 mb-2 py-md-0 mb-md-2">
+            <span class="d-flex flex-grow-1 justify-content-between">
+              {{ 'Reviews' | t }}
+              <span class="review-stars mr-1 d-inline-block d-md-none">
+                {% if not theme.yotpo_id %}
+                  <span class="stars">
+                  <!--
+                  {% for i in 1..5 %}
+                    --><i class="icon-star-s {{ i > (product.score * 5) ? 'star-empty' : 'star-fill' }}"></i><!--
+                  {% endfor %}
+                  -->
+                  </span>
+                {% endif %}
+              </span>
+            </span>
+          </h3>
+          <div class="toggle-content toggle-content-md">
+            {% if theme.yotpo_id %}
+            <div class="yotpo yotpo-main-widget"
+              data-product-id="{{ product[theme.yotpo_product_identifier] }}"
+              data-name="{{ product.title }}"
+              data-url="{{ product.url | url }}"
+              data-image-url="{{ product.image | url_image }}"
+              data-description="{{ product.description }}"
+              data-product-spec-sku="{{ product.sku }}"
+              data-product-spec-ean="{{ product.ean }}">
+            </div>
+            {% else %}
+              {% include 'snippets/product-reviews.rain' with {'limit': 3} %}
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+        <div class="col-md-5 info-right">
+
+        {# set hasProCons = false %}
+
+        {% for spec in product.specs if spec.title in ['pros', 'cons'] and spec.value %}
+          {% if loop.first %}
+            {% set hasProCons = true %}
+            <div class="product-procons mt-4 d-none d-md-block">
+          {% endif %}
+
+            {% set specValues = spec.value | split(';') %}
+
+            {% for specValue in specValues %}
+              <div class="product-procon d-flex align-items-center pb-1">
+                <i class="procon-icon white mr-2 {{ (spec.title | lower) == 'pros' ? 'icon-check-b bg-success' : 'icon-x bg-non-success'}}"></i> {{ specValue }}
+              </div>
+            {% endfor %}
+        {% endfor %}
+        {% if hasProCons %}</div>{% endif #}
+
+        {% set lastCategory = false %}
+        {% set lastDepth = 1 %}
+
+        {% for category in product.categories %}
+          {% if category.depth >= lastDepth %}
+            {% set lastCategory = category.url %}
+            {% set lastDepth = category.depth %}
+          {% endif %}
+        {% endfor %}
+
+      {% if theme.product_custom_detail_position == 'above_related' %}
+        {% for spec in product.specs if (spec.title starts with 'custom_details' and ';' in spec.value) %}
+          {% set values = spec.value | split(';') %}
+          <div class="d-nodne d-md-block">
+            <div class="toggle-title ztoggle-title-md gray-border-bottom -lte-md py-2 mt-0 mt-md-4 py-md-2"><h3 class="pp-section-title">{{ values[0] | trim }}</h3></div>
+            <div class="toggle-content ztoggle-content-md">
+              <ul class="product-custom-detail-list">
+                {% for value in values if value != values[0] %}
+                <li>{{ value | trim | t | raw }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+        {% if theme.product_serviceblock_enabled %}
+        <div id="product-serviceblock" class="mt-4 d-none d-md-flex">
+          {% if theme.product_serviceblock_image_enabled %}<img id="product-serviceblock-img" src="{{ 'product-serviceblock-image.png' | url_asset }}" loading="lazy" class="img-responsive" widht="64" height="64">{% endif %}
+          <div>
+          <div class="bold fz-110">{{ theme.product_serviceblock_title | t | raw }}</div>
+          <div class="lh-130">{{ theme.product_serviceblock_content | t | raw }}</div>
+          </div>
+        </div>
+        {% endif %}
+
+          {% if product.bundles and not productFeatures['bundle'] %}
+          <div class="product-bundles mt-4">
+            <h3 class="pp-section-title py-2mb-2py-md-0 mb-2">{{ 'Product bundels' | t }}</h3>
+              {% include 'snippets/product-bundles.rain' with {'type': 'aside'} %}
+          </div>
+
+           <script src="{{ 'gui.js' | url_core }}" defer></script>
+          {% endif %}
+
+          {% if (product.related or theme.enable_auto_related_products) %}
+          <div class="relat mt-4 pos-relative">
+            <h3 class="pp-section-title">{{ 'Related products' | t }}</h3>
+            <div id="pp-related-products" class="mx-n2zz static-products-holder translucent-whiteapply-shadowpx-3"> {# overflow-x-hidden">#}
+            {% if product.related %}
+              <div class="content-scroll-overflowcontent-scroll-overflow-desktoppx-2 custom-scrollbar">
+
+                  {% include 'snippets/products.rain' with {'mode': 'list_mini', 'products': product.related, 'limit':5} %}
+
+              </div>
+            {% else %}
+              <div class="dynamic-products content-scroll-overflowcontent-scroll-overflow-desktoppx-2 custom-scrollbar" data-products-url="{{ (lastCategory ?: 'collection') | url }}?request_type=ajax&amp;request_action=collection&amp;mode=list_mini&amp;limit=5&amp;sort=popular&amp;exclude={{ product.id }}&amp;fclass=mt-0">
+              <div class="mt-3 w-100 p-3">
+                <div class="loader-icon loader-icon-small"></div>
+              </div>
+              </div>
+            {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if product.tags and theme.show_product_tags %}
+            <div class="tagcloud mt-4">
+              {% for tag in product.tags if 'blog_' not in tag.title %}
+                <a href="{{ tag.url | url }}" title="{{ tag.title }}" class="tagcloud-tag">{{ tag.title }} <span>({{ tag.count }})</span></a>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+        {# mobile only service callout #}
+        {% if theme.product_serviceblock_enabled %}
+        <div id="product-serviceblock" class="mt-4 d-flex d-md-none">
+          {% if theme.product_serviceblock_image_enabled %}<img id="product-serviceblock-img" src="{{ 'product-serviceblock-image.png' | url_asset }}" loading="lazy" class="img-responsive" widht="64" height="64">{% endif %}
+          <div>
+          <h5 class="fz-110">{{ theme.product_serviceblock_title | t | raw }}</h5>
+          <div class="lh-130 mt-1">{{ theme.product_serviceblock_content | t | raw }}</div>
+          </div>
+        </div>
+        {% endif %}
+        {# end mobile only service callout #}
+
+      </div>
+    
+      {% if (product.related or theme.enable_auto_related_products) and false %}
+      <div class="mt-4 container">
+        <h2 class="py-2 mb-2 py-md-0 mb-md-2">{{ 'Related products' | t }}</h2>
+        <div id="pp-related-products" class="pos-relative product-slider"> {# overflow-x-hidden">#}
+        {% if product.related %}
+          <div class="row static-products-holder">
+
+              {% include 'snippets/products.rain' with {'mode': 'mini_list', 'products': product.related} %}
+
+          </div>
+        {% else %}
+          <div id="pp-related-dynamic" class="py-2 my-n2 dynamic-products row flex-nowrap static-products-holder horizontal-scroller horizontal-scroller-with-nav" data-revalidate-on-change data-products-url="{{ (lastCategory ?: 'collection') | url }}?request_type=ajax&amp;request_action=collection&amp;mode=grid&amp;limit=8&amp;sort=popular&amp;exclude={{ product.id }}&amp;col_width=3" data-event-complete="themeProductGridChanged">
+          <div class="mt-3 w-100 p-3">
+            <div class="loader-icon loader-icon-small"></div>
+          </div>
+          </div>
+        {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    
+		</div>
+	</div>
+</div>
+  
+  {% if page.recent %}
+  <h2 class="mt-5">{{ 'Recently viewed' | t }}</h2>
+  <div class="static-products-holder row">
+  	{% include 'snippets/products.rain' with {products: page.recent, mode: 'grid', col_width:3, limit:4} %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="productpage fancy-modal specs-modal-holder">
+  <div class="specs-modal rounded">
+    <div class="x"></div>
+    <h4 style="margin-bottom:15px;">{{ 'Specifications' | t }}</h4>
+    {% include 'snippets/product-specifications.rain' with {'limit': 1000} %}
+  </div>
+</div>
+
+<div class="productpage fancy-modal reviews-modal-holder">
+  <div class="reviews-modal rounded">
+    <div class="x"></div>
+    
+    <div class="reviews">
+      {% include 'snippets/product-reviews.rain' with {'limit': 1000, 'hide_review_buttons': true} %}
+    </div>
+  </div>
+</div>
+
+{% if product.data_02 == 'sizechart' or theme.sizechart == 'always' %}
+<div class="fancy-modal p-3" id="fancy-sizechart" data-type="modal">
+	<div class="fancy-modal-inner fancy-modal-medium pos-relative p-3 p-sm-4 p-md-5">
+    <i class="icon-x-l close-fancy close-icon-absolute"></i>
+    <div class="modal-content content overflow-x-auto"></div>
+  </div>
+</div>
+{% endif %}
+
+{% if theme.inventory_per_location or request.get.inventory_location == 'true' %}
+<div class="fancy-modal p-3" id="fancy-stock-location" data-type="modal">
+  <div class="fancy-modal-inner fancy-modal-medium pos-relative p-3 p-sm-4 p-md-5">
+    <i class="icon-x-l close-fancy close-icon-absolute"></i>
+    
+    
+    <h2>{{ 'Available in store' | t }}</h2>
+    <div id="store-inventory-content" class="mt-4">
+    
+    </div>
+    <div id="stock-modal-store-bottom" class="mt-4">
+      <div class="fz-090">
+        {{ 'Online and in-store prices may differ' | t }}
+      </div>
+      <div class="fz-080">
+        <strong>{{ 'Last updated' | t }}</strong>: {{ 'Today at' | t }} {{ now | date('H:i') }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+</div>

@@ -1,0 +1,49 @@
+{% if logoText %}
+
+  {% if theme.logo_position == 'left' and position == 'left' %}
+    <a href="{{ '' | url }}">
+      <h1 class="text-logo d-none d-lg-inline-block">{{ logoText | raw }}</h1>
+    </a>
+	{% elseif theme.logo_position == 'left' and position == 'center' %}
+    <a href="{{ '' | url }}">
+      <h1 class="text-logo d-inline-block d-lg-none">{{ logoText | raw }}</h1>
+    </a>
+	{% elseif theme.logo_position == 'center' and position == 'center' %}
+    <a href="{{ '' | url }}">
+      <h1 class="text-logo">{{ logoText | raw }}</h1>
+    </a>
+	{% endif %}
+
+{% else %}
+
+  {% if theme.logo_position == 'left' and position == 'left' %}
+    <a href="{{ '' | url }}" class="mr-3 mr-sm-0">
+<!--       <img class="logo" src="{{ logoUrl }}" alt="{{ shop.title }}"> -->
+    	{% if logoUrlMobile and theme.enable_logo_mobile %}
+        <img class="logo d-none d-sm-inline-block" src="{{ logoUrl }}" alt="{{ shop.title }}">
+        <img class="logo mobile-logo d-inline-block d-sm-none" src="{{ logoUrlMobile }}" alt="{{ shop.title }}">
+    	{% else %}
+      	<img class="logo" src="{{ logoUrl }}" alt="{{ shop.title }}">
+    	{% endif %}
+    </a>
+	{# elseif theme.logo_position == 'left' and position == 'center' and false %}
+		<a href="{{ '' | url }}" class="d-lg-none">
+    	{% if mobileLogoUrl %}
+        <img class="logo d-none d-sm-inline-block" src="{{ logoUrl }}" alt="{{ shop.title }}">
+        <img class="logo mobile-logo d-inline-block d-sm-none" src="{{ logoUrlMobile }}" alt="{{ shop.title }}">
+    	{% else %}
+      	<img class="logo" src="{{ logoUrl }}" alt="{{ shop.title }}">
+    	{% endif %}
+    </a>#}
+	{% elseif theme.logo_position == 'center' and position == 'center' %}
+    <a href="{{ '' | url }}" class="d-inline-blockzz mr-3 mr-sm-0">
+    	{% if logoUrlMobile and theme.enable_logo_mobile %}
+        <img class="logo d-none d-sm-inline-block" src="{{ logoUrl }}" alt="{{ shop.title }}">
+        <img class="logo mobile-logo d-inline-block d-sm-none" src="{{ logoUrlMobile }}" alt="{{ shop.title }}">
+    	{% else %}
+      	<img class="logo" src="{{ logoUrl }}" alt="{{ shop.title }}">
+    	{% endif %}
+    </a>
+	{% endif %}
+
+{% endif %}

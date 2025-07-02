@@ -1,0 +1,28 @@
+{# snippets/home-mod-video.rain #}
+{% if not theme.home_vid_fullwidth and not theme.home_mod_video_fullwidth %}
+<div class="container">
+{% endif %}
+  
+  <div id="home-video-holder" class="banner-holder">
+	<video id="home-video" loop="true" muted="true" autoplay="true" playsinline="true">
+		<source src="{{ theme.home_vid_url }}" type="video/mp4">
+	</video> 
+    
+<a href="{{ theme.home_vid_button_url | t }}" class="banner-content-holder banner-overlay">
+            <div class="banner-content align-items-end justify-content-end">
+            <div class="banner-text text-right">
+              <div class="banner-text-block block-acrylic-none">
+                <h2 class="banner-title c-inherit" style="">{{ theme.home_vid_title | t }}</h2>
+                <div class="banner-subtitle mt-1 fz-110" style="">{{ theme.home_vid_sub | t }}</div>
+							</div>
+              {% if theme.home_vid_button_text %}
+              <span class="mt-2 button button-medium banner-button- with-icon ">{{ theme.home_vid_button_text | t }} <i class="icon-arrow-right"></i></span>
+              {% endif %}
+            </div>
+          	</div>
+          </a>
+    
+  </div>
+{% if not theme.home_vid_fullwidth and not theme.home_mod_video_fullwidth %}
+</div>
+{% endif %}

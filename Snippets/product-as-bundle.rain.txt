@@ -1,0 +1,247 @@
+{% if productAsABundleType == 'bundles' %}
+
+  {% for bundle in product.bundles | limit(1) %}
+
+    {# determine specific stock status #}
+    {% set stockText = 'In stock' %}
+    {% set stockType = 'in-stock' %}
+
+    {% if product.stock.track %}
+      {% if not product.stock.available and not product.stock.on_stock %}
+        {% set stockText = 'Out of stock' %}
+        {% set stockType = 'out-of-stock' %}
+      {% elseif product.stock.available and not product.stock.on_stock %}
+        {% set stockText = 'Backorder' %}
+        {% set stockType = 'backorder' %}
+      {% endif %}
+    {% endif %}
+
+<form id="bundle_configure_form_{{ bundle.id }}" class="bundle-item-{{ bundle.id }} mt-3">
+  <input name="main_product_variant" value="{{ product.vid }}" type="hidden">
+  
+  <div id="product-as-bundle">
+    
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-xl-3">
+    {% for bundleProduct in bundle.products %}
+    <div class="col text-centerd">
+      
+      <div class="bundle-as-product-item with-shadow box-shadow mt-3 d-flex flex-row flex-xl-column align-items-center align-items-xl-stretch">
+        <a href="{{ bundleProduct.url | url }}" class="bundle-as-product-image-holder gray-overlay">
+          <img src="{{ bundleProduct.image | url_image(imageSize, bundleProduct.fulltitle) }}" alt="{{ bundleProduct.fulltitle }}" class="img-responsive" />
+        </a>
+
+<!--         <div class="mt-auto"></div> -->
+        
+        <div class="p-3 d-flex h-100 align-items-center flex-grow-1">
+          <div class="w-100">
+        <h5 class="producttitle"><a href="{{ bundleProduct.url | url }}" target="_blank">{{ bundleProduct.title }}</a> {% if bundleProduct.variant %} <span class="varianttitle">{{ bundleProduct.variant }}</span>{% endif %}</h5>
+        
+        <div>
+          {% if not bundleProduct.variants %}
+          <div class="fz-090 opacity-70">{{ 'Default' | t }}</div>
+          {% else %}
+          {{ bundleProduct | html_bundle_item_configure(product, bundle) | raw }}
+          {% endif %}
+        </div>
+          </div>
+        
+      </div>
+      </div>
+      
+    </div>
+    {% endfor %}
+  </div>
+  
+  <div class="row align-items-center mt-5">
+      
+    <div class="col-6 col-md-12 col-lg-4 product-price lh-1">
+       <div class="c-{{ stockType }} bold nowrap mb-2"><i class="icon-check-b"></i> {{ stockText | t }}</div>
+      
+      {% if product.price.price_old %}
+      <span class="price-old margin-right-10">{{ product.price.price_old | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}</span>
+      {% endif %}
+
+      <span class="price margin-right-10">{{ bundle.price.price | money_without_currency }}</span>
+
+      <span class="nowrap">
+        <span class="price-strict" {% if vatSwitcherEnabled %}style="font-weight: bold; font-size: 1em; text-decoration: underline;"{% endif %}>{% if shop.b2b %}{{ 'Excl. VAT' | t }}{% else %}{{ 'Incl. VAT' | t }}{% endif %}</span>
+
+      {% if shop.settings.legal.mode == 'strict' %}
+        <br /><span class="price-strict">* {{ 'Excl. $1' | t('<a href="' ~ 'service/shipping-returns' | url ~ '" class="highlight-txt">' ~ 'Shipping costs' | t ~ '</a>') | raw }}</span>
+      {% endif %} 
+        
+      </span>
+		</div>
+    
+    <div class="col-12 col-md-12 col-lg-8 mt-2 mt-lg-0">
+      <button id="bundle-add-to-cart-button" type="submit" name="addtocart" class="fz-110 p-0 w-100 button button-cta add-to-cart-button add-bundle-btn" onclick="javascript: THEME_add_product_bundle('{{ bundle.id }}'); return false;"{% if not bundle.stock.available %} style="display:none"{% endif %}>
+        <span class="button-content">
+          <span class="flex-grow-1 align-self-center px-3">{{ 'Add to cart' | t }}</span>
+          <span class="button-icon">
+            <i class="px-3 icon-{{ theme.cart_icon }}"></i>
+          </span>
+        </span>
+      </button>
+      
+    <button id="bundle-add-to-cart-button" type="button" name="addtocart" class="fz-110 p-0 w-100 button button-cta out-of-stock add-to-cart-button c-white" onclick="return false;"{% if bundle.stock.available %} style="display:none"{% endif %}>
+      {{ 'Out of stock' | t }}
+    </button>
+    </div>
+
+  </div>
+    
+        {% if product.data_02 == 'sizechart' or theme.sizechart == 'always' %}
+        <div class="mt-2 text-right">
+          {% if shop.settings.wish_list %}
+          <a href="{{ ('account/wishlistAdd/' ~ product.id ~ '?variant_id=' ~ product.vid) | url }}" class="mr-2">
+            <i class="icon-heart fz-150"></i>
+          </a>
+          {% endif %}
+          
+          <a href="{{ ('service/'~'sizechart') | url }}" id="sizechart-button" class="button-utton-medium trigger-live-modal" data-modal="fancy-sizechart" data-json-url="{{ ('service/'~'sizechart') | url }}?format=json">
+            <i class="icon-sizeguide fz-130 mr-2"></i>
+            <span>{{ 'Size chart' | t }}</span>
+          </a>          
+        </div>
+        {% endif %}
+    
+  </div>
+</form>
+
+<script>
+  
+function update_variant_option(selected, bundleId)
+{
+  var action    = $(selected).attr('data-action') + '?format=json';
+  var form_data = $(selected).closest('form').serialize();
+
+  var bundleItemForm = $(selected).closest('form');
+  var oldPrice = bundleItemForm.find('.old-price');
+  var price = bundleItemForm.find('.price');
+  var discount = bundleItemForm.find('.product-details .discount');
+  var discountTitle = discount.find('h1, h2, h3, h4, h5, h6');
+  var discountClone = discount.clone();
+  discountClone.find('h3').remove();
+  var discountText = discountClone.text();
+
+  var bundleItem = $('.bundle-item-' + bundleId);
+  var bundleItemBtn = bundleItem.find('.add-bundle-btn');
+  var bundleItemStock = bundleItem.find('.out-of-stock');
+
+  var request = $.ajax({
+    url: action,
+    method: 'POST',
+    data: form_data,
+    dataType: 'JSON'
+  });
+
+  request.done(function(result){
+    // Display prices
+    oldPrice.text(result.view.price_old);
+    price.text(result.view.price);
+
+    if (discount) {
+      if (discountTitle.length) discountTitle = discountTitle[0].outerHTML;
+      else discountTitle = '';
+      discount.html(discountTitle + discountText.replace(/\d{1,3}\%/, result.view.percentage));
+    }
+
+    bundleItemBtn.toggle(result.stock.available);
+    bundleItemStock.toggle(!result.stock.available);
+
+    Object.keys(result.selected_variants).forEach(function(key) {
+      var selected_variant_id = result.selected_variants[key];
+      var input_name = 'bundle_products[' + bundleId + '][' + key + ']';
+
+      $('input[name=\"' + input_name + '\"]').remove(); // Removes previously set variants
+
+      // Adds the new ones
+      $('<input>').attr({
+        type: 'hidden',
+        name: input_name,
+        value: selected_variant_id
+      }).appendTo('#bundle_configure_form_' + bundleId);
+    });
+  });
+}
+  
+function THEME_add_product_bundle(bundle_id) {
+  $('#bundle-add-to-cart-button').html('<i class="icon-loader-rect icon-large icon-spin"></i>');
+  var bundles           = $('#bundle_configure_form_' + bundle_id + ' input[name^=bundle_products]');
+  var bundleConfigId    = $('#product_configure_form #product_configure_bundle_id');
+  var productConfigForm = $('#product_configure_form');
+
+  bundles.each(function(idx, elem){
+    $(elem).appendTo('#product_configure_form');
+  });
+
+  bundleConfigId.val(bundle_id);
+  productConfigForm.submit();
+}
+</script>
+{% endfor %}
+{% else %}
+	{# related as a bunde #}
+
+	{% set bundle_total_price = 0 %}
+  <form id="" action="{{ '/cart/addBulk'| url }}" method="POST" class="mt-3">
+    <div id="product-as-bundle">      
+      <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-xl-3">
+      {% for relatedProduct in product.related %}
+        {% set bundle_total_price = bundle_total_price + relatedProduct.price.price  %}
+        <div class="col">
+          <div class="bundle-as-product-item with-shadow box-shadow mt-3 d-flex flex-row flex-xl-column align-items-center align-items-xl-stretch">
+            <a href="{{ relatedProduct.url | url }}" class="bundle-as-product-image-holder gray-overlay">
+              <img src="{{ relatedProduct.image | url_image(imageSize, relatedProduct.fulltitle) }}" alt="{{ bundleProduct.fulltitle }}" class="img-responsive" />
+            </a>
+
+            <div class="p-3 d-flex h-100 align-items-center flex-grow-1">
+              <div class="w-100">
+                <h5 class="producttitle"><a href="{{ relatedProduct.url | url }}" target="_blank">{{ relatedProduct.title }}</a> {% if relatedProduct.variant %} <span class="varianttitle">{{ bundleProduct.variant }}</span>{% endif %}</h5>
+
+                <div class="product-as-bundle-variants" data-json="{{ relatedProduct.url | url | replace({'.html': '.html?format=json'}) }}">
+                	<div class="fz-090 opacity-70">{{ 'Default' | t }} - {{ relatedProduct.price.price | money_without_currency }}</div>
+                </div>
+              </div>
+          </div>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+
+      <div class="row align-items-center mt-5">
+        <div class="col-6 col-md-12 col-lg-4 product-price lh-1">
+           <div class="c-{{ stockType }} bold nowrap mb-2"><i class="icon-check-b"></i> {{ stockText | t }}</div>
+          {% if product.price.price_old %}
+          <span class="price-old margin-right-10">{{ product.price.price_old | money_without_currency }}{% if shop.settings.legal.mode == 'strict' %} {{ 'SRP' | t }}{% endif %}</span>
+          {% endif %}
+
+          <span class="price margin-right-10">{{ bundle_total_price | money_without_currency }}</span>
+
+          <span class="nowrap">
+            <span class="price-strict" {% if vatSwitcherEnabled %}style="font-weight: bold; font-size: 1em; text-decoration: underline;"{% endif %}>{% if shop.b2b %}{{ 'Excl. VAT' | t }}{% else %}{{ 'Incl. VAT' | t }}{% endif %}</span>
+
+          {% if shop.settings.legal.mode == 'strict' %}
+            <br /><span class="price-strict">* {{ 'Excl. $1' | t('<a href="' ~ 'service/shipping-returns' | url ~ '" class="highlight-txt">' ~ 'Shipping costs' | t ~ '</a>') | raw }}</span>
+          {% endif %} 
+          </span>
+        </div>
+
+
+        <div class="col-12 col-md-12 col-lg-8 mt-2 mt-lg-0">
+          <button id="bundle-add-to-cart-button" type="submit" name="addtocart" class="fz-110 p-0 w-100 button button-cta add-to-cart-button add-bundle-btn" onclick="">
+            <span class="button-content">
+              <span class="flex-grow-1 align-self-center px-3">{{ 'Add all to cart' | t }}</span>
+              <span class="button-icon">
+                <i class="px-3 icon-{{ theme.cart_icon }}"></i>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+	{# end related as a bunde #}
+{% endif %}
