@@ -1,0 +1,169 @@
+<header id="header" class="usp-carousel-pos-{{ uspCarouselPosition }}{% if theme.navigation_mode == 'menubar' %} header-scrollable{% endif %}">
+<div id="header-holder" class="usp-carousel-pos-{{ uspCarouselPosition }}{% if theme.navigation_mode != 'menubar' %} header-scrollable{% endif %}{% if theme.header_shadow_effect %} header-has-shadow{% elseif theme.header_bgcolor == theme.navbar_bgcolor and theme.navigation_mode == 'menubar' %} no-shadow-on-scroll{% endif %}">
+  {% if uspCarouselPosition == 'top' %}
+    {% include 'snippets/usp-carousel.rain' with {'position': 'top'} %}
+  {% endif %}
+  
+  <div id="header-content" class="container logo-{{ theme.logo_position }} d-flex align-items-center {% if theme.logo_position =='center' %}justify-content-md-between{% endif %}">
+    <div id="header-left" class="header-col d-flex align-items-center{% if theme.navigation_mode != 'menubar' %} with-scrollnav-icon{% endif %}">      
+      <div id="mobilenav" class="nav-icon hb-icon d-lg-none" data-trigger-fancy="mobile-nav-holder">
+            <div class="hb-icon-line line-1"></div>
+            <div class="hb-icon-line line-2"></div>
+            <div class="hb-icon-label">{{ 'Menu' | t }}</div>
+      </div>
+      {% if theme.navigation_mode == 'button' %}
+      <div id="scroll-nav" class="nav-icon hb-icon d-none mr-3">
+            <div class="hb-icon-line line-1"></div>
+            <div class="hb-icon-line line-2"></div>
+            <div class="hb-icon-label">{{ 'Menu' | t }}</div>
+      </div>
+      {% endif %}
+      
+      {% if theme.logo_position == 'left' %}
+        {% include 'snippets/header-logo.rain' with {'position': 'left'} %}
+      {% endif %}
+      
+      <form id="header-search" action="{{ 'search' | url }}" method="get" class="search-form-icon-inside d-none{% if theme.logo_position == 'left' %} d-lg-block ml-4{% else %} header-search-small d-md-block header-search-left mr-3{% endif %}{% if twkInstance %} is-dummy{% endif %}"{% if twkInstance %} onsubmit="return false;"{% endif %}>
+        <input id="header-search-input"  maxlength="50" type="text" name="q" class="theme-input search-input header-search-input{% if theme.searchbox_white %} as-body border-none{% endif %}{% if theme.searchbox_rounded %} br-xl pl-20{% endif %}" placeholder="{{ 'Search' | t }}..">
+        <button class="search-button{% if theme.searchbox_rounded %} r-10{% endif %}" type="submit"><i class="icon-search{% if theme.searchbox_white %} c-body-text{% endif %}"></i></button>
+        <div id="search-results" class="as-body px-3 py-3 pt-2 row apply-shadow{% if theme.logo_position == 'center' %} search-results-left{% endif %}"></div>
+      </form>
+    </div>
+    {% if theme.logo_position == 'center' %}
+    <div id="header-center" class="header-col d-flex justify-content-md-center">
+      {% include 'snippets/header-logo.rain' with {'position': 'center'} %}
+    </div>
+    {% endif %}
+    
+    <div id="header-right" class="header-col {{ theme.header_icons_show_label ? 'with' : 'without' }}-labels">
+      <div id="header-fancy-account" class="header-item">
+        {% if page.account %}
+          <a href="{{ 'account' | url }}" class="header-link" data-tooltip title="{{ 'My account' | t }}" data-placement="bottom">
+            <i class="header-icon icon-user"></i>
+            <span class="header-icon-label">
+              <span class="fz-0-8 d-block">{{ 'Welcome' | t }},</span>
+              <strong>{{ page.account.firstname ?: ('My account' | t) }}</strong>
+            </span>
+          </a>
+        {% else %}
+            <span class="header-link" data-tooltip title="{{ 'My account' | t }}" data-placement="bottom" data-trigger-fancy="fancy-account" data-fancy-type="hybrid">
+            <i class="header-icon icon-user"></i>
+            <span class="header-icon-label">{{ 'My account' | t }}</span>
+            </span>
+        {% endif %}
+      </div>
+      
+      <div id="header-fancy-cart" class="header-item mr-0">
+        <a href="{{ 'cart' | url }}" id="cart-header-link" class="cart header-link justify-content-center" data-trigger-fancy="fancy-cart">
+            <i id="header-icon-cart" class="icon-{{ theme.cart_icon }}"></i><span id="cart-qty" class="{{ theme.cart_icon }}">{{ cartqty }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobile-search-row" class="container d-md-none">
+    <form id="mobile-header-search" action="{{ 'search' | url }}" method="get" class="search-form-icon-inside {% if twkInstance %} is-dummy{% endif %}"{% if twkInstance %} onsubmit="return false;"{% endif %}>
+        <input id="mobile-header-search-input" maxlength="50" type="text" name="q" class="theme-input search-input header-search-input{% if theme.searchbox_white %} as-body border-none{% endif %}{% if theme.searchbox_rounded %} br-xl pl-20{% endif %}" placeholder="{{ 'Search' | t }}..">
+        <button class="search-button{% if theme.searchbox_rounded %} r-10{% endif %}" type="submit"><i class="icon-search{% if theme.searchbox_white %} c-body-text{% endif %}"></i></button>
+    </form>
+  </div>
+
+  <div class="nieuwe-navigatiebalk-container container d-none d-lg-flex" style="background-color: #f9f9f9; border-bottom: 1px solid #e0e0e0; justify-content: space-between; align-items: center;">
+      <div class="navigatie-links-sectie" style="display: flex; align-items: center; padding: 8px; flex-grow: 1;">
+          
+          <nav class="subheader-nav" style="margin-right: 15px;">
+              <div id="main-categories-button" class="knop-assortiment-stijl">
+                  Assortiment
+                  <div class="nav-icon arrow-icon">
+                      <div class="arrow-icon-line-1"></div>
+                      <div class="arrow-icon-line-2"></div>
+                  </div>
+              </div>
+              {% include 'snippets/navigation-vertical.rain' %}
+          </nav>
+
+          <div class="populaire-keuzes-sectie">
+              <span class="populaire-keuzes-label">Populaire keuzes:</span>
+              <a href="/weekdeals" class="knop-weekdeals-hover populaire-keuze-link">Weekdeals</a>  
+              <a href="https://www.kittenenlijmen.nl/kitten/siliconenkit/" class="populaire-keuze-link">Siliconenkit</a>
+              <a href="https://www.kittenenlijmen.nl/kitten/montagekit/" class="populaire-keuze-link">Montagekit</a>
+              <a href="https://www.kittenenlijmen.nl/kitten/beglazingskit/" class="populaire-keuze-link">Beglazingskit</a>
+              <a href="/purschuim" class="populaire-keuze-link">Purschuim</a>
+          </div>
+      </div>
+      <div class="navigatie-rechts-sectie" style="padding: 8px; margin-left: auto; display: flex; align-items: center;">
+          {% include 'snippets/header-brands-dropdown.rain' %}
+          {% if vatSwitcherEnabled %}
+            <div class="d-none d-lg-flex align-items-center subheader-vat">
+                {% include 'snippets/vat-switcher.rain' %}
+            </div>
+          {% endif %}
+      </div>
+  </div>
+</div>
+</header>
+  
+{% if theme.notification_enabled or request.get.notificationbar == 'true' %}
+<div id="notification-holder" class="container{% if theme.notification_fullwidth or request.get.notification_fullwidth == 1 %} notification-full-width{% endif %}" {% if request.get.notificationbar == 'true' %} style="display:block;"{% endif %}>
+<div id="notification">
+  <div>{{ theme.notification_text | t | raw }}</div>
+  <i class="icon-x-l" id="close-notification"></i>
+</div>
+</div>
+<script>
+if( !localStorage.getItem('{{ theme.notification_name }}') )
+{
+  let notificationElement = document.getElementById('notification-holder');
+  notificationElement.style.display = 'block';
+  document.getElementById('close-notification').addEventListener('click', function()
+  {
+    localStorage.setItem('{{ theme.notification_name }}', true);
+    notificationElement.style.display = 'none';
+  })
+}
+</script>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Script voor Assortiment menu (hover open/close)
+    let menuHideTimer = null;
+    const menuTrigger = document.querySelector('#main-categories-button');
+    const menuContainer = document.querySelector('.nav-main-holder');
+
+    function showAndKeepOpen() {
+        clearTimeout(menuHideTimer);
+        if (menuTrigger) menuTrigger.classList.add('active');
+        if (menuContainer) menuContainer.classList.add('active');
+    }
+
+    function startHideTimer() {
+        clearTimeout(menuHideTimer);
+        menuHideTimer = setTimeout(function() {
+            if (menuTrigger) menuTrigger.classList.remove('active');
+            if (menuContainer) menuContainer.classList.remove('active');
+        }, 150);
+    }
+
+    if (menuTrigger && menuContainer) {
+        menuTrigger.addEventListener('mouseenter', showAndKeepOpen);
+        menuContainer.addEventListener('mouseenter', showAndKeepOpen);
+        menuTrigger.addEventListener('mouseleave', startHideTimer);
+        menuContainer.addEventListener('mouseleave', startHideTimer);
+    }
+
+    // Script om te kijken of de zoek-popup actief is
+    const searchResults = document.getElementById('search-results');
+    if (searchResults) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    const searchIsActive = searchResults.classList.contains('active');
+                    document.body.classList.toggle('overlay-active', searchIsActive);
+                }
+            });
+        });
+        observer.observe(searchResults, { attributes: true });
+    }
+});
+</script>

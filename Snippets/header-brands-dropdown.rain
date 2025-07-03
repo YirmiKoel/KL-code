@@ -1,0 +1,22 @@
+{# snippets/header-brands-dropdown.rain #}
+{% if shop.brands %} {# We houden deze if om de knop te verbergen als er helemaal geen merken zijn #}
+  <div class="header-item-dropdown" id="brands-header-dropdown">
+
+    {# De link/knop die de dropdown activeert #}
+    <a href="{{ 'brands' | url }}" class="subheader-link">
+      {{ 'Merken' | t }}
+      <i class="icon-angle-down" style="font-size:8px;"></i>
+    </a>
+
+    {# Dropdown-paneel dat verschijnt bij hover #}
+    <div class="brand-logos-dropdown" id="brands-menu-content">
+      <div class="container">
+        {# DEZE CONTAINER WORDT NU DOOR JAVASCRIPT GEVULD #}
+        <div class="all-brands-grid-container">
+            <p style="text-align: center; padding: 20px 0; color: #777;">Merken worden geladen...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endif %}    

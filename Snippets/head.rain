@@ -2,23 +2,6 @@
 {% if not theme.use_custom_font_css and not shop.gdpr_theme %}<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>{% endif %}
 
-<!--
-
-    Theme Proxima | v1.0.0.1903202301_{{ shop.settings.template_editor ? '1' : '0' }}_{{ shop.id }}
-    Theme designed and created by Dyvelopment - We are true e-commerce heroes!
-
-    For custom Lightspeed eCom development or design contact us at www.dyvelopment.com
-
-      _____                  _                                  _   
-     |  __ \                | |                                | |  
-     | |  | |_   ___   _____| | ___  _ __  _ __ ___   ___ _ __ | |_ 
-     | |  | | | | \ \ / / _ \ |/ _ \| '_ \| '_ ` _ \ / _ \ '_ \| __|
-     | |__| | |_| |\ V /  __/ | (_) | |_) | | | | | |  __/ | | | |_ 
-     |_____/ \__, | \_/ \___|_|\___/| .__/|_| |_| |_|\___|_| |_|\__|
-              __/ |                 | |                             
-             |___/                  |_|                             
--->
-
 {% if twkInstance %}
 <script>
   window.tweakwiseNavigationCid = '{{ collection.category_id }}';
@@ -30,7 +13,8 @@
 
 <title>{{ page.title }} - {{ shop.name }}</title>
 
-{# Do not edit the code below. Doing so will break your apps #}
+{# Do not edit the code below.
+Doing so will break your apps #}
 <meta name="dyapps-addons-enabled" content="{{ theme.dyapps_addons_enabled ? 'true' : 'false' }}">
 <meta name="dyapps-addons-version" content="2022081001">
 <meta name="dyapps-theme-name" content="Proxima">
@@ -88,15 +72,9 @@
   <link rel="stylesheet" href="{{ 'gui-nova.css' | url_asset }}" />
 {% endif %}
 
-<!-- <link rel="preload" href="{{ 'style.css' | url_asset }}" as="style">-->
 <link rel="stylesheet" href="{{ 'style.css' | url_asset }}?{{ 'now' | date('U') }}" />
-<!-- <link rel="preload" href="{{ 'style.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'"> -->
-
 <link rel="preload" href="{{ 'shopmonkey.css' | url_asset }}?{{ 'now' | date('U') }}" as="style">
 <link rel="stylesheet" href="{{ 'shopmonkey.css' | url_asset }}?{{ 'now' | date('U') }}">
-
-<link rel="stylesheet" href="https://cdn.webshopapp.com/shops/262688/themes/163980/assets/colors.css?2021060713425120201104100027" />
-
 
 {% if theme.use_custom_font_css %}
   {% if theme.headings_font_css_url %}
@@ -144,10 +122,8 @@
 <link rel="preload" href="{{ 'settings.css' | url_asset }}" as="style">
 <link rel="preload" href="{{ 'custom.css' | url_asset }}" as="style">
 <link rel="stylesheet" href="{{ 'settings.css' | url_asset }}" />
+<link rel="stylesheet" href="{{ 'header.css' | url_asset }}" />
 <link rel="stylesheet" href="{{ 'custom.css' | url_asset }}" />
-
-<!-- <link rel="preload" href="{{ 'settings.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-<link rel="preload" href="{{ 'custom.css' | url_asset }}" as="style" onload="this.onload=null;this.rel='stylesheet'"> -->
 
 {% if template == 'pages/product.rain' %}
 	{# keep or not to keep? #}
@@ -172,3 +148,6 @@
 <script type="text/javascript" src="{{ 'swiper-453-min.js' | url_asset }}" defer></script>
 <script type="text/javascript" src="{{ 'global.js' | url_asset }}?{{ 'now' | date('U') }}" defer></script>
 <script type="text/javascript" src="{{ 'shopmonkey.js' | url_asset }}" defer></script>
+
+{# === TOEGEVOEGD: Laadt het script voor de merken dropdown === #}
+<script src="{{ 'custom-brands-dropdown.js' | url_asset }}" defer></script>

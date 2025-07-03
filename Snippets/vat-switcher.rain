@@ -1,0 +1,19 @@
+{#
+  ============================================================================
+  Nieuwe BTW Schakelaar (Definitieve stabiele versie)
+  ============================================================================
+#}
+<div class="vat-switcher-wrapper" data-default="{{ theme.b2b_default_pricing }}">
+    
+    <input type="checkbox" name="toggle_vat" class="vat-switcher-checkbox" id="toggle_vat">
+    
+    <div class="vat-label-state-wrapper">
+      <span class="vat-label-state vat-label-incl">{{ 'Incl.' | t }}</span>
+      <span class="vat-label-state vat-label-excl">{{ 'Excl.' | t }}</span>
+    </div>
+
+    <label for="toggle_vat" class="slider"></label>
+    
+    <span class="vat-label-btw">{{ 'BTW' | t }}</span>
+
+</div>
